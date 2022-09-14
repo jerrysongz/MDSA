@@ -1,0 +1,78 @@
+---
+title: "Untitled"
+output: pdf_document
+date: "2022-09-14"
+---
+
+```{r}
+library(dplyr)  #adds the dplyr package
+library(nycflights13)
+```
+
+```{r}
+names(flights)
+```
+
+
+```{r}
+head(flights,5)
+```
+
+```{r}
+demoairline1 = select(flights, year, month, day, dep_delay, carrier, arr_delay, distance)  #create a new data frame selecting the 6 variables
+head(demoairline1,4) #shows the first four rows
+```
+```{r}
+options(scipen=999) #removes the scientific notation on the y -axis
+ggplot(data=demoairline1, mapping=aes(x=dep_delay)) + geom_histogram(col="red", fill='blue', binwidth=40, na.rm=TRUE) + xlab("Minutes Flight Delayed in Departure") + ggtitle("Frequency Histogram of Flight Delay")
+```
+
+```{r}
+ggplot(data=demoairline1, mapping=aes(x=dep_delay)) + geom_density(col='red', na.rm=TRUE) + xlab("Minutes Flight Delayed in Departure") + ylab("Density") + ggtitle("Density-scale Histogram of Flight Delay")
+
+```
+```{r}
+ggplot(data=demoairline1, mapping=aes(x=dep_delay)) + geom_histogram(col='blue', binwidth=40, na.rm=TRUE) + xlab("Minutes Flight Delayed in Departure") + facet_wrap(~carrier)
+
+```
+
+```{r}
+length(demoairline1$dep_delay)  #counts the number of data points in the variable "dep_delay"
+## [1] 336776
+count(is.na(demoairline1$dep_delay)) #is.na will return each data point as TRUE if there is a N/A (missing data point)
+## n_TRUE 
+##   8255
+#or we can use the ‘filter’ function to visualize the minutes a departing flight is delayed for a certain airline, in the instance below UA (United Airlines) in addition to setting the class limits to: 0<25, 25<50, ⋯, 475<500. The earliest departure delay is -20 minutes, the latest is 486 minutes.
+
+ua.breaks <- seq(-25, 500, 25)
+ua.breaks
+#定好每个bar都是一样大小，25
+```
+```{r}
+ggplot(data = filter(demoairline1, carrier == "UA"), aes(x = dep_delay)) + geom_histogram(col="red", fill="blue", breaks = ua.breaks, na.rm=TRUE) + xlab("Minutes Flight Delayed in Departure") + ylab("Count") + ggtitle("Frequency Histogram for Departure Delay: United Airlines")
+```
+```{r}
+
+delay.breaks <- seq(-100, 1272, 25)
+
+
+ggplot(data=demoairline1, mapping=aes(x=arr_delay)) + geom_histogram(col="red", fill='blue', breaks = delay.breaks, na.rm=TRUE) + xlab("Minutes Flight Delayed in Arr") + ggtitle("Frequency Histogram of Flight arr Delay")
+
+```
+```{r}
+ua.flights <- subset(demoairline1, carrier == "UA")
+head(ua.flights, 4)
+
+length(demoairline1$dep_delay)
+count(is.na(ua.flights$dep_delay)) 
+
+```
+```{r}
+uaflights.early <- nrow(subset(ua.flights, dep_delay < 0))
+uaflights.early
+```
+```{r}
+prop_uaflightsdepartearly <- uaflights.early/uaflights.denominator
+print(prop_uaflightsdepartearly)
+```
+

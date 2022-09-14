@@ -1,0 +1,93 @@
+---
+title: '9.13'
+output: html_document
+date: "2022-09-13"
+---
+
+```{r}
+library(mdsr)  #or click on the mdsr appearing in the Packages tab
+head(SAT_2010, 10)
+
+```
+
+```{r}
+
+library(ggplot2)
+
+ggplot(data=SAT_2010, aes(x = expenditure, y = math)) + geom_point(col='blue', size=2) + xlab("Expenditure $ per Student") + ylab("Average SAT Math Score") + ggtitle("Scatterplot of Averate SAT Score to State Expenditure per Student")
+
+
+```
+
+
+```{r}
+dim(SAT_2010) #gives us no. rows and columns of the SAT_2010 data frame
+```
+
+```{r}
+head(SAT_2010,3)
+```
+
+```{r}
+SAT_2010$sat_pct
+```
+
+
+```{r}
+SAT_2010 = SAT_2010 %>%  
+  mutate(SAT_class = cut(sat_pct, breaks=c(0,33,67,100), labels = c("low", "medium", "high"))) 
+#creates the different bins, 0 < 33 (low), 33 < 67 (medium), 67 < 100 (high)
+
+head(SAT_2010, 10)
+#see the first four rows of the new data set with the new variable SAT_rate
+
+```
+
+
+```{r}
+
+mean(~salary, data=SAT_2010) #computes the average 'average income' for all N = 50 states
+SAT_2010$salary
+```
+```{r}
+median(~salary, data=SAT_2010)
+```
+
+
+```{r}
+max(~salary,data=SAT_2010)
+```
+
+
+```{r}
+table(SAT_2010$SAT_class)
+```
+```{r}
+ggplot(data=SAT_2010, aes(x = expenditure, y = math, color=SAT_class)) + geom_point(size=2, position="jitter") + xlab("Expenditure $ per Student") + ylab("Average SAT Math Score") + ggtitle("Scatterplot of Average SAT Math Score to Student Expenditure - by SAT CLASS")
+
+```
+
+```{r}
+ggplot(data=SAT_2010, aes(x = expenditure, y = math, color=SAT_class)) + geom_point(size=2, position="jitter") + xlab("Expenditure $ per Student") + ylab("Average SAT Math Score") + facet_wrap(~ SAT_class) +  ggtitle("Scatterplot of Average SAT Math Score to Student Expenditure - by SAT CLASS")
+```
+
+```{r}
+ggplot(data=SAT_2010, aes(x = expenditure, y = math, color=SAT_class)) + geom_point(size=2, position="jitter") + xlab("Expenditure $ per Student") + ylab("Average SAT Math Score") + facet_wrap(~ SAT_class) +  ggtitle("Scatterplot of Average SAT Math Score to Student Expenditure - by SAT CLASS") + geom_smooth(method="lm")
+
+```
+
+```{r}
+ggplot(data=SAT_2010, aes(x = pupil_teacher_ratio, y = salary)) + geom_point(col='blue', size=2) + xlab(" Number of students per class") + ylab("Salary of Teacher") + ggtitle("play2")
+
+
+```
+```{r}
+SAT_2010 = SAT_2010 %>%  
+  mutate(sal_category = cut(salary, breaks=c(40000,50000,60000,70000,80000), labels = c("low", "medium", "medhigh", "high"))) 
+head(SAT_2010,5)
+```
+```{r}
+ggplot(data=SAT_2010, aes(x = pupil_teacher_ratio, y = salary, color=sal_category)) + geom_point(size=2, position="jitter") + xlab(" Number of students per class") + ylab("Salary of Teacher") + ggtitle("play2")
+
+```
+
