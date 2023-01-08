@@ -1,0 +1,610 @@
+---
+editor_options:
+  markdown:
+    wrap: 72
+output:
+  html_document:
+    df_print: paged
+---
+
+**Question 1**
+
+```{r cars}
+library(resampledata)
+library(mosaic)
+```
+
+**Q1. a.**
+
+```{r}
+tail(NCBirths2004, 4)
+#data.frame(table(NCBirths2004$Tobacco))
+data.frame(table(NCBirths2004$Smoker))
+#dfno = NCBirths2004[NCBirths2004$Smoker == 'No', ]
+#dfyes = NCBirths2004[NCBirths2004$Smoker == 'Yes', ]
+#tail(dfyes, 4)
+#tail(dfno, 4)
+favstats(~Weight|Smoker, data=NCBirths2004)
+#favstats(~Weight, data=dfyes)
+nsims = 1000 #the number of simulations
+n.Yes = favstats(~Weight|Smoker, data=NCBirths2004)$n[2] 
+n.No = favstats(~Weight|Smoker, data=NCBirths2004)$n[1]
+#n.Yes
+#n.No
+
+mean.NonSmoke = numeric(nsims) 
+mean.YesSmoke = numeric(nsims) 
+diffmeans = numeric(nsims) 
+No = filter(NCBirths2004, Smoker == 'No')  
+Yes = filter(NCBirths2004, Smoker == 'Yes')   
+
+for(i in 1:nsims)
+{   mean.NonSmoke[i] = mean(sample(No$Weight, n.No, replace=TRUE))  
+    mean.YesSmoke[i] = mean(sample(Yes$Weight, n.Yes, replace=TRUE)) 
+    diffmeans[i] = mean.NonSmoke[i] - mean.YesSmoke[i]  
+}
+boot.diffmeans = data.frame(mean.NonSmoke, mean.YesSmoke, diffmeans)  
+head(boot.diffmeans, 3)
+ggplot(data=boot.diffmeans, aes(x = diffmeans)) + geom_histogram(fill='blue', col='red', binwidth=25) + xlab("Difference Between Mean Weight(NonSmoke - Smoke)") + ggtitle("Distribution of Mean_{NonSmoke} - Mean_{Smoke}")
+```
+
+**Q1. b.**
+
+```{r}
+qdata(~ diffmeans, c(0.025, 0.975), data=boot.diffmeans) 
+
+```
+
+From my result, the 95% Bootstrap Confidence Interval is
+$111.8109 \leq \mu_{NonSmoke} - \mu_{Smoke} \leq 308.5742$
+
+**Q1. c.**
+
+```{r}
+t.test(~Weight|Smoker, data=NCBirths2004, conf.level = 0.95, var.equal=FALSE)  #provides the df and the CI
+
+```
+
+From my result, the 95% Confidence Interval using the t-version is
+$112.3161 \leq \mu_{NonSmoke} - \mu_{Smoke} \leq 317.6881$
+
+**Q1. d.** I can infer that, children born to birth mother who did not
+smoke during pregnancy weigh more on average than babies born to birth
+mothers who did smoke during pregnancy, as the
+$\mu_{NonSmoke} - \mu_{Smoke}$ falls in confidence intervals that both
+upper bound and lower bound are positive.
+
+**Q2. a.**
+
+```{r}
+nsims = 2000
+sd.NonSmoke = numeric(nsims) 
+sd.YesSmoke = numeric(nsims) 
+ratiosd = numeric(nsims) 
+
+for(i in 1:nsims)
+{   sd.NonSmoke[i] = sd(sample(No$Weight, n.No, replace=TRUE))  
+    sd.YesSmoke[i] = sd(sample(Yes$Weight, n.Yes, replace=TRUE)) 
+    ratiosd[i] = sd.NonSmoke[i] / sd.YesSmoke[i]  
+}
+boot.ratiosd = data.frame(sd.NonSmoke, sd.YesSmoke, ratiosd)  
+head(boot.ratiosd, 3)
+
+ggplot(data=boot.ratiosd, aes(x = ratiosd)) + geom_histogram(fill='blue', col='red', binwidth=0.05) + xlab("Ratio of the Sample Standard Deviations") + ggtitle("Distribution of Ratio of the Sample Standard Deviations")
+```
+
+**Q2. b**
+
+```{r}
+ggplot(data=boot.ratiosd, aes(sample = ratiosd)) + stat_qq(size=2, col='blue') + stat_qq_line(col='red') + ggtitle("Normal Probability Plot of Ratio of the Sample Standard Deviations")
+#As the plot shows, the ratio of the sample standard deviations appear to follow a Normal distribution.
+```
+
+**Q2. c**
+
+```{r}
+qdata(~ ratiosd, c(0.025, 0.975), data=boot.ratiosd) 
+
+```
+
+From my result, the 95% Bootstrap Confidence Interval is
+$0.8008792 \leq \frac{\sigma_{Smoke}}{\sigma_{NonSmoke}} \leq 1.0858073$
+
+**Q2. d** the ratio of the sample standard deviations of Weight has a
+95% of confidents falls in between 0.8008792 and 1.0858073, it shows
+$\sigma_{Smoke}$ is less than \sigma\_{NonSmoke}. The Weight of Non
+smoke mom's baby has a more clustered distribution around the mean. The
+Weight of Smoker mom's baby's has a more spread out distribution around
+the mean.
+
+**Q3 .a**
+
+If mercury levels in walleye fish harvested from the Athabaska River
+(downstream of Whitecourt) exceed Heath Canada's action level, then on
+average, $mu_{m} > 1$. If not, on average, $\mu{m} \leq 1$. The
+following are statistical hypotheses:
+
+$$
+\begin{eqnarray}
+{\rm H}_{0}: \mu_{m} & \leq  (= ) & 1 \hspace{0.2in} \text{(the mean of mercury levels from sampling walleyes did not exceed Heath Canada’s action level)} \\
+{\rm H}_{a}: \mu_{m} & > &  1 \hspace{0.2in} \text{(the mean of mercury levels from sampling walleyes exceed Heath Canada’s action level)} \\
+\end{eqnarray}
+$$
+
+**Q3. b.** In the context of my statistical hypotheses in part a, The
+Type I Error should be that, when the mean mercury (in ppm) of walleye
+found downstream from Whitecourt did not exceed Heath Canada's action
+level, we make a decision to conclude that the mean mercury exceed. In a
+other word, When the null hypothesis is True, Reject the null
+hypothesis. The Type II Error should be that, when the mean of mercury
+levels from sampling walleyes exceed Heath Canada's action level, I make
+a decision to conclude that the mean mercury did not exceed. In a other
+word, When the null hypothesis is False, Fail to Reject the null
+hypothesis.
+
+**Q3 c**
+
+```{r}
+
+mercury.data = data.frame(mercury = c(1.2,1.1,1.0,1.0,1.1,1.0,1.0,1.0,0.9,1.1,1.1,1.2,1.0,1.1,1.0, 1.1,1.0,0.9,1.0,1.0,1.1,1.0,1.0,1.1,1.2,1.0,1.1,1.0,1.0,1.2,1.1))
+favstats(~mercury, data=mercury.data) #will compute various minutes arrive late statistics "conditional" upon airline name
+head(mercury.data)
+ggplot(data=mercury.data, aes(x = "", y = mercury)) + geom_violin(col="red", fill="blue") + geom_boxplot(width=0.15, fill="orange", na.rm=TRUE) + xlab("") + ylab("Departure Delay in Minutes") + scale_x_discrete(breaks=NULL) + coord_flip() + ggtitle("Violin and Boxplot of the sample of n = 31 mercury (in ppm) from each walleyes from a recent commercial fishing catch downstream from Whitecourt")
+```
+
+**Q3 d.** These data does suggest that Health Canada should place a
+moritorium on commercial walleye fishing on the Athabaska River
+downstream of Whitecourt.
+
+```{r}
+#I set up The Alpha = 0.05
+t.test(~ mercury, mu=1, alternative="greater", data=mercury.data)
+pvalue = 0.0006595 # 0.0006595 < 0.05
+#p-value < Alpha 
+#Therefore, I reject the null hypothesis.
+t.test(~mercury, data=mercury.data)$conf
+#A 95% confidence interval for the mean mercury (in ppm) of walleye found downstream from Whitecourt.
+#Is [1.021857, 1.081368].
+#In the given scenario, the p-value means that the area under the t-distribution where t > 3.5425.
+#measures how far the test statistic from the H_0.
+```
+
+**Q4**
+
+$$
+\begin{eqnarray}
+{\rm H}_{0}: p  & \leq (=) & \:0.60 \hspace{0.25in} {\rm \text{(the proportion of certified coffee growers in Southern Mexico who are either certified or in the process of being certified, is less or equal than 60%)}} \\
+{\rm H}_{0}: p & >& \:0.60 \hspace{0.25in} {\rm \text{(the proportion of certified coffee growers in Southern Mexico who are either certified or in the process of being certified, is more than 60%)}} \\
+\end{eqnarray}
+$$
+
+```{r}
+Xcertified = 475 +75
+Xcertified
+```
+
+I set up $\alpha = 0.05$ $n_{SMCG} = 845$. From this, the observed
+number who indicated that they were relying on an inheritance to achieve
+their financial goals is $X_{Obs} = 550$.
+
+The Distribution of the Statistic $X_{Obs}$
+
+```{r}
+plot(seq(400, 1585526, 1), dbinom(seq(1583526, 1585526, 1), 1584526, 0.313), xlab="Values of Sample Sum", ylab="P(X = X_{Obs})", type="h", col="blue", main="Distribution of the Test Statistic")
+abline(v = 550, col="red")
+```
+
+Computation of the $P$-value. Under the assumption/condition that the
+null hypothesis ${\rm H}_{0}: p = 0.60$ is true, the $P$-value is
+
+```{r}
+pvalue.q4 <- 1 - pbinom(550, 845, 0.6) # computes P(X <= 550) with n = 845 and the incorporated assummed value of p = 0.6
+pvalue.q4
+#Reject H_0, as 0.001045019 < 0.05
+```
+
+Reject ${\rm H}_{0}$, as $0.001045019 < 0.05$
+
+For a regulated value of $\alpha = 0.05$, the rejection region is
+
+```{r}
+qbinom(0.95, 845, 0.6)
+```
+
+As a result, we have distrust in that assumption and the null hypothesis
+is rejected. As a result we conclude from these this sample, that
+$p > 0.60$, or that more than 60% of certified coffee growers in
+Southern Mexico who are either certified or in the process of being
+certified.
+
+**Q5**
+
+```{r}
+prop.test(c( 348 + 1, 274 + 1), c(670+ 2, 376 + 2), correct=FALSE)
+
+```
+
+From the result, it shows that difference between two population
+proportions are negative. 
+$$
+-0.266833 \leq p_{hs} - p_{uni} \leq -0.149503
+\\p_{hs} < p_{uni}
+$$ 
+It means that the proportion of persons with at most a high school
+education who disagree the science around vaccinations isn't greater
+than the similar proportion of persons with at least an undergraduate
+university degree The proportion of persons with at most a high school
+education who disagree the science around vaccinations is less than the
+similar proportion of persons with at least an undergraduate university
+degree.
+
+**Q6. a**
+
+$$
+\begin{eqnarray}
+{\rm H}_{0}: p & \leq  & 0.45 \hspace{0.2in} \text{(do not run for office)} \\
+{\rm H}_{A}: p & > &  0.45 \hspace{0.2in} \text{(run for office)} \\
+\end{eqnarray}
+$$
+
+**Q6 b**
+
+The null hypothesis in (a) is rejected if this count X is greater than
+or equal to 20. That is, Reject ${\rm H}_{0}$ if $X≥20$. Compute the
+value of $\alpha$:
+
+```{r}
+#Given that you have decided that there is enough statistical 
+#evidence to support the “mimimum of 45%”-claim if out of n=50 randomly 
+#chosen voters, at least 20 indicate they will vote for 
+#this candidate if they run.
+#Therefore, The X is set to be 20.
+
+#qbinom(0.95, 50, 0.45)
+#1 - pbinom(28, 50, 0.45)
+alpha6 = sum(dbinom(20:50, 50, 0.45))
+alpha6
+
+
+```
+
+**Q6. c**
+
+```{r}
+#I think the creator of the question wants us to compute the Type II Error here.
+
+#It is the Type II Error if and only if the statistical hypotheses set to be
+#H_0 is P >= 0.45, H_a is p < 0.45.
+
+#However, I set up my statistical hypotheses as H_0: p<= 0.45, H_a: p >0.45
+#This makes the part c becomes that, when H_0 is Ture, Reject H_0, 
+#which is a Type I Error. 
+
+#From what I learn in the lecture, There is no wrong setting up for 
+#the statistical hypotheses as long as the following steps can make sense.
+#And I am certain that my H_0 and H_a can carry out the Hypothesis Testing
+#with no problem.
+
+#Therefore, it is not my fault that part c, d and e makes less sense under 
+#the statistical hypotheses I came up with.
+
+probc = sum(dbinom(20:50, 50, 0.42))
+probc 
+#1 - pbinom(19, 50, 0.42)
+#The probability that you will conclude they should run for office,
+#if the candidate were to receive 42% of the vote.
+
+#This is the probability that If H_0 is true, Reject H_0.
+#(in this case, H_0:p <= 0.45)
+```
+
+**Q6. d**
+
+```{r}
+#Refer to my thought in part c, 
+#those are probabilities of H_0 is true,Reject H_0, 
+#with different values of p <= 0.45
+proportionofvote = c(0.41,0.40,0.39,0.38,0.35, 0.30)
+
+
+proboutcomes = 1 - pbinom(19,50,proportionofvote)
+
+df.proboutcomes <- data.frame(proportionofvote,proboutcomes)
+head(df.proboutcomes)
+ggplot(data=df.proboutcomes, aes(x = proportionofvote, y = proboutcomes)) + geom_point(fill="blue") + xlab("Values of p (Proportion of Reveiving Votes) ") + ylab("Probabiltiy of Reject H_0")
+```
+
+**Q6. e**
+
+```{r}
+#The graph in part (d) tells that the probability that 
+#I will conclude they should run for office 
+#is proportional to the value of p which are the proportion of vote received.
+#In another word, as the the the candidate receives more votes,
+#the probability of concluding that he should run for the office is increasing. 
+
+
+#As those are Type I Errors with different values of p <= 0.45, 
+#It means that the chance of making a Type I Error is very high, 
+#when the p value is approaching to the upper bound of H_0, where p = 0.45.
+#In another word, The probability of Type I Error appearing is too high.
+
+#The statistical test can be improved by changing the rejection region.
+#For a regulated value of alpha = 0.05, the rejection region is x > 28
+#And the value of alpha should be change to 0.04437937
+#It insures that the statistical hypotheses is more accurate.
+qbinom(0.95, 50, 0.45)
+alphae = 1 - pbinom(28, 50, 0.45)
+alphae
+```
+
+$$
+\text{Reject the null hypothesis if} \:\: \{X_{Obs}: X > 28\}
+$$
+
+**Q7. a**
+
+```{r}
+df.q7 = read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/bookprices.csv")
+#head(df.q7)
+df.q7 = df.q7 %>%
+  mutate(Diff = UsedBkStore - UsedAmazon) #create a new variable called Diff = price of camera at JR - price of same camera at BH
+head(df.q7)
+```
+
+Given that these data were collected using a **Matched Pairs
+Experimental Design**, the difference is defined as
+
+$$
+d_{i} = x_{UsedBkStore, i} - x_{UsedAmazon, i}
+$$
+
+the statistical hypothesis to be tested is
+
+$$
+\begin{eqnarray}
+{\rm H}_{0}: \mu_{d} & \leq  (= ) & 0 \hspace{0.2in} \text{(the mean of a population of differences is at most equal to zero)} \\
+{\rm H}_{A}: \mu_{d} & > &  0 \hspace{0.2in} \text{(the mean of a population of differences is more than zero)} \\
+\end{eqnarray}
+$$
+
+I set up the $\alpha = 0.05$
+
+```{r}
+#Find p-value by using t.test
+t.test(~Diff, mu=0, alternative="two.sided", data=df.q7)
+#p-value is 0.008898
+```
+
+Because $p-value < \alpha$, I Reject $H_{0}: \mu_{d} \leq(=) 0$. I
+conclude that the price of a used textbook at the University of Calgary
+Bookstore is more when compared to the price of a used text book on
+Amazon.ca.
+
+**Q7. b** The inferences made about the mean different in the price of
+used textbooks between University of Calgary Bookstore and Amazon.ca are
+made upon the condition that the differences follow a Normal
+distribution/can be modeled by the Normal probability model.
+
+```{r}
+ggplot(data=df.q7, aes(sample = Diff)) + stat_qq(size=2, col='blue') + stat_qq_line(col='red') + ggtitle("Normal Probability Plot of Difference: UsedBkStore - UsedAmazon")
+#As the plot shows this condition is satisfied.
+```
+
+**Q8** the statistical hypothesis to be tested is $$
+\begin{eqnarray}
+{\rm H}_{0}: p_{psd}  & = & \:0.62 \hspace{0.25in} {\rm \text{(the proportion of residents of a certain municipality is the same as the provincial proportion)}} \\
+{\rm H}_{0}: p_{psd} & \neq & \:0.62 \hspace{0.25in} {\rm \text{(the proportion of residents of a certain municipality differs from the provincial proportion)}} \\
+\end{eqnarray}
+$$ I set up the $\alpha = 0.05$
+
+Obtain a test statistic, a smaple of 250 randomly chosen adults yielded
+145 completed some form of post-secondary education. X = 145 which is
+the test statistic. $n = 250$, $X_{Obs} = 145$
+
+```{r}
+#Calculate the p-value
+binom.test(145, 250, 0.62, ci.method="plus4")
+
+```
+
+The 95% Confidence Interval for $p_{psd}$ is: $$
+0.5180179  \leq p_{psd} \leq 0.6394624
+$$ Where the $H_{0}$ falls in this Confidence Interval.
+
+The $p_value = 0.1932$, $p_value >\alpha$. I Fail to Reject $H_{0}$.
+
+Thus, I conclude that the proportion of residents of a certain
+municipality is the same as the provincial proportion.
+
+In the context of these data, the p-value is the probability that
+another sample of n=250 randomly chosen adults aged 25 - 64 living in
+this municipality will yield more condemning evidence than the test
+statistic we have this time which is 145, assuming that the null
+hypothesis $p = 0.62$ is correct. Where the null hypothesis is the
+proportion of residents of a certain municipality is the same as the
+provincial proportion.
+
+For a two tail test, p - value is the area under the binomial
+probability distribution curve values that far from the absolutely
+values of test statistic and the negative absolutely values of test
+statistic in both directions. Each area represents half of the p-value.
+
+**Q9 a**
+
+```{r}
+n1 = 1000
+x1 = 561
+n2 = 1010
+x2 = 601
+prop.test(c(x1 + 1, x2 + 1), c(n1 + 2, n2 + 2), conf.level=0.95, correct=FALSE)$conf 
+
+```
+
+The 95% Confidence Interval for $p_{2019} - p_{2012}$ is: $$
+-0.077100209    \leq p_{2019} - p_{2012} \leq 0.009133376
+$$
+
+**Q9 b** The result in part (a) shows that there is no statistically
+significant difference between $p_{2019}$ and $p_{2012}$. Because the
+difference between the proportion of Canadians who currently support a
+ban on single-use plastics and the proportion of Canadians who supported
+such a ban in 2012 falls in the interval [-0.077100209, 0.009133376].
+Between a negative value and a positive value, it could happen if
+$p_{2019} - p_{2012} = 0$.
+
+**Q10 a** The statistical hypothesis to be tested is $$
+\begin{eqnarray}
+{\rm H}_{0}: \mu_{w}  & = & \:500 \hspace{0.25in} {\rm \text{(the mean weight of cereals is 500 grams)}} \\
+{\rm H}_{a}: \mu_{w} & < & \:500 \hspace{0.25in} {\rm \text{(the mean weight of cereals is less than 500 grams)}} \\
+\end{eqnarray}
+$$ I set up the $\alpha = 0.05$
+
+```{r}
+cereal.data = data.frame(gram = c(497.2,499.9,495.8,514.2,490.0,498.3,495.1,486.7))
+head(cereal.data)
+favstats(~gram, data = cereal.data)
+ggplot(data=cereal.data, aes(sample = gram)) + stat_qq(size=2, col="blue") + stat_qqline(col="red") + ggtitle("Normal Probability Plot n = 8 Weights the contents of each Box Cereal from Different Stores")
+#n = 8
+#Inspected a Normal Probability plot of these data, it appeared to be Normal (for the most part).
+```
+
+```{r}
+mu.0 <- 500
+dof <- favstats(~gram, data = cereal.data)$n - 1 #set the degrees of freedom to n - 1
+t.obs <- (favstats(~gram, data = cereal.data)$mean - mu.0)/(favstats(~gram, data = cereal.data)$sd /sqrt(favstats(~gram, data = cereal.data)$n))
+t.obs
+pt(t.obs, 7)
+```
+
+```{r}
+t.test(~ gram, mu=500, alternative= "less", data=cereal.data) #sets mu = 500 (H0 is true) and indicates sign in Ha
+
+```
+
+$T_{Obs} = 0.1604$ $$
+P-\text{value} = 0.178
+$$ Because $P-\text{value} > \alpha$, I Fail to Reject ${\rm H}_{0}$.
+Thus, I conclude that the mean of Cereals is 500 grams. Usman is getting
+the amount of cereal as stated on the box.
+
+**Q10 b**
+
+```{r}
+ntimes = 1000  
+nsize = 8     
+Tboot = numeric(ntimes)  
+mu.0 = favstats(~gram, data = cereal.data)$mean
+dof = nsize - 1
+origdata = c(497.2,499.9,495.8,514.2,490.0,498.3,495.1,486.7)
+for(i in 1:ntimes) #start the for loop, run 1000 times
+{   databoot = sample(origdata, nsize, replace=TRUE)  #data of nsize, sampling w replacement
+    Tboot[i] =  (favstats(databoot)$mean - mu.0)/(favstats(databoot)$sd /sqrt(favstats(databoot)$n))
+} #close the for loop
+Tbootstrap = data.frame(Tboot)
+head(Tbootstrap)
+ggplot(data=Tbootstrap, aes(x = Tboot)) + geom_histogram(col='blue', fill='yellow', binwidth=0.5) + ylab("Count") + ggtitle("Distribution of Bootstrap Statisic:  t-distriubution") + geom_vline(xintercept = -0.9880385, col="black")
+qdata(~ Tboot, 0.05 , data=Tbootstrap)
+#The  5th percentile of the distribution is -2.459316 
+```
+```{r}
+mu.0
+```
+
+**Q10 c**
+
+```{r}
+X_bar = favstats(~gram, data = cereal.data)$mean
+S = favstats(~gram, data = cereal.data)$sd
+n = favstats(~gram, data = cereal.data)$n
+tboot5th = qdata(~ Tboot, 0.05 , data=Tbootstrap)
+X_bar5th = X_bar - tboot5th * (S/n)
+X_bar5th
+#It is very close to 500
+#The result infer the same thing as the result in part (a).
+#I Fail to Reject H_0.
+#I conclude that the mean of Cereals is 500 grams.
+#Usman is getting the amount of cereal as stated on the box.
+```
+
+**Q11 a** $$
+{\rm H}_{0}: \beta   = 2 \hspace{0.5in} {\rm H}_{A}: \beta   < 2
+\\
+\text{Reject} \:\:{\rm H}_{0}: \{X_{Min} < 2.018\}
+$$ $$
+\begin{eqnarray}
+\alpha & = & P(\text{Reject}\:\:{\rm H}_{0} | {\rm H}_{0} \: \text{is true}) \\
+       & = & P(X_{Min} < 2.018 | \beta   = 2) \\
+       & = & P(2 < X_{Min} < 2.018) \\
+\end{eqnarray}
+$$
+
+```{r}
+pdfxmin = function(x) {
+  6*exp(-6*(x-2))
+}
+integrate(pdfxmin, lower = 2, upper = 2.018)$value
+
+```
+
+The value of $\alpha$ was used in the derivation of this statistical
+test is $\alpha = 0.1023724$
+
+**Q11 b** Assuming $H_{0}$ is True.
+
+```{r}
+obs = c(2.95,2.21,2.43,2.11,2.77,3.12)
+xminobs = favstats(obs)$min
+xminobs
+integrate(pdfxmin, lower = 2, upper = xminobs)$value #Calculating the p-value
+
+```
+
+$$
+P-\text{value} = 0.1455216 
+$$ Because $P-\text{value} > \alpha$, I Fail to Reject ${\rm H}_{0}$.
+This sample does support the null hypothesis above.
+
+**Q11 c** Calculate the Type II Error $$
+\begin{eqnarray}
+\beta & = & P(\text{Fail to Reject}\:\:{\rm H}_{0} | {\rm H}_{0} \: \text{is false}) \\
+       & = & P(X_{Min} \geq 2.018 | \beta    = 1.8) \\
+       & = & 1- P(X_{Min} < 2.018 | \beta    = 1.8) \\
+\end{eqnarray}
+$$
+
+```{r}
+pdfxminc = function(x) {
+  6*exp(-6*(x-1.8))
+}
+
+1- integrate(pdfxminc, lower = 1.8, upper = 2.018)$value
+#Or just do
+#integrate(pdfxmin, lower = 2.018, upper = Inf)
+#Getting same result.
+```
+
+**Q8 d**
+
+$\alpha = 0.2$
+
+
+$$
+\begin{eqnarray}
+\alpha & = & P(\text{Reject}\:\:{\rm H}_{0} | {\rm H}_{0} \: \text{is true}) \\
+0.2       & = & P(X_{Min} < t | \beta    = 2) \\
+\end{eqnarray}
+$$ $$
+ \int_{2}^{t} 6e^{-6(x_{Min}-2)} \,dx = 0.2
+$$ Solve for t. I solved the t by hand with u substitution, the solution
+is too complicated to type.
+
+$$
+ t = \frac{12 - \log(0.8) }{{6}} \approx 2.0372
+$$
+
+```{r}
+integrate(pdfxmin, lower = 2, upper = 2.0372)$value
+```
+
+The value of $X_{Min}$ is 2.0372

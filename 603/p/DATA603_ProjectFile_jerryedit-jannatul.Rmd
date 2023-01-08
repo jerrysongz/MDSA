@@ -1,0 +1,797 @@
+---
+editor_options:
+  markdown:
+    wrap: sentence
+output: word_document
+---
+
+DATA 603: FINAL REPORT PROJECT TITLE: MULTIPLE REGRESSION ANALYSIS OF ENERGY CONSUMPTION IN THE CITY OF CALGARY Group 13: CODE 404 Team members: 1.
+Khushi Himanshu Dave 2.
+Shashank Kumar Srivastava 3.
+Zheyu Song 4.
+Jannatul Naeema
+
+# INTRODUCTION:
+
+## 1.1. Motivation
+
+The domain that we will be working with for this project is Energy and sustainability of Calgary.
+Energy plays a fundamental role in our lives; everything requires energy in one form or another.
+Canada is in the top five of natural gas producers in the world; two-thirds of which come from Alberta.
+In 2017, the energy sector made up 9.2%, or \$175 Billion, of Canada's Gross Domestic Product (GDP) whereas, in Alberta the energy sector contributed 21.61% of provincial GDP.
+This is signiﬁcantly more than in the rest of Canada; the oil and gas sector make up a major part of economic activity in Alberta.
+As one of the major cities in Alberta, Calgary has long been known as an energy city and took on a lot of initiatives to encourage in becoming more energy efficient in the long run.
+In 2008, the City of Calgary developed the Sustainable Buildings Partnership Program to improve the performance of existing city infrastructure and support the sustainable building policy.
+The purpose of this program is to identify and improve the efficiency of existing corporate infrastructure.
+These is proposed to be done using audits, alternative energy technologies, conservation, and energy efficiency upgrades.
+We focused on addressing this context and investigate into energy consumption situation at City of Calgary.
+## 1.2.
+Objectives In our project we would like to analyze the energy consumption situations at different structure and facilities at City of Calgary.
+The goal of this project is to predict future energy use for the buildings and investigate the effects of different variables.
+We will perform multiple linear regression and we will use R studio to analyze the topic.
+This study is important to assess if the energy use of buildings and structures are in aligned with the sustainable building policy.
+Through this investigation, we aim to understand better energy efficiency and we aim to provide new insights as to whether the energy efficiency need to be improved.
+
+# METHODOLOGY:
+
+## 2.1 Dataset Dataset 1: Building Energy Benchmarking -- City of Calgary The first dataset we are using for this project is Building Energy Benchmarking Data from the City of Calgary webpage.
+
+This is a open dataset and available for public use; the reference of dataset is included in the reference section of this report.
+This dataset is open data in tabular format collected annually, collected over period 2019-2021 with 297 rows and 23 columns.
+The City of Calgary's Commercial and Institutional Building Energy Benchmarking Program facilitates in measuring and tracking the energy performance of any commercial, institutional or non-profit organization with a building of any size that is located within the city boundary.
+This dataset contains building energy and greenhouse gas emission performance information for a subset of properties owned and operated by the City of Calgary.
+All energy and greenhouse gas emission metrics are calculated by ENERGY STAR Portfolio Manager using monthly, whole-building energy consumption data billed between January 1st and December 31st.
+This initiative is significant in obtaining standardized information on building energy consumption, energy costs and greenhouse gas emissions and also assisting in becoming eligible for ENERGY Star® Certification.
+collected from City of Calgary open data website, available for public use.
+In this dataset, there are 17 different types of property built from 1896 to 2018 including fire station, ice rink, office, recreation center, heated swimming pool etc.
+Dataset 2: Current and Historical Alberta Weather Station Data - ACIS The weather dataset was collected by the Alberta Climate Information Service (ACIS) from a variety of meteorological stations operated by various government agencies.
+For the investigation of this dataset, we will be focusing on the variables: Date, Air Temp.
+Avg.
+(°C), Relative Humidity Avg.
+(%), Precip.
+Accumulated (mm), Wind Speed 10 m Avg.
+(km/h) for our predictive model designing and interpretation, and all the variables are quantitative.
+The dataset recorded daily temperature from 2014 to 2022 at Calgary International CS weather station.
+We will merge dataset 1 and dataset 2; we will take all variables from dataset 1, and from dataset 2 we will add precipitation, and calculate and then add the columns of Corn Heat Unit, Heating Degree Days, Cooling Degree Days.
+We will use these four columns from dataset 2 along with 20 columns from dataset 1 to build full model for energy use.
+
+## 2.2 Approach We imported the data in RStudio for our analysis by first using the "read.csv" and created the 'dataset' data frame.
+
+The data we needed for our regression analysis included the dependent variable Site Energy as a function of twenty independent variables, we will build full model first with all these variables.
+Then from this point forward we will try to improve our model.
+All variables in the dataset are as follows: 1.
+Site Energy: The annual amount of all the energy a property consumes on-site, regardless of the source, dependent numerical variable 2.
+Property type: We have 17 different types of properties for this dataset, each type of property has multiple buildings; among the types of properties there are 107 fire-stations, 66 office buildings, 30 ice rinks, 24 fitness centers and few other different kinds of properties at different locations.
+This is categorical independent variable.
+3.
+Number of Buildings: This represents how many buildings are present at a certain property, numerical independent variable.
+4.
+Year built: This indicates either at which year the property was constructed or at which year the most recent major renovation was done including a complete interior redesign, categorical independent variable.
+5.
+Property GFA: This includes the total property gross floor area, numerical independent variable.
+6.
+Energy Star Score: A measure of how well a property is performing relative to similar properties, when normalized for climate and operational characteristics.
+This is categorical independent variable.
+7.
+Weather Normalized Site Energy Use (GJ): This indicates the energy use a property would have consumed during 30-year average weather conditions, numerical independent variable.
+8.
+Site EUI (GJ/m²): The Site Energy Use divided by the property square meters, numerical variable, numerical independent variable.
+9.
+Weather Normalized Site EUI (GJ/m²): The Weather Normalized Site Energy Use divided by the property square meters, numerical independent variable.
+10.
+Source Energy Use (GJ): The total amount of all the raw fuel required to operate a property, including losses that take place during generation, transmission, and distribution of the energy, numerical independent variable.
+11.
+Weather Normalized Source Energy Use (GJ): The source energy use your property would have consumed during 30-year average weather conditions, numerical independent variable.
+12.
+Source EUI: The Source Energy Use divided by the property square meters, numerical independent variable.
+13.
+Weather Normalized Source EUI (GJ/m²): The Weather Normalized Source Energy Use divided by the property square meters, numerical independent variable.
+14.
+CO2 Emission: Total Emissions is the sum of Direct Emissions and Indirect Emissions, numerical independent variable.
+15.
+CO2 Emissions Intensity: Total GHG Emissions divided by the property square meters, numerical independent variable.
+16.
+Direct GHG Emissions: Direct Emissions of CO2 as greenhouse gas are emissions associated with onsite fuel combustion (e.g. combustion of natural gas or fuel oil), numerical independent variable.
+17.
+Direct GHG Emissions Intensity: Direct GHG Emissions divided by the property square meters, numerical independent variable.
+19.
+Natural Gas: Total annual Natural Gas used annually, numerical independent variable.
+20.
+Electricity Use -- Generated from Onsite Renewable System: The total amount of energy produced by onsite solar/wind), numerical independent variable.
+21.
+Year Ending: The last day of the 12-month reporting period, numerical independent variable.
+22.
+Precipitation: The recorded rainfall and snowfall, numerical value.
+23.
+Corn Heat Unit: Temperature-based index often used by farmers and agricultural researchers to estimate whether the climate is warm enough (but not too hot) to grow corn, numerical.
+24.
+Heating Degree Days: Heating Degree Days are equal to the number of degrees Celsius a given day's mean temperature is below 18 °C, numerical.
+25.
+Cooling Degree Days: Cooling Degree Days (CDD) are equal to the number of degrees Celsius a given day's mean temperature is above 18 °C.
+For example, if the daily mean temperature is 21 °C, the CDD value for that day is equal to 3 °C.
+If the daily mean temperature is below 18 °C, the CDD value for that day is set to zero, numerical.
+
+# MODELLING PLAN:
+
+We intend to create a multiple regression model for forecasting future Site energy use by using the procedures we have learned from the Data 603 course materials.
+To check for multicollinearity, we will first construct a first-order model using all the predictor variables and use variance inflation factors (VIF).
+Then, using a screening method called stepwise regression, we shall ascertain which independent variables in the list are the key determinants of Y.
+To verify the outcome, we will now check the test statistics (t-test) for each of the various coefficients.
+Additionally, an all-possible-regressions selection technique will be used to choose the "best" regression model.
+After removing some variables from the model that are not crucial, the model will be improved by considering interaction terms and/or a high order multiple regression model.
+We shall perform the following steps in our model to reach the final conclusion and the best model: 1.
+Creating the full model 2.
+Using VIF technique and Multicollinearity and possible elimination of correlated variables.
+3.
+Stepwise Regression 4.
+Global F- Test 5.
+Individual T-Test , with alpha value = 0.05.
+6.
+Interaction models, and testing for significant variables and repeating the process till best model is found.
+7.
+Decide the best model based on interactions 8.
+Higher order model is found.
+9.
+Test assumptions: Linearity, Independence, Equal Variance, Normality and Outlier assumptions 10.
+Based on the output, we will decide whether to do Box-cox transformations or not.
+
+On following these steps, we will achieve our best model for Site Energy prediction.
+Justification for using these methods: To find the best model from any given Full model, when we follow these steps, we end up with our Best model.
+These steps are conducted to be very sure of our new reduced Best Model.
+
+We will have our Outcome Variable: Site_Energy, and Predictor Variables: NumberofBuildings, Emissions_CO2, Natural_Gas, Property_GFA in our best mode, as observed from the conclusion.
+We choose Site_Energy as our outcome variable as its value depends on all the other variables.
+
+For the division of workload: Khushi Himanshu Dave: VIF and elimination,Interaction models, step wise regression, Normality assumption, Box-cox Transformation, Theory of project.
+Zheyu Song: F and T-tests, higher order model, Equal Variance assumption, Box-cox Transformation , Final model and interpretation, Theory of project.
+Shashank Kumar Srivastava: Interaction models, Linear assumptions, Normality assumption, Box-cox Transformation, Final model and interpretation, Theory of project.
+Jannatul Naeema: worked on Full model, VIF and elimination, higher order model, Equal Variance assumption, Box-cox Transformation, Theory of project.
+
+# WORKING ON OUR DATASET:
+
+```{r}
+dataset = read.csv('cleaned603dataset_-_dataset603_1.csv')
+head(dataset)
+options(scipen = 999)
+dataset <- na.omit(dataset)
+
+```
+
+## 1.
+
+Generating the full model:
+
+```{r}
+fullmodel <-lm(Site_Energy~factor(Property_Type)+NumberofBuildings+Year_Built+Property_GFA+WeatherNormalizedSiteEnergyUse+SiteEUI+WeatherNormalizedSiteEUI+SourceEnergyUse+WeatherNormalizedSourceEnergyUse+SourceEUI+WeatherNormalizedSource.EUI+Emissions_CO2+Emissions_Intensity+DirectGHGEmissions+DirectGHGEmissionsIntensity+Electricity+Natural_Gas+YearEnding+Precipitation+Corn_Heat_Unit+Heating_Degree_Days+Cooling_Degree_Days, data=dataset)
+
+summary(fullmodel)
+```
+
+## 2.
+
+VIF: The variance inflation factor (VIF), a straightforward test for multicollinearity in your regression model, can be used.
+The variance inflation factor (VIF) determines the existence and magnitude of correlations between independent variables.
+
+```{r}
+library(mctest)
+```
+
+```{r}
+imcdiag(fullmodel, method='VIF')
+```
+
+The VIF values are ideally supposed to be less than 5 for us to not take any corrective action.
+However, here in our fullmodel, we can observe that the VIF values are well above 5.
+As we suspected, there is considerable multicollinearity in our data!
+To solve this problem, we just drop the problematic variables.
+Since the presence of multicollinearity suggests that the information that this variable gives about the response is redundant in the presence of the other variables, this may typically be done without much harm to the regression model.
+After eliminating the problematic variables manually, we end up with: NumberofBuildings, Year_Built, Property_GFA, Natural_Gas, Emissions_CO2.
+But, we will not use Year_Built as it generates a Time-Series dependancy, which we want to avoid.
+
+```{r}
+newmodel <-lm(Site_Energy~NumberofBuildings+Property_GFA+Natural_Gas+Emissions_CO2,data=dataset)
+summary(newmodel)
+```
+
+```{r}
+imcdiag(newmodel, method='VIF')
+```
+
+Here, we can observe that Property_GFA and Emissions_CO2 have a VIF\>5, but they are important variables to us in the prediction of Site_Energy, and therefore we decide to keep them as a part of our New Model.
+
+## 3.
+
+Stepwise Regression: Stepwise regression is the iterative process of building a regression model step by step while choosing independent variables to be included in the final model.
+After each iteration, the potential explanatory factors are successively added or removed, and the statistical significance is tested.
+
+```{r}
+library(olsrr)
+```
+
+```{r}
+stepmod=ols_step_both_p(newmodel,pent = 0.1, prem = 0.3, details=TRUE)
+summary(stepmod$model)
+```
+
+After doing stepwise regression, we get our final model as: Site_Energy = 702.127112 + 6.389525(Emissions_CO2) + 0.614171(Natural_Gas) + 0.153195(Property_GFA) - 1183.156115(NumberofBuildings)
+
+### Our full model:
+
+\$\$
+
+```{=tex}
+\begin{aligned}
+Y_{SiteEnergy}&==\beta_0 +  \beta_1 X_{EmissionsCO2}  +\beta_2 X_{Natural_Gas} +\beta_3 X_{Property_GFA}+\beta_4 X_{NumberofBuildings} +\epsilon  \\
+
+\end{aligned}
+```
+\$\$
+
+## 4.Global F Test on Full Model:
+
+Any statistical test with an F-distribution for the test statistic under the null hypothesis is known as an F-test.
+In order to determine which statistical model better represents the population from which the data were sampled, it is most frequently applied when contrasting models that have been fitted to data sets.
+
+*Hypothesis Statement for Individual T-test:*
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\mbox{at least one }\beta_i\mbox{ is not zero } (i=1,2,3,4) 
+\end{aligned}
+$$
+
+We set up the significance level at 0.05($\alpha = 0.05$).
+
+Full Model Global F Test:
+
+```{r}
+#Full Model Test
+fullmodel <-lm(Site_Energy~NumberofBuildings+Property_GFA+Emissions_CO2+ Natural_Gas, data=dataset)
+reg<-lm(Site_Energy~1, data=dataset) # Model with only intercept
+
+anova(fullmodel,reg) # We compare the NULL model with the full model
+```
+
+By using global F test, the output shows that $F_{cal}= 25794$ with df= -4, and $p-value< 0.00000000000000022 < \alpha=0.05$,indicating that we should clearly reject the null hypothesis.
+It provides compelling evidence against the null hypothesis.
+The Global F-test suggests that at least one of the independent variables must be related to Site Energy.
+Based on the p-value, we also have extremely strong evidence that at least one of the independent variables is associated with increased Site Energy.
+
+After we check the global F-test and reject the null hypothesis, we are checking the test statistics for the individual coefficients and particular subsets of the full model test in the following steps.
+
+## 5.Individual Coefficients Test:
+
+To evaluate whether there is a significant difference between the means of two groups and their relationships, a t-test is an inferential statistic that is used.
+When data sets contain unknown variances and a normal distribution, such as the data set obtained from tossing a coin 100 times, t-tests are utilised.
+In order to evaluate statistical significance, the t-test, a test used for hypothesis testing in statistics, uses the t-statistic, the values of the t-distribution, and the degrees of freedom.
+
+*Hypothesis Statement for Individual T-test:*
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0 (i=1,2,3,4)
+\end{aligned}
+$$ We set up the significance level at 0.05($\alpha = 0.05$).
+
+```{r}
+summary(fullmodel)
+```
+
+From the out put, It shows that the variables NumberofBuildings has $t_{cal}=-6.182$ with the $p-value = 0.00000000218 < 0.05$, Property_GFA has $t_{cal}=11.761$ with the $p-value< 0.0000000000000002 < 0.05$ , Emissions_CO2 has $t_{cal}=58.698$ with the $p-value< 0.0000000000000002 < 0.05$, Natural_Gas has $t_{cal}=122.447$ with the $p-value< 0.0000000000000002 < 0.05$ , indicating that we should clearly reject the null hypothesis for variable NumberofBuildings, Property_GFA,Emissions_CO2 and Natural_Gas, which means that we should keep those variables to the model at the significance level at $α=0.05$.
+
+## Interaction Model
+
+Interaction models A particular trait of three or more variables known as an interaction in statistics occurs when two or more variables interact to impact a third variable in a non-additive way.
+In other words, the two factors interact to produce a result that is greater than the combination of their individual effects.
+
+### Individual Coefficients Test (T-tests) on Interaction Term:
+
+For testing an interaction term in regression model, we use the Individual Coefficients Test (t-test) method.
+*Hypothesis Statement:*
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0
+\end{aligned}
+$$
+
+$$
+\begin{aligned} 
+(i=NumberofBuildings*EmissionsCO2,NumberofBuildings*NaturalGas,NumberofBuildings*PropertyGFA,EmissionsCO2*NaturalGas,EmissionsCO2*PropertyGFA,NaturalGas*PropertyGFA ) 
+\end{aligned}
+$$ We set up the significance level at 0.05($\alpha = 0.05$).
+
+```{r}
+#T-tests:
+#Hypothesis:
+#H0= Bi = 0
+#Ha: Bi != 0 (i = 1,2,3...)
+interacmodel <-lm(Site_Energy~(NumberofBuildings+Emissions_CO2+Natural_Gas+Property_GFA)^2, data=dataset)
+summary(interacmodel)
+```
+
+From the out put, It shows that the interaction terms $EmissionsCO2*NaturalGas$ has $t_{cal}=7.701$ with the $p-value= 0.000000000000234 < 0.05$, $EmissionsCO2*PropertyGFA$ has $t_{cal}=27.469$ with the $p-value < 0.0000000000000002 < 0.05$, and $NaturalGas*PropertyGFA$ has $t_{cal}=-14.642$ with the $p-value < 0.0000000000000002 < 0.05$ indicating that we should clearly reject the null hypothesis which means that we should add the above interaction terms to the model at $α=0.05$.
+
+However, the interaction terms $NumberofBuildings*EmissionsCO2$ has $t_{cal}=-0.687$ with the $p-value= 0.492700 > 0.05$, $NumberofBuildings*NaturalGas$ has \$t\_{cal}=1.233 \$ with the $p-value = 0.218692 > 0.05$, indicating that we should clearly not reject the null hypothesis which means that we should not add the above interaction terms to the model at $α=0.05$.
+
+The interaction terms $NumberofBuildings*PropertyGFA$ has $t_{cal}=-1.788$ with the $p-value= 0.074809 > 0.05$, is lies in the grey zone.
+
+After including the interaciton terms we can see that not every interaction term contributes to the model.
+We are removing NumberofBuildings:Emissions_CO2, NumberofBuildings:Natural_Gas but we are going to keep NumberofBuildings:Property_GFA as it lies in the grey zone.
+Hence we are going to do the T-test again with the predictors that are significant to the model.
+For the rest of the predictors p-value is less than the alpha value(0.05) hence, we can reject our null hypothesis and accept the alternative.
+
+### Individual Coefficients Test (T-tests) on Interaction Term:
+
+*Hypothesis Statement:*
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0
+\end{aligned}
+$$
+
+$$
+\begin{aligned} 
+(i=NumberofBuildings*PropertyGFA,EmissionsCO2*NaturalGas,EmissionsCO2*PropertyGFA,NaturalGas*PropertyGFA ) 
+\end{aligned}
+$$ We set up the significance level at 0.05($\alpha = 0.05$).
+
+```{r}
+#Hypothesis:
+#H0= Bi = 0
+#Ha: Bi != 0 (i = 1,2,3...)
+interacmodel1 <-lm(Site_Energy~NumberofBuildings+Emissions_CO2+Natural_Gas+Property_GFA+NumberofBuildings*Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+
+summary(interacmodel1)
+```
+
+From the out put, It shows that the interaction term $NumberofBuildings*PropertyGFA$ has $t_{cal}=-1.450$ with the $p-value= 0.148229 > 0.05$, indicating that we should clearly not reject the null hypothesis which means that we should not add the above interaction terms to the model at $α=0.05$.
+
+The interaction terms $EmissionsCO2*NaturalGas$ has \$t\_{cal}=7.610 \$ with the $p-value= 0.000000000000413 < 0.05$, $EmissionsCO2*PropertyGFA$ has \$t\_{cal}=27.672 \$ with the $p-value < 0.0000000000000002 < 0.05$, and $NaturalGas*PropertyGFA$ has \$t\_{cal}=-14.666 \$ with the $p-value < 0.0000000000000002 < 0.05$ indicating that we should clearly reject the null hypothesis which means that we should keep the above interaction terms to the model at $α=0.05$.
+
+After removing the insignificant terms yet keeping the grey zone predictor, we see that it also becomes insignificant to the model.
+Hence we can now safely remove the predictor which once was in the grey zone.
+Therefore, we are left with NumberofBuildings, Emissions_CO2, Natural_Gas+Property_GFA, Emissions_CO2:Natural_Gas, Emissions_CO2:Property_GFA, Natural_Gas:Property_GFA as our final predictors for our model.
+As for these predictors the p-value is less than the alpha value(0.05) hence, we can reject our null hypothesis and accept the alternative.
+
+### Individual Coefficients Test (T-tests) on Interaction Term:
+
+Hypothesis Statement:
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0
+\end{aligned}
+$$
+
+$$
+\begin{aligned} 
+(i=EmissionsCO2*NaturalGas,EmissionsCO2*PropertyGFA,NaturalGas*PropertyGFA ) 
+\end{aligned}
+$$
+
+We set up the significance level at 0.05($\alpha = 0.05$).
+
+```{r}
+#Hypothesis:
+#H0= Bi = 0
+#Ha: Bi != 0 (i = 1,2,3...)
+interacmodel2 <-lm(Site_Energy~NumberofBuildings+Emissions_CO2+Natural_Gas+Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+
+summary(interacmodel2)
+```
+
+From the out put, It shows that the interaction terms $EmissionsCO2*NaturalGas$ has \$t\_{cal}=7.759 \$ with the $p-value= 0.000000000000156309 < 0.05$, $EmissionsCO2*PropertyGFA$ has \$t\_{cal}=27.664 \$ with the $p-value < 0.0000000000000002 < 0.05$, and $NaturalGas*PropertyGFA$ has \$t\_{cal}=-14.575 \$ with the $p-value < 0.0000000000000002 < 0.05$ indicating that we should clearly reject the null hypothesis which means that we should keep the above interaction terms to the model at $α=0.05$.
+
+All the remaining predictors are significant to the model.
+Their p-value is much less than the alpha value(0.05).
+Hence, we can reject our null hypothesis and accept the alternative.
+
+### Interaction Term Partial F-tests:
+
+After fitting a model with all interactions, we dropped non-significant interaction terms.
+Final estimation model obtained is the interacmodel3.
+
+$$
+\begin{aligned}
+Y_{SiteEnergy}&=\beta_0 +  \beta_1 X_{EmissionsCO2}  +\beta_2 X_{NaturalGas} +\beta_3 X_{PropertyGFA}+\beta_4 X_{NumberofBuildings} +\beta_5 X_{EmissionsCO2*NaturalGas}\\
+&+\beta_6 X_{EmissionsCO2*PropertyGF}+\beta_7 X_{NaturalGas*PropertyGFA} +\epsilon
+\end{aligned}
+$$
+
+To confirm that we should drop all those interaction terms together, we perform a partial F-test.
+
+*Hypothesis Statement:*
+
+$$
+\begin{aligned}
+H_0&:\beta_{p-q+1}=\beta_{p-q+2}=...=\beta_p=0 \mbox{(Interaction terms are not significant) }\\
+H_a&:\mbox{at least one }\beta_i \neq0 \mbox{(At least one interaction term is significant) }
+\end{aligned}
+$$
+
+We set up the significance level at 0.05($\alpha = 0.05$).
+
+```{r}
+anova(interacmodel2,interacmodel1)
+```
+
+It gives a p-value of $0.1482>0.05$, indicating that we should clearly not to reject the null hypothesis, which confirms that we do not have enough evidence to keep those non-significant interaction terms in the model.
+Hence, we can conclude that the interaction model below is the best fitted model:
+
+$$
+\begin{aligned}
+\widehat{Y_{SiteEnergy}}&=\beta_0 +  \beta_1 X_{EmissionsCO2}  +\beta_2 X_{NaturalGas} +\beta_3 X_{PropertyGFA}+\beta_4 X_{NumberofBuildings} +\beta_5 X_{EmissionsCO2*NaturalGas}\\
+&+\beta_6 X_{EmissionsCO2*PropertyGF}+\beta_7 X_{NaturalGas*PropertyGFA}
+\end{aligned}
+$$
+
+# Higher Order
+
+In the previous steps, the stepwise regression procedure declared that the best one-variable predictor of site energy usage is emissions CO2.
+Hence, we decided to add quadratic term to the model based on it.
+
+For testing an higher order term in regression model, we use the Individual Coefficients Test (t-test) method.
+
+```{r}
+interacmodel2 <-lm(Site_Energy~NumberofBuildings+Emissions_CO2+I(Emissions_CO2^2)+I(Emissions_CO2^3)+Natural_Gas+Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+
+summary(interacmodel2)
+```
+
+In conclusion, adding higher-order terms to a Linear regression model can improve its predictive power by allowing for more complex relationships between the dependent and independent variables.
+In this case, the addition of up to the power of 3 for the main effect Emissions_CO2 resulted in improved model performance.
+However, when the power of 4 was tested, the model did not pass the hypothetical test, therefore, should not be included in the final model.
+This shows that while the addition of higher-order terms can be beneficial, it is important to carefully evaluate their impact on the model and avoid overfitting.
+Overall, the use of higher-order terms can help to better capture the underlying relationships in the data and improve the accuracy of the model's predictions.
+
+We will be using the Higher Order model for further calculations.
+
+# 7.Linearity Assumption
+
+Linearity Assumption The linear regression model counts on a linear relationship existing between the predictors and the outcome.
+Almost all of the conclusions we get from the fit are dubious if the underlying relationship is not linear.
+Additionally, the model's forecast accuracy may suffer dramatically.
+
+```{r}
+library(ggplot2)
+ggplot(interacmodel2, aes(x=.fitted, y=.resid)) +
+  geom_point() + geom_smooth()+
+  geom_hline(yintercept = 0)+
+  ggtitle("Residual vs Fitted")
+```
+
+We can draw the conclusion that, compared to a basic linear regression model, the quadratic model more closely fits the data.
+Model interpretations are meaningless when the independent variable's range is exceeded.
+Despite the fact that the model seems to back up the data.
+The value of X must fall inside the range of the independent variable in order to generate a forecast for Y.
+Otherwise, the prediction won't have any real relevance.
+
+# 8.Independence Assumption
+
+Independence Assumption When subsequent errors are correlated, the assumption of independent errors is broken.
+This often happens when time-series data, which are observations of data for both dependent and independent variables sequentially over a period of time, are used.
+Since the objects of our experiment were unrelated to time, we may be quite confident that the measurements are independent.
+
+# 9.Equal Variance Assumption
+
+Equal Variance Assumption Test: Uneven dispersal is a sign of heteroscedasticity.
+Heteroscedasticity in regression analysis is a systematic alteration in the distribution of the residuals over the range of measured values.
+Using a concave function to convert the response Y in response to this issue is one potential fix.
+We conduct the equal variance assumption test (Breusch- Pagan test).
+
+```{r}
+plot(interacmodel2,which=1)
+```
+
+```{r}
+library(lmtest)
+```
+
+```{r}
+#H0: heteroscedacity is not present
+#H1: Heteroscedacity is present
+bptest(interacmodel2)
+```
+
+From our dataset, the output displays the Breusch-Pagan test that results from the cubic model.
+The p-value = 0.0000000000000002956 \<0.05, indicating that we do reject the null hypothesis.
+Therefore, the test provides very strong evidence to suggest that heteroscedasticity does exist.
+Therefore, we do the Shapiro-Wilk test.
+
+# 10.Normality Assumption
+
+Normality Assumption Test: The residuals of the regression, or the errors between observed and predicted values, must be regularly distributed in order to perform a multiple linear regression analysis.
+By examining a histogram, a normal probability plot, or a Q-Q-Plot, this assumption can be verified.
+We conduct the Normality assumption test (Shapiro-Wilk Test).
+
+```{r}
+#H0: the sample data are significantly normally distributed 
+#Ha: the sample data are not significantly normally distributed 
+shapiro.test(residuals(interacmodel2))
+```
+
+Shapiro-Wilk normality test also confirms that the residuals are NOT normally distributed as the p-value= 0.00000000000000022\< 0.05.
+It is alson confirmed in the normal Q-Q plot below:
+
+```{r}
+#normal QQ plot
+ggplot(dataset, aes(sample=interacmodel2$residuals)) +
+  stat_qq() +
+  stat_qq_line()
+```
+
+Non-normal and Heteroscedastic means we need to do the Box-Cox transformation in the forthcoming steps.
+
+# 11.Outliers Test
+
+Outliers Test: A specific observation (Y, X1, X2,..., Xp) that deviates from the majority of the cases in the data collection is referred to as an outlier case.
+We can identify and assess outlier or influential points in a variety of ways.
+We use Cook's distance method.
+The Cook's distance Di is interpreted for the ith observation and quantifies the impact of eliminating a specific observation.
+Influential Outliers
+
+```{r}
+
+#Influential Outliers
+
+plot(interacmodel2,which=5)
+```
+
+```{r}
+plot(interacmodel2,pch=18,col="red",which=c(4))
+```
+
+```{r}
+dataset[cooks.distance(interacmodel2)>0.5,]
+
+```
+
+# 12.Box-Cox Transformation
+
+Box-Cox Transformation: When the Normality assumption and heteroscedastic assumption fail, we must do Box-Cox transformation.
+
+```{r}
+library(MASS)
+```
+
+```{r}
+bc=boxcox(interacmodel2,lambda=seq(-0.5,3))
+```
+
+From performing the Box-Cox Transformation, we have the lambda value that can help us improve our model.
+We will be discussing this before our final presentation.
+
+```{r}
+bestlambda=bc$x[which(bc$y==max(bc$y))]
+bestlambda
+```
+
+```{r}
+interacmodel2 <-lm(Site_Energy~NumberofBuildings+Emissions_CO2+I(Emissions_CO2^2)+I(Emissions_CO2^3)+Natural_Gas+Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+summary(interacmodel2)
+```
+
+```{r}
+bcmodel2=lm((((Site_Energy^0.5606)-1)/0.5606)~NumberofBuildings+Emissions_CO2+I(Emissions_CO2^2)+I(Emissions_CO2^3)+Natural_Gas+Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+summary(bcmodel2)
+```
+
+After box-cox transformation the Residual standard error improved from 381.8 to 16.78.
+We can check for normality and heteroscedasticity again.
+
+```{r}
+#Hypothesis for Heteroscedasticity
+#Null Hypothesis, H0: Heteroscedasticity is not present
+#Alternate Hypothesis, Ha: Heteroscedasticity is present
+bptest(bcmodel2)
+```
+
+```{r}
+#Testing for Normality
+shapiro.test(residuals(bcmodel2))
+```
+
+From the output, the Breusch-Pagan test that result from the Box-Cox model, the p-value \< 0.000000000000000220 which is \<0.05, indicating that we reject the null hypothesis.
+Therefore, the test provide evidence to suggest that homoscedasticity does not exist but heteroscedasticity does exist in the model even after improvement with box-cox transformation.Additinally, Shapiro-Wilk normality test also confirms that the residuals are not normally distributed as the p-value=0.000000003178 \>0.05.
+So Box-Cox Tranformation is helpful for our model to improve model by reducing RMSE, but it did not help with normality and homoscedasticity.
+
+# Plots of the model after Box Cox transformation
+
+```{r}
+par(mfrow=c(2,2))
+plot(bcmodel2)
+```
+
+In our case, the two interaction terms Emissions_CO2:Natural_Gas and Emissions_CO2:Property_GFA became non-significant after applying the Box-Cox transformation, which reduced the accuracy of our predictions.
+Therefore, we decided to revert to the original model for our final model instead of the model after the Box-Cox transformation.
+
+# RESULTS
+
+## Final Model and Interpreting Coefficients
+
+After successfully conducting all these tests, our final best fitted model including main effects, interaction terms and higher order terms is expressed as:
+
+$$
+\begin{aligned}
+Y_{SiteEnergy}&=\beta_0 +  \beta_1 X_{EmissionsCO2} +  \beta_2 X^2_{EmissionsCO2}+  \beta_3 X^3_{EmissionsCO2} +\beta_4 X_{NaturalGas} +\beta_5 X_{PropertyGFA}\\
+&+\beta_6 X_{NumberofBuildings} +\beta_7 X_{EmissionsCO2*NaturalGas} +\beta_8 X_{EmissionsCO2*PropertyGF}+\beta_9 X_{NaturalGas*PropertyGFA} + \epsilon
+\end{aligned}
+$$
+
+### Final model expanded with all terms
+
+$$
+\begin{aligned}
+\widehat{Y_{SiteEnergy}}&=149.7182 +  5.7774 X_{EmissionsCO2}   -0.0002257 X^2_{EmissionsCO2}+  0.000000007 X^3_{EmissionsCO2} +0.6629 X_{NaturalGas} \\
+&+0.0406 X_{PropertyGFA} -200.0864 X_{NumberofBuildings} +0.0000192 X_{EmissionsCO2*NaturalGas} \\
+&+0.0000385 X_{EmissionsCO2*PropertyGFA}-0.0000031 X_{NaturalGas*PropertyGFA}
+\end{aligned}
+$$
+
+### Adjusted R-square and RMSE of Best Fitted Model
+
+The adjusted R-squared, $R^2_{adj} =0.9995$ implies that 99.95% of the variation in the response variable site energy is explained by this model containing the predictors emissions CO2, natural gas, property GFA, number of buildings, and the interactions trems $EmissionsCO2*NaturalGas$, $EmissionsCO2*PropertyGFA$, $NaturalGas*PropertyGFA$ as well as the second order term and third order term of emissions CO2.
+
+$RMSE = 381.8$, this value indicates that the standard deviation of the unexplained variation in estimation of response variable site energy is 381.8 GJ.
+
+### Final model with EmissionsCO2 terms collected
+
+$$
+\begin{aligned}
+\widehat{Y_{SiteEnergy}}&=149.7182 +  (5.7774+0.0000192 X_{NaturalGas}+0.0000385 X_{PropertyGFA}) X_{EmissionsCO2}\\
+&-0.0002257 X^2_{EmissionsCO2}+  0.000000007 X^3_{EmissionsCO2} +0.6629 X_{NaturalGas} \\
+&+0.0406 X_{PropertyGFA} -200.0864 X_{NumberofBuildings}  \\
+&-0.0000031 X_{NaturalGas*PropertyGFA}
+\end{aligned}
+$$
+
+### Final model with NaturalGas terms collected
+
+$$
+\begin{aligned}
+\widehat{Y_{SiteEnergy}}&=149.7182 +  5.7774 X_{EmissionsCO2}   -0.0002257 X^2_{EmissionsCO2}+  0.000000007 X^3_{EmissionsCO2}\\
+&+(0.6629 +0.0000192 X_{EmissionsCO2}-0.0000031 X_{PropertyGFA}) X_{NaturalGas} \\
+&+0.0406 X_{PropertyGFA} -200.0864 X_{NumberofBuildings} \\
+&+0.0000385 X_{EmissionsCO2*PropertyGFA}
+\end{aligned}
+$$
+
+### Final model with PropertyGFA terms collected
+
+$$
+\begin{aligned}
+\widehat{Y_{SiteEnergy}}&=149.7182 +  5.7774 X_{EmissionsCO2}   -0.0002257 X^2_{EmissionsCO2}+  0.000000007 X^3_{EmissionsCO2} +0.6629 X_{NaturalGas} \\
+&+(0.0406+0.0000385 X_{EmissionsCO2}-0.0000031 X_{NaturalGas}) X_{PropertyGFA}\\
+&-200.0864 X_{NumberofBuildings} +0.0000192 X_{EmissionsCO2*NaturalGas} \\
+\end{aligned}
+$$
+
+## Interpretation of Coefficients
+
+There are four $\beta_i (i = EmissionsCO2, PropertyGFA, NaturalGas,NumberofBuildings)$ coefficients in our final model.
+
+Explanations of the relationship between each coefficients and the response variable site energy are given below.
+
+Note that in the following interpretation we ignore the higher order terms, due to their complexity.
+
+$$
+\begin{aligned}
+\widehat{\beta_{EmissionsCO2}}&= 5.7774+0.0000192 X_{NaturalGas}+0.0000385 X_{PropertyGFA}
+\end{aligned}
+$$
+
+This equation value indicates that the effect of emissions CO2 on site energy (in GJ) changes by natural gas and property GFA.
+While all other main effects are held constant,increasing emissions CO2 by 1 metric tons leads to an increase in site energy by $5.7774+0.0000192 X_{NaturalGas}+0.0000385 X_{PropertyGFA}$ GJ.
+
+$$
+\begin{aligned}
+\widehat{\beta_{NaturalGas}}&= 0.6629 +0.0000192 X_{EmissionsCO2}-0.0000031 X_{PropertyGFA}
+\end{aligned}
+$$
+
+This equation value indicates that the effect of natural gas on site energy (in GJ) changes by emissions CO2 and property GFA.
+While all other main effects are held constant,increasing natural gas by 1 GJ leads to an increase in site energy by $0.6629 +0.0000192 X_{EmissionsCO2}-0.0000031 X_{PropertyGFA}$ GJ.
+
+$$
+\begin{aligned}
+\widehat{\beta_{PropertyGFA}}&= 0.0406+0.0000385 X_{EmissionsCO2}-0.0000031 X_{NaturalGas}
+\end{aligned}
+$$
+
+This equation value indicates that the effect of property GFA on site energy (in GJ) changes by emissions CO2 and natural gas.
+While all other main effects are held constant,increasing the property gross floor area by 1 $m^2$ leads to an increase in site energy by $0.0406+0.0000385 X_{EmissionsCO2}-0.0000031 X_{NaturalGas}$ GJ.
+
+$$
+\begin{aligned}
+\widehat{\beta_{NumberofBuildings}}&=  -200.0864
+\end{aligned}
+$$ This equation value indicates that while all other main effects are held constant,increasing 1 buildings on the property leads to a decrease in site energy by -200.0864 GJ.
+
+## Predicted Site Energy Use
+
+We use the model to make a prediction of energy usage as an example.
+In a scenario where the number of buildings is 2, the property gross floor area is 9300 $m^2$, emissions CO2 is 760 Metric Tons, and natural gas usage is 9500 GJ.
+
+Checking Extrapolation:
+
+```{r}
+favstats(~NumberofBuildings, data=dataset)
+favstats(~Emissions_CO2, data=dataset)
+favstats(~Natural_Gas, data=dataset)
+favstats(~Property_GFA, data=dataset)
+
+```
+
+Extrapolation does not exist.
+
+$$
+\begin{aligned}
+\widehat{Y_{SiteEnergy}}&=149.7182 +  5.7774 X_{EmissionsCO2}   -0.0002257 X^2_{EmissionsCO2}+  0.000000007 X^3_{EmissionsCO2} +0.6629 X_{NaturalGas} \\
+&+0.0406 X_{PropertyGFA} -200.0864 X_{NumberofBuildings} +0.0000192 X_{EmissionsCO2*NaturalGas} \\
+&+0.0000385 X_{EmissionsCO2*PropertyGFA}-0.0000031 X_{NaturalGas*PropertyGFA}\\
+
+\widehat{Y_{SiteEnergy}}&=149.7182 +  5.7774 *(760)   -0.0002257 *(760)^2+  0.000000007 (760)^3 +0.6629 *(9500) \\
+&+0.0406 *(9300) -200.0864 *(2) +0.0000192*(760*9500) \\
+&+0.0000385 *(760*9300)-0.0000031*(9500*9300)\\
+&=10825.06491
+
+\end{aligned}
+$$
+
+In a scenario where the number of buildings is 2, the property gross floor area is 9300 $m^2$, emissions CO2 is 760 Metric Tons, and natural gas usage is 9500 GJ.
+In this scenario, the predicted site energy usage results are 10825.06491 GJ.
+
+```{r}
+interacmodel3 <-lm(Site_Energy~NumberofBuildings+Emissions_CO2+Natural_Gas+Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+
+
+newdata = data.frame(NumberofBuildings= 2, Emissions_CO2=760, Property_GFA=9300, Natural_Gas = 9500  )
+predict(interacmodel3,newdata,interval="predict")
+
+```
+
+From the R command predict, with 95% confidence interval, the site energy usage is between 10121.64 GJ to 11711.19 GJ when the number of buildings is 2, the property gross floor area is 9300 $m^2$, emissions CO2 is 760 Metric Tons, and natural gas usage is 9500 GJ.
+Our result of 10825.06491 GJ which lies in the 95% confidence interval.
+Thus, it verifies our result.
+
+# CONCLUSION:
+
+# DISCUSSION: The site energy use can be predicted using a few variables that are the most significant.
+
+We studied the effects of NumberofBuildings, Emissions_CO2, Natural_Gas, Property_GFA on Site Energy variable.
+We initially expected that all variables from the original model would be responsible for the Site Energy value, but turned out not all were significant enough.
+So we conducted tests and assumptions to get rid of the insignificant variables, and then formed our final model as mentioned above.
+The issue we faced initially was that our R\^2adj value was very close to 1, and that there was almost no scope for improvement.
+We, however, went ahead and conducted the tests and tried getting the R\^2adj value from 0.9994 or higher, for practice purposes as suggested by Ms. Thuntida.
+
+In this Statistical Analysis, we found the best model for prediction of Site Energy use.
+However, below are a few things we can do to improve our model and as a future scope: 1.
+Use of Time Series regression to check if model is improving.
+2.
+Use All possible regression and drop more variables to get our best model.
+3.
+Get the ANOVA table and interpret the meaning of the values.
+4.
+By using lambda value from box-cox, we can improve our model.
+
+# REFERENCES:
+
+Canada Energy Regulator-Energy in Canada [Online].
+Available at: <https://www.cer-rec.gc.ca/en/about/publications-reports/annual-report/2018/energy-in-canada.html#>:\~:text=Canada%20is%20currently%20ranked%20the,and%20future%20needs%20of%20Canadians (Accessed November 6, 2022) 2.
+Sustainable Building Partnership Program, City of Calgary [Online].
+Available at: <https://www.calgary.ca/development/sustainable-building-partnership.html> (Accessed November 6, 2022) 3.
+Canada Energy Regulator - Provincial and Territorial Energy Profiles -- Alberta [Online].
+Available at: <https://www.cer-rec.gc.ca/en/data-analysis/energy-markets/provincial-territorial-energy-profiles/provincial-territorial-energy-profiles-alberta.html> (Accessed November 6, 2022) 4.
+Building Energy Benchmarking - City of Calgary [Online].
+Available at: <https://data.calgary.ca/Environment/Building-Energy-Benchmarking-City-of-Calgary/8twd-upbv> (Accessed November 1, 2022) 5.
+Alberta Agriculture, Forestry and Rural Economic Development, Alberta Climate Information Service.
+(2022) Current and Historical Alberta Weather Station Data [Online].
+Available at: <https://acis.alberta.ca/acis/weather-data-viewer.jsp> (Accessed November 5, 2022) University of Calgary Utilites, Thermal Comfort [Online].
+Available at: <https://www.ucalgary.ca/facilities/thermal-comfort> (Accessed November 5, 2022)

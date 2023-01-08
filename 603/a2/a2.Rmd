@@ -1,0 +1,513 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+# 603 Assignment 1 Multiple Linear Regression
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(mosaic)
+require(mosaicData)
+library(ggplot2)
+
+```
+## Problem 1
+
+**a**
+
+```{r}
+options(scipen = 999)
+tires=read.csv("tires.csv", header = TRUE)
+head(tires)
+tail(tires)
+```
+```{r}
+fullmodel = lm(wear~ave+factor(type), data=tires) # (Full) model with all variables
+
+```
+
+The statistical hypothesis to be tested is:
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0\mbox{    (i=1,2)}
+\end{aligned}
+$$
+I set up the $\alpha = 0.05$
+```{r}
+summary(fullmodel)
+```
+It shows that the ave has $tcal=21.94$ with the $p-value <0.0000000000000002 < 0.05$,
+indicating that we Reject the null hypothesis that the average speed in km/hour has significantly influence on wear at $α=0.05$.
+
+type has $tcal=18.44$ with the $p-value <0.0000000000000002 < 0.05$,
+indicating that we Reject the null hypothesis that the type has significantly influence on wear at $α=0.05$.
+
+The estimated model is:
+$$
+\begin{aligned}
+\widehat{Wear_i}&=-0.6445083 + 0.0113094Ave +0.1725006Type_i\\
+\end{aligned}
+$$
+$$
+\widehat{Wear_i}= 0.0113094Ave + 
+\begin{cases} 
+-0.6445083+ 0.1725006  & \mbox{if } i^{th}\mbox{tire is a Type B} \\
+-0.6445083  & \mbox{if } i^{th}\mbox{tire is a Type A}
+\end{cases}
+$$
+**b**
+The dummy variable is type of tires which has 2 types, type A and type B,  $\beta_2 = 0.1725006$ as the average difference in  tread wear  between Type B and Type A.
+
+**c**
+
+Interpretation:
+
+
+$\beta_0 = -0.6445083$ can be interpreted as the average difference in  tread wear per 160 km in the percentage among Type A tires,
+
+$\beta_2 = 0.1725006$ can be interpreted as the average difference in  tread wear per 160 km in the percentage among Type B tires.
+
+$\beta_1 = 0.0113094$ means that for a given type of tire, increase 1 km/h of average speed leads to an increase in tread wear by approximately 0.0113094 percentage.
+
+**d**
+```{r}
+interacmodel<-lm(wear~(ave+factor(type))^2, data=tires)
+
+```
+
+For testing an interaction term in regression model, we use the Individual Coefficients Test (t-test) method. 
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0\mbox{    (i=1,2,3)}\\\\\\
+\end{aligned}
+$$
+I set up the $\alpha = 0.05$
+
+
+```{r}
+summary(interacmodel)
+
+```
+From the out put, It shows that the interaction term ave*type has $t_{cal}=16.11$ with the $p-value <0.0000000000000002< 0.05$, indicating that we should clearly Reject the null hypothesis for them which means that we should add this interaction term to the model at $α=0.05$.
+
+The model I suggest using for predicting y is: 
+$$
+\begin{aligned}
+\widehat{Wear_i}&=-0.3888744 + 0.0087833Ave -1.0800050Type_i + 0.0119840Ave*Type_i\\
+\end{aligned}
+$$
+
+**e**
+The adjusted-R2 value from the model in part (d) is 0.96
+Interpretation: 
+For the model, $R^2_{adj} = 0.96$ that means the model explains 96% of the variation of the response variable tread wear.
+
+**f**
+
+```{r}
+newdata = data.frame(ave= 100, type = 'A' )
+predict(interacmodel,newdata,interval="predict")
+
+```
+Interpretation:
+
+When a car with type A with the average speed of 100 km/hour, the fit prediction for the average tread wear per 160 km in the percentage of tread thickness is 0.48946 or 48.946% 
+
+The 95% confidence interval of the average tread wear per 160 km in the percentage of tread thickness with the given parameters is between 0.4263475 and 0.5525725 for a car with type A with the average speed of 100 km/hour.
+
+## Problem 2
+
+**a**
+```{r}
+mh=read.csv("MentalHealth.csv", header = TRUE)
+head(mh)
+tail(mh)
+```
+The dependent variable is EFFECT.
+
+**b**
+The independent variables are AGE and METHOD.
+
+
+**c** 
+```{r}
+mixmodel<- lm(EFFECT~AGE+factor(METHOD),data=mh)
+summary(mixmodel)
+#For student y=593.8135+5.9843Income
+#For nonstudent  y=211.1430+5.9843 Income
+ma=function(x){coef(mixmodel)[2]*x+coef(mixmodel)[1]}
+mb=function(x){coef(mixmodel)[2]*x+coef(mixmodel)[1]+coef(mixmodel)[3]}
+mc = function(x){coef(mixmodel)[2]*x+coef(mixmodel)[1]+ coef(mixmodel)[4]}
+ggplot(data=mh,mapping= aes(y=EFFECT,x=AGE,colour=METHOD))+geom_point()+ 
+  stat_function(fun=ma,geom="line",color=scales::hue_pal()(3)[1])+
+  stat_function(fun=mb,geom="line",color=scales::hue_pal()(3)[2])+
+  stat_function(fun=mc,geom="line",color=scales::hue_pal()(3)[3])
+
+```
+Notice that this amounts to fitting 3 parallel lines to the data, for METHOD A , METHOD B and METHOD C. This 3 lines have different intercepts, but the same slope, $β_1$. The fact that the lines are parallel means that the average effect on EFFECT of a 1 unit increase in AGE does not depend on the METHOD used. This represents a potentially serious limitation of the model.
+
+**d**
+
+```{r}
+interacmodel2<-lm(EFFECT~(AGE+factor(METHOD))^2, data=mh)
+
+```
+
+For testing an interaction term in regression model, we use the Individual Coefficients Test (t-test) method. 
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0\mbox{    (i=1,2,3)}\\\\\\
+\end{aligned}
+$$
+I set up the $\alpha = 0.05$
+
+
+```{r}
+summary(interacmodel2)
+
+```
+
+From the out put, It shows that the interaction term AGE*METHOD has $t_{cal}=6.451$ with the $p-value <0.000000398247265 < 0.05$, indicating that we should clearly Reject the null hypothesis for them which means that we should add this interaction term to the model at $α=0.05$.
+
+**e**
+The model I suggest using for predicting y is: 
+$$
+\begin{aligned}
+\widehat{EFFECT_i}&=47.51559 + 0.33051AGE_i -18.59739METHOD_{i1} -41.30421METHOD_{i2}+0.19318AGE_i*METHOD_{i1}+0.70288AGE_i*METHOD_{i2}\\
+\end{aligned}
+$$
+$$
+\begin{aligned}
+\widehat{EFFECT_i}=
+\begin{cases} 
+47.51559 +0.33051AGE_i & \mbox{if } i^{th}\mbox{ patient use treatment A} \\
+ 28.9182 + 0.52369 AGE_i & \mbox{if } i^{th}\mbox{ patient use treatment B}\\
+ 6.21138 + 1.0339 AGE_i & \mbox{if } i^{th}\mbox{ patient use treatment C}
+\end{cases}
+\end{aligned}
+$$
+**f**
+The average EFFECT of treatment A is 47.51559 when other predictor variables AGE is held constant. The average EFFECT of treatment B is 28.9182 when other predictor variables AGE is held constant. The average EFFECT of treatment C is 6.21138 when other predictor variables AGE is held constant. The slope for treatment A is 0.33051 which is lower than the slope for  treatment B (0.52369)  which is lower than the slope for treatment C (1.0339) . This suggests that increases in AGE are associated with smaller increases in EFFECT among treatment C as compared to treatment B which is then greater as compared to treatment A.
+
+**g**
+
+```{r}
+coef(interacmodel2)
+#For student y=593.8135+5.9843Income
+#For nonstudent  y=211.1430+5.9843 Income
+ta=function(x){0.33051*x+47.51559}
+tb=function(x){0.52369*x+28.9182}
+tc=function(x){1.0339*x+6.21138}
+ggplot(data=mh,mapping= aes(y=EFFECT,x=AGE,colour=METHOD))+geom_point()+ 
+  stat_function(fun=ta,geom="line",color=scales::hue_pal()(3)[1])+
+  stat_function(fun=tb,geom="line",color=scales::hue_pal()(3)[2])+
+  stat_function(fun=tc,geom="line",color=scales::hue_pal()(3)[3])
+
+
+
+```
+One May have the same conclusion as in part (f). As a matter of fact, the scatter diagram shows exactly what I have conclued in part f.
+
+## Problem 3
+
+**a**
+
+```{r}
+q3=read.table(file = "FLAG2.txt", header = TRUE) 
+head(q3)
+tail(q3)
+```
+
+```{r}
+library(olsrr)#need to install the package olsrr
+ 
+
+fullmodel<-lm(LOWBID~DOTEST+factor(STATUS)+factor(DISTRICT)+NUMIDS+DAYSEST+RDLNGTH+ PCTASPH + PCTBASE + PCTEXCAV + PCTMOBIL + PCTSTRUC + PCTTRAF, data = q3)
+summary(fullmodel)
+stepmod=ols_step_both_p(fullmodel,pent = 0.05, prem = 0.1, details=TRUE)
+summary(stepmod$model)
+```
+
+The output shows that the independent variables most suitable for modeling Y is DOTEST, STATUS and NUMIDS.
+The final model is:
+
+
+
+
+$$
+\begin{aligned}
+\hat{Y_i}&=57105.97270 + 0.93743DOTEST_i + 95252.38907 STATUS_{i1} - 15353.81995 NUMIDS_i\\
+\widehat{LOWBID_i}&=
+\begin{cases} 
+57105.97270+  0.93743DOTEST_i - 15353.81995 NUMIDS_i & \mbox{if } i^{th}\mbox{ contract  is competitive)} \\
+152358.3618 +  0.93743DOTEST_i - 15353.81995 NUMIDS_i  & \mbox{if } i^{th}\mbox{ contract  is fixed}
+\end{cases}
+\end{aligned}
+$$
+
+**b**
+```{r}
+formodel=ols_step_forward_p(fullmodel,penter = 0.05, details=TRUE)
+summary(formodel$model)
+```
+
+The output shows that the independent variables most suitable for modeling Y is DOTEST, STATUS and NUMIDS.
+The final model is:
+
+
+
+$$
+\begin{aligned}
+\hat{Y_i}&=57105.97270 + 0.93743DOTEST_i + 95252.38907 STATUS_{i1} - 15353.81995 NUMIDS_i\\
+\widehat{LOWBID_i}&=
+\begin{cases} 
+57105.97270+  0.93743DOTEST_i - 15353.81995 NUMIDS_i & \mbox{if } i^{th}\mbox{ contract  is competitive)} \\
+152358.3618 +  0.93743DOTEST_i - 15353.81995 NUMIDS_i  & \mbox{if } i^{th}\mbox{ contract  is fixed}
+\end{cases}
+\end{aligned}
+$$
+
+
+**c**
+```{r}
+backmodel=ols_step_backward_p(fullmodel, prem = 0.05, details=TRUE)
+summary(backmodel$model)
+```
+The output shows that the independent variables most suitable for modeling Y is DOTEST, STATUS and NUMIDS.
+The final model is:
+
+
+
+
+$$
+\begin{aligned}
+\hat{Y_i}&=57105.97270 + 0.93743DOTEST_i + 95252.38907 STATUS_{i1} - 15353.81995 NUMIDS_i\\
+\widehat{LOWBID_i}&=
+\begin{cases} 
+57105.97270+  0.93743DOTEST_i - 15353.81995 NUMIDS_i & \mbox{if } i^{th}\mbox{ contract  is competitive)} \\
+152358.3618 +  0.93743DOTEST_i - 15353.81995 NUMIDS_i  & \mbox{if } i^{th}\mbox{ contract  is fixed}
+\end{cases}
+\end{aligned}
+$$
+
+**d**
+
+Individual Coefficients Test (t-test) :
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0\mbox{    (i=1,2,...,12)}\\
+\end{aligned}
+$$
+I set up the $\alpha = 0.05$
+
+```{r}
+summary(fullmodel)
+
+```
+
+From the out put, It shows that:
+DAYSEST has $p-value= 0.6643> 0.05$,
+RDLNGTH has $p-value= 0.2509> 0.05$,
+PCTASPH has $p-value= 0.2015> 0.05$,
+PCTBASE has $p-value= 0.1727> 0.05$,
+PCTEXCAV has $p-value= 0.0805> 0.05$,
+PCTMOBIL has $p-value= 0.2308> 0.05$,
+PCTSTRUC has $p-value= 0.3690> 0.05$,
+PCTTRAF has $p-value= 0.4800> 0.05$,
+indicating that we should clearly not to reject the null hypothesis for them which means that we should not add those variables to the model at $α=0.05$.
+
+From the out put, It shows that the variable
+DOTEST has $t_{cal}=55.494$ with the $p-value< 0.0000000000000002 < 0.05$ ,
+STATUS has $t_{cal}=2.554$ with the $p-value = 0.0112 < 0.05$ ,
+DISTRICT has  $p-value = 0.0485 < 0.05$ and NUMIDS has $t_{cal}=-2.550$ with the $p-value= 0.0114 < 0.05$,
+indicating that we should clearly reject the null hypothesis for those which means that we should add those variables to the model at $α=0.05$.
+```{r}
+reducm <-lm(LOWBID~DOTEST+factor(STATUS)+factor(DISTRICT)+NUMIDS, data = q3)
+summary(reducm)
+```
+
+**e**
+Model for 3d:
+
+$$
+\begin{aligned}
+\hat{Y_i}&=60498.36032 +  0.94474 DOTEST_i + 99908.88953 STATUS_{i} -17361.29713 NUMIDS_i  + 70997.36495 DISTRICT_{i2} + 11563.79117 DISTRICT_{i3} -316505.61879 DISTRICT_{i4} -14151.26611 DISTRICT_{i5}\\
+
+\end{aligned}
+$$
+
+Model for 3a,3b,3c:
+$$
+\begin{aligned}
+\hat{Y_i}&=57105.97270 + 0.93743DOTEST_i + 95252.38907 STATUS_{i1} - 15353.81995 NUMIDS_i\\
+\widehat{LOWBID_i}&=
+\begin{cases} 
+57105.97270+  0.93743DOTEST_i - 15353.81995 NUMIDS_i & \mbox{if } i^{th}\mbox{ contract  is competitive)} \\
+152358.3618 +  0.93743DOTEST_i - 15353.81995 NUMIDS_i  & \mbox{if } i^{th}\mbox{ contract  is fixed}
+\end{cases}
+\end{aligned}
+$$
+
+
+By Comparing the results in all 4 models, 3a,3b and 3c are the same model with $R^2_adj = 0.9761$ and RMSE = 281700. And the model in 3d has $R^2_adj = 0.9768$ and $RMSE = 278000$ by adding one more variable DISTRICT. The improvement of 3d model is very low by adding the DISTRICT variable. 
+Independent variables consistently are selected as the ‘’best’’ predictors for the model are DOTEST, STATUS and NUMIDS.
+
+**f**
+```{r}
+reducm <-lm(LOWBID~DOTEST+factor(STATUS)+factor(DISTRICT)+NUMIDS, data = q3)
+summary(reducm)
+```
+
+The absolute difference in average contact bid price (by the lowest bidder) between District 1 and 4 is 316505.61879,when other predictors are held as a constant.
+
+**g**
+```{r}
+abs(-14151.26611 - 70997.36495 )
+```
+
+The difference in average contact bid price (by the lowest bidder) between District 2 and 5 is 85148.63,when other predictors are held as a constant.
+
+**h**
+Individual Coefficients Test (t-test) :
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0\mbox{    (i=1,2,...,p)}\\
+\end{aligned}
+$$
+```{r}
+interacmodelq3<-lm(LOWBID~(DOTEST+factor(STATUS)+factor(DISTRICT)+NUMIDS)^2, data=q3)
+summary(interacmodelq3)
+```
+
+From the out put, It shows that the interaction term STATUS*DISTRICT has the $p-value= 0.33964> 0.05$,
+STATUS*NUMIDS has the $p-value= 0.33964> 0.05$,
+indicating that we should clearly not to reject the null hypothesis for them which means that we should not add those interaction term to the model at $α=0.05$.
+
+From the out put, It shows that the interaction term DOTEST:STATUS has the $p-value= 0.01063 < 0.05$ and the interaction term DOTEST:DISTRICT has the $p-value= 0.000005636 < 0.05$,
+DOTEST:NUMIDS has the $p-value= 0.000000177< 0.05$, DISTRICT:NUMIDS has $p-value= 0.00126< 0.05$
+indicating that we should clearly reject the null hypothesis for those which means that we should add those interaction terms to the model at $α=0.05$.
+
+Individual Coefficients Test (t-test) :
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0\mbox{    (i=1,2,...,p)}\\
+\end{aligned}
+$$
+
+```{r}
+reducinm <-lm(LOWBID~DOTEST+factor(STATUS)+factor(DISTRICT)+NUMIDS +DOTEST:factor(STATUS) + DOTEST:factor(DISTRICT) +  DOTEST:NUMIDS + NUMIDS:factor(DISTRICT) , data = q3)
+summary(reducinm)
+```
+
+From the out put, It shows that all the the interaction terms are significant at $α=0.05$
+indicating that we should clearly reject the null hypothesis for those which means that we should keep all those interaction terms to the model at $α=0.05$.
+
+Final Model:
+$$
+\begin{aligned}
+\hat{Y_i}&=-33531.299250 +  1.097041 DOTEST_i  -11991.440846  STATUS_{i} -4697.039625 NUMIDS_i  -12149.855489   DISTRICT_{i2} + 90368.664800 DISTRICT_{i3}-1531677.676150 DISTRICT_{i4} -44376.120006 DISTRICT_{i5} + 0.094507 DOTEST:STATUS1 + ..... \\
+
+\end{aligned}
+$$
+
+**i**
+$RMSE_{modeld} = 279700$, in part d, an RMSE = 279700 means that the standard deviation of the unexplained variance by the model is 279700.
+$RMSE_{modelh} = 251800$, in part h, an RMSE = 251800 means that the standard deviation of the unexplained variance by the model is 251800
+
+**j**
+$R^2_{adj} = 0.9809$, it means the model explains 94% of the variation of the response variable LOWBID.
+
+## Problem 1
+
+**a**
+```{r}
+q4=read.csv("KBI.csv", header = TRUE)
+head(q4)
+tail(q4)
+```
+```{r}
+
+
+fullmodel<-lm(BURDEN~., data = q4)
+#summary(fullmodel)
+stepmod=ols_step_both_p(fullmodel,pent = 0.1, prem = 0.3, details=TRUE)
+summary(stepmod$model)
+```
+
+Final Model:
+$$
+\begin{aligned}
+\widehat{BURDEN_i}&=115.53922 +  0.56612 MEM  -0.49237  SOCIALSU + 0.12168 CGDUR  \\
+
+\end{aligned}
+$$
+
+**b**
+```{r}
+library(leaps)
+
+best.subset<-regsubsets(BURDEN~., data= q4, nv=7 ) 
+#by default, regsubsets() only reports results up to the best 8-variable model
+#Model selection by exhaustive search, forward or backward stepwise, or sequential replacement
+#The summary() command outputs the best set of variables for each model size using RMSE.
+summary(best.subset)
+reg.summary<-summary(best.subset)
+
+# for the output interpretation
+cp<-c(reg.summary$cp)
+AdjustedR<-c(reg.summary$adjr2)
+RMSE<-c(reg.summary$rss)
+BIC<-c(reg.summary$bic)
+cbind(cp,BIC,RMSE,AdjustedR)
+```
+Model 3 is the Best. 
+```{r}
+reducedmodel = lm(BURDEN~CGDUR + MEM + SOCIALSU, data = q4)
+summary(reducedmodel)
+```
+
+Final Model:
+$$
+\begin{aligned}
+\widehat{BURDEN_i}&=115.53922 +  0.56612 MEM  -0.49237  SOCIALSU + 0.12168 CGDUR  \\
+
+\end{aligned}
+$$
+
+**c**
+By comparing the results of part a and part b, independent variables that are consistently selected as the ‘’best’’ predictors are MEM, SOCIALSU and CGDUR.
+
+Individual Coefficients Test (t-test) :
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0\mbox{    (i=1,2,...,p)}\\
+\end{aligned}
+$$
+```{r}
+interacmodelq4<-lm(BURDEN~(CGDUR + MEM + SOCIALSU)^2, data=q4)
+summary(interacmodelq4)
+```
+From the out put, it shows that the interaction term CGDUR:MEM has $t_{cal}=0.894$ with the $p-value= 0.373411> 0.05$,
+
+CGDUR:SOCIALSU has $t_{cal}=-0.634$ with the $p-value= 0.527485 > 0.05$,
+
+MEM:SOCIALSU   has $t_{cal}=-0.492$ with the $p-value= 0.623553 > 0.05$,
+
+indicating that we should clearly not to reject the null hypothesis for them which means that we should not add those interaction term to the model at $α=0.05$.
+Therefore, the final model is:
+$$
+\begin{aligned}
+\widehat{BURDEN_i}&=115.53922 +  0.56612 MEM  -0.49237  SOCIALSU + 0.12168 CGDUR  \\
+
+\end{aligned}
+$$

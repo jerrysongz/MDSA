@@ -1,0 +1,262 @@
+---
+title: "Data 602 - Class Notes for September 27"
+output: html_notebook
+---
+
+**From Last Day**, **Time to Play with Data 3**..
+
+```{r}
+stdebt
+```
+
+```{r}
+vec.stds <- numeric(1000)
+for(i in 1:1000){
+  st.debtresampled <- sample(stdebt, length(stdebt), replace=TRUE)
+  vec.stds[i] <- sd(st.debtresampled)
+}
+```
+
+```{r}
+first.boottoday <- data.frame(vec.stds)
+```
+
+```{r}
+ggplot(first.boottoday, aes(x = vec.stds)) + geom_histogram(col="orange", fill="yellow", binwidth=200) + xlab("Values of Bootstrap Statistic: S") + ylab("Count") + ggtitle("Distribution of Bootstrap Statistic: S")
+```
+```{r}
+qdata(~vec.stds, c(0.01, 0.99), data=first.boottoday)
+```
+and the 95% Bootstrap CI for $\sigma_{Student\_Debt}$ is
+$$
+3063.31 \leq \sigma_{Student\_Debt} \leq 5995.89
+$$
+
+-----------------------------------------
+
+
+**Time to Play with Data 2:** $p = 0.58$, using $n = 1000$. 
+
+```{r}
+nairs <- 1000
+value.p <- 0.58
+air.discontent <- c(rep(0, (1 - value.p)*(nairs)), rep(1, (value.p*nairs)))
+```
+
+```{r}
+boot.phats <- numeric(1000)
+for(i in 1:1000){
+   s.data <- sample(air.discontent, nairs, replace=TRUE)
+   boot.phats[i] <- mean(s.data)
+}
+```
+
+```{r}
+sept22ttp2.df <- data.frame(boot.phats)
+```
+
+```{r}
+head(sept22ttp2.df, 4)
+tail(sept22ttp2.df, 3)
+```
+
+```{r}
+ggplot(sept22ttp2.df, aes(boot.phats)) + geom_histogram(col="orange", fill="yellow", binwidth=0.005) + xlab("Sample Proportion (n = 1000)") + ylab("Count") + ggtitle("Distribution of Bootstrap Sample Proportion") + geom_vline(xintercept = value.p, col="black")
+favstats(~boot.phats, data=sept22ttp2.df)
+qdata(~boot.phats, c(0.025, 0.975), data=sept22ttp2.df)
+```
+The 95% Bootstrap Confidence Interval for $p_{Avoid\_airports}$ is
+$$
+0.548 \leq p_{Avoid\_airports} \leq 0.609
+$$
+
+(b) Can we infer from this finding that $p_{Avoid\_airports} > 0.60$? No...
+
+Alternatively,
+
+```{r}
+ncdns = 1000
+example3data = c(rep(0,0.49*ncdns), rep(1, 0.58*ncdns))
+bootstrap_trials7 = do(1000) * mean(resample(example3data, ncdns))
+ggplot(data=bootstrap_trials7, aes(x = mean)) + geom_histogram(col='blue', fill='red', binwidth=0.01) + xlab("Bootstrap Statistic - Sample Proportion")
+qdata(~mean, c(0.025, 0.975), data=boostrap_trials7)
+```
+
+------------------------
+
+R Code for the Illustration Example 1(a)
+
+```{r echo=TRUE}
+waterbill = data.frame(billamount = c(198.58, 187.49, 174.77, 178.86, 177.03, 159.43, 178.94, 150.52, 157.48, 176.24, 162.88, 153.58, 170.91, 185.79, 182.03)) # create a data from called waterbill with billamount as the variable
+head(waterbill,3) #a look at the first 3 rows of the waterbill data frame
+```
+
+```{R}
+meanbill = favstats(~billamount, data=waterbill)$mean  #assigns sample mean to meanbill
+sdbill = favstats(~billamount, data=waterbill)$sd  #assigns sample standard deviation to sdbill
+nsize = favstats(~billamount, data=waterbill)$n
+```
+
+```{r}
+meanbill
+sdbill
+nsize
+```
+
+```{r echo=TRUE}
+lbavewaterbill = meanbill - (qt(0.975, nsize - 1)*(sdbill)/sqrt(nsize))  # subtract the margin of error from the sample mean to find the lower bound
+ubavewaterbill = meanbill + (qt(0.975, nsize - 1)*(sdbill)/sqrt(nsize))  # add the margin of error to the sample mean to find the upper bound
+cat("The lower bound is computed to be", lbavewaterbill,"and the upper bound is computed to be",ubavewaterbill,".\n") # report in a statement
+```
+
+Illustration of t.test
+
+```{r}
+t.test(~billamount, conf.level = 0.99, data=waterbill)$conf
+```
+
+```{r}
+uselectiondata <- read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/USElectionData2016.csv")
+```
+
+**Time to Play with Data 1:**
+
+```{r}
+counties.sampled <- sample(uselectiondata, 50, replace=FALSE) #do not need the is.na argument here to skip over all missing data points...
+```
+
+```{r}
+head(counties.sampled, 4)
+```
+
+Consider the variable **Median.Earnings.2010**.
+
+(a) 95% CI for $\mu_{Median.Earnings.2010}$
+
+**Answer:**
+
+```{r}
+favstats(~Median.Earnings.2010, data=counties.sampled)
+#
+ncountiessampled <- favstats(~Median.Earnings.2010, data=counties.sampled)$n
+mean.medincome <- favstats(~Median.Earnings.2010, data=counties.sampled)$mean
+sd.medincome <- favstats(~Median.Earnings.2010, data=counties.sampled)$sd
+#
+mean.medincome
+sd.medincome
+ncountiessampled 
+```
+```{r}
+moe <- qt(0.975, ncountiessampled - 1) * (sd.medincome/sqrt(ncountiessampled))
+#
+moe
+```
+
+```{r}
+lb.meanmedincome <- mean.medincome - moe
+ub.meanmedincome <- mean.medincome + moe
+cat("The 95% confidence interval for the mean median income of all counties is somewhere between", lb.meanmedincome, "and", ub.meanmedincome, "with 95% level of confidence.")
+```
+
+```{r}
+qt(0.975, ncountiessampled - 1)
+```
+
+$$
+\overline{X} \pm t_{1 - \frac{0.05}{2}, n - 1}\left(\frac{S}{\sqrt{n}}\right) \rightarrow 26156.15 \pm (2.009575)\left(\frac{6883.299}{\sqrt{50}} \right) \rightarrow 26156.15 \pm 1956.212 \\
+24199.94  \:\:  \leq \:\: \mu_{Median.Income.2010} \leq \: 28112.37 
+$$
+The confidence interval above can (and should) be computed with the `t.test` command:
+
+```{r}
+t.test(~Median.Earnings.2010, data=counties.sampled)$conf
+```
+
+
+(b) Normality. To address the Normality condition,
+
+```{r}
+ggplot(counties.sampled, aes(sample = Median.Earnings.2010)) + stat_qq(col="blue") + stat_qqline(col="red") +ggtitle("Normal Probability Plot of Median Earnings per County (2010)")
+```
+A violin plot of these data...
+
+```{r}
+ggplot(counties.sampled, aes(x = "var", y = Median.Earnings.2010)) + geom_violin(col="red", fill="blue") + geom_boxplot(width=0.2, fill="orange") + xlab("") + coord_flip()
+```
+(c) 95% Bootstrap Interval for $\mu_{Median.Earnings.2010}$
+
+```{r}
+sept27.boot <- do(1000) * mean(resample(counties.sampled$Median.Earnings.2010))
+```
+
+```{r}
+head(sept27.boot, 4)
+```
+```{r}
+qdata(~mean, c(0.025, 0.975), data=sept27.boot)
+```
+
+```{r}
+ggplot(sept27.boot, aes(x = mean)) + geom_histogram(col="red", fill="blue", binwidth=200) + xlab("Average Median Income of a County") + ylab("Count") + ggtitle("Distribution of Bootstrap Stat: Sample Mean") + geom_vline(xintercept = 24322.55, col="orange") + geom_vline(xintercept = 28075.27, col="orange")
+```
+and the 95% bootstrap confidence interval is
+$$
+24322.55 \leq \mu_{Median.Earnings.2010} \leq 28075.27
+$$
+(d and e) Compare (c) to (a). $\mu_{Median.Earnings.2010} = 25462.81$. Capture?
+
+-------------------------
+
+**Time to Play 2:**
+
+```{r}
+head(counties.sampled, 3)
+```
+
+(a) How many counties have **Graduate.Degree** $> 10$?
+
+```{r}
+nrow(subset(counties.sampled, Graduate.Degree > 10))
+```
+
+In my sample of $n = 50$, there are $X = 10$ counties that have a the percentage of residents with a **Graduate.Degree** exceeding 10%. 
+
+
+(b) The 95% confidence interval for $p$ is
+
+```{r}
+binom.test(10, 50, ci.method="Plus4")$conf
+```
+From this output,
+$$
+0.1113 \leq p \leq 0.3331
+$$
+
+Now, the population proportion turns out to be $p = 0.1336$. 
+
+
+```{r}
+nrow(subset(uselectiondata, Graduate.Degree > 10))/3143
+```
+
+
+**Time Permitting....**
+
+(a) the 95% confidence interval for $p_{Young}$ is
+```{r}
+binom.test(329, 732, ci.method="Plus4")
+```
+
+$$
+0.4138 \leq p_{Young} \leq 0.4856
+$$
+
+(b) the 95% confidence interval for $p_{Middle}$
+```{r}
+binom.test(409, 1241, ci.method="Plus4")
+```
+
+$$
+0.3040 \leq p_{Middle} \leq 0.3562
+$$
+

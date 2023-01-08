@@ -1,0 +1,668 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+```{r}
+library(binom)
+library(car)
+library(collapsibleTree)
+library(dbplyr)
+library(dplyr)
+library(EnvStats)
+library(ggformula)
+library(ggplot2)
+library(gmodels)
+library(htmltools)
+library(ISLR)
+library(knitr)
+library(lawstat)
+library(markdown)
+library(mosaic)
+library(mdsr)
+library(mosaicData)
+library(nycflights13)
+library(olsrr)
+library(plyr)
+library(purrr)
+library(plotly)
+library(resampledata)
+library(rmarkdown)
+library(rpart)
+library(rpart.plot)
+library(rvest)
+library(SDaA)
+library(shiny)
+library(stringi)
+library(tibble)
+library(tidyr)
+library(tidyselect)
+library(tinytex)
+library(yaml)
+library(shiny)
+```
+
+
+##Q1 
+
+**Q1 a**
+
+
+The statistical hypothesis to be tested is
+
+$$
+\begin{eqnarray}
+{\rm H}_{0}: \mu_{vitC} & =  & \mu_{Placebo} \hspace{0.2in} \text{(The differences between the two sample means of recovery time are the result of randomness)} \\
+{\rm H}_{A}: \mu_{vitC} & <  & \mu_{Placebo} \text{(The recovery time is quicker with Vitamin C than without)} \\
+\end{eqnarray}
+$$
+If the Vitamin C is more effective,in another words,the recovery time is quicker with Vitamin C than without, then the 
+$$
+\mu_{vitC} < \mu_{Placebo} \longrightarrow \mu_{vitC} - \mu_{Placebo} < 0
+$$
+
+I set up the $\alpha = 0.05$
+```{r}
+VitC = c(6, 7, 7, 7, 8, 7, 7, 8, 7, 8, 10, 6, 8, 5, 6)
+Placebo = c(10, 12, 8, 6, 9, 8, 11, 9, 11, 8, 12, 11, 9, 8, 10, 9)
+recovertime = c(Placebo, VitC)
+isVitC = c(rep("Placebo", 16),rep("VitC", 15) )
+recoverdata = data.frame(isVitC, recovertime)
+head(recoverdata, 4)
+tail(recoverdata,4)
+obsdiff = mean(~recovertime, data=filter(recoverdata, isVitC=="VitC"))  - mean(~recovertime, data=filter(recoverdata, isVitC=="Placebo"))
+outcome = numeric(2000) #create a vector to store differences of means
+for(i in 1:2000)
+{ index = sample(31, 15, replace=FALSE)  
+  outcome[i] = mean(recoverdata$recovertime[index]) - mean(recoverdata$recovertime[-index]) #difference between means
+}
+hist(outcome, xlab="Difference Between Mean recovertime of VitC and Mean recovertime of recovertime", ylab="Frequency", main="Outcome of 2000 Permutation Tests", col='blue')
+abline(v = obsdiff, col="red")
+
+pvalueq1 = (sum(outcome < obsdiff))/(2000)  #computes P-value
+pvalueq1
+```
+Because $p-value < \alpha$, Reject $H_{0}: \mu_{vitC} & =  & \mu_{Placebo}$. 
+I conclude that the recovery time is quicker with Vitamin C than without.
+
+**Q1 b**
+
+```{r}
+
+#t-test 
+t.test(VitC,Placebo, conf.level=0.95, alternative="less", data=recoverdata)
+
+
+```
+```{r}
+ggplot(recoverdata, aes(sample = recovertime)) + stat_qq(col="blue") + stat_qqline(col="red") + ggtitle("Normal Probability Plot of recovery time")
+```
+##Q2
+
+**a**
+```{r}
+
+df <- data.frame(Sentenced = c("Death", "Not Death", "Death", "Not Death"),
+                 Count = c(45, 85, 14, 218),
+                 Victim = c("Caucasian"   ,  "Caucasian" ,  "African-American" ,  "African-American")
+                 )
+ggplot(data=df, aes(Victim,Count, fill=Sentenced)) + geom_bar(position = "dodge",stat = "identity") 
+```
+**b**
+The statistical hypothesis to be tested is
+
+$$
+\begin{eqnarray}
+{\rm H}_{0}: \text{the race of the victim does Not appear to affect whether an African-American convicted of murder in Georgia will receive a death sentence} \\
+{\rm H}_{A}: \text{the race of the victim does appear to affect whether an African-American convicted of murder in Georgia will receive a death sentence} \\
+\end{eqnarray}
+$$
+I set up the $\alpha = 0.05$
+
+```{r}
+death = rbind(c(45,85), c(14, 218))
+rownames(death) = c("Victim was Caucasian", "Victim was African-American")
+colnames(death) = c("Sentenced to Death", "Not Sentenced to Death")
+death
+chisq.test(death, correct=FALSE)
+pvalue = 1.628e-12
+pvalue
+```
+Because $p-value < \alpha$, Reject $H_{0}$. 
+I conclude that the race of the victim does appear to affect whether an African-American convicted of murder in Georgia will receive a death sentence.
+
+The confidence interval:
+
+```{r}
+prop.test(c(45,14), c(45+85,14+218), alternative="two.sided", correct=FALSE)
+
+```
+The 95 percent confidence interval is: (0.1984768, 0.3731412)
+
+## Q3
+**a**
+```{r}
+df.q3 = read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/CloudSeedingData.csv")
+head(df.q3)
+tail(df.q3)
+```
+
+$$
+\hspace{0.25in} {\rm H}_{0}: \mu_{seeded} - \mu_{unseeded} = 0 \hspace{0.25in} \text{(cloud seeding does not have an effect on rainfall on average)}
+\\
+\hspace{0.25in} {\rm H}_{A}: \mu_{seeded} - \mu_{unseeded} \ne 0 \hspace{0.25in} \text{(cloud seeding does have an effect on rainfall on average)}
+$$
+I set up the $\alpha = 0.05$
+```{r}
+t.test(~RAINFALL|TREATMENT, conf.level=0.95, alternative = "two.sided", var.equal=FALSE, df.q3)
+
+```
+Because $p-value > \alpha$, Fail to Reject $H_{0}$. 
+I conclude that, on average, cloud seeding does not have an effect on rainfall.
+The 95 percent confidence interval is: (-4.764295, 559.556603)
+
+```{r}
+n.SEEDED = favstats(~RAINFALL|TREATMENT, data=df.q3)$n[1] 
+n.UNSEEDED = favstats(~RAINFALL|TREATMENT, data=df.q3)$n[2]
+n.SEEDED
+n.UNSEEDED
+#n > 25 
+#Condition satisfied
+```
+
+**b**
+$$
+\hspace{0.25in} {\rm H}_{0}: \frac{\sigma_{seeded}}{\sigma_{unseeded}} \ge 1 \hspace{0.25in} 
+\\
+\hspace{0.25in} {\rm H}_{A}: \frac{\sigma_{seeded}}{\sigma_{unseeded}} < 1  
+$$
+I set up the $\alpha = 0.05$
+```{r}
+favstats(~RAINFALL|TREATMENT, data=df.q3)
+favstats(~RAINFALL|TREATMENT, data=df.q3)$sd[2]
+favstats(~RAINFALL|TREATMENT, data=df.q3)$sd[1] / favstats(~RAINFALL|TREATMENT, data=df.q3)$sd[2]
+
+```
+
+
+```{r}
+sd.obs = favstats(~RAINFALL|TREATMENT, data=df.q3)$sd[1] / favstats(~RAINFALL|TREATMENT, data=df.q3)$sd[2]
+
+outcome = numeric(2000) #create a vector to store rate of sd
+for(i in 1:2000)
+{ index = sample(52, 26, replace=FALSE)  
+  outcome[i] = sd(df.q3$RAINFALL[index]) / sd(df.q3$RAINFALL[-index]) 
+}
+hist(outcome, xlab="Rate of Sd", ylab="Frequency", main="Outcome of 2000 Permutation Tests", col='blue')
+abline(v = sd.obs, col="red")
+
+pvalueq3b = (sum(outcome <= sd.obs) )/(2000)  #computes P-value
+pvalueq3b
+```
+Because $p-value > \alpha$, Fail to Reject $H_{0}$.
+
+**c**
+```{r}
+df.q3 = df.q3 %>%
+  mutate(Ln = log(RAINFALL)) #create a new variable called Diff = price of camera at JR - price of same camera at BH
+head(df.q3)
+```
+
+$$
+\hspace{0.25in}  {\rm H}_{0}: \overline{ln(X_{SEEDED})} - \widetilde{ln(X_{UNSEEDED})} = 0 \hspace{0.25in} 
+\\
+\hspace{0.25in} {\rm H}_{A}: \overline{ln(X_{SEEDED})} - \widetilde{ln(X_{UNSEEDED})} \neq 0 \hspace{0.25in} 
+$$
+I set up the $\alpha = 0.05$
+```{r}
+favstats(~RAINFALL|TREATMENT, data=df.q3)
+```
+
+
+```{r}
+diffmd.obs = favstats(~Ln|TREATMENT, data=df.q3)$mean[1] - favstats(~Ln|TREATMENT, data=df.q3)$median[2]
+
+outcome3c = numeric(2000) #create a vector to store
+for(i in 1:2000)
+{ index = sample(52, 26, replace=FALSE)  
+  outcome3c[i] = mean(df.q3$Ln[index]) - median(df.q3$Ln[-index]) 
+}
+hist(outcome3c, xlab="Diff of Median ln", ylab="Frequency", main="Outcome of 2000 Permutation Tests", col='blue')
+abline(v = diffmd.obs, col="red")
+
+pvalueq3 = (sum(outcome3c >= diffmd.obs) + sum(outcome3c <=  -diffmd.obs))/(2000)  #computes P-value
+pvalueq3
+```
+Because $p-value < \alpha$,Reject $H_{0}$.
+
+```{r}
+favstats(outcome3c)
+diffmd.obs
+```
+
+
+##Q4
+
+
+The statistical hypothesis to be tested is
+
+$$
+\begin{eqnarray}
+{\rm H}_{0}: p_{minoxidil} & \leq  & p_{placebo} \hspace{0.2in} \text{(minoxidil is not effective in treating male pattern baldness )} \\
+{\rm H}_{A}: p_{minoxidil} & >  & p_{placebo} \text{(minoxidil is effective in treating male pattern baldness )} \\
+\end{eqnarray}
+$$
+If the Vitamin C is more effective then:
+
+$$
+\begin{eqnarray}
+p_{minoxidil} > p_{Placebo} \longrightarrow p_{minoxidil} - p_{Placebo} > 0
+\end{eqnarray}
+$$
+
+I set up the $\alpha = 0.05$
+
+```{r}
+prop.test(c(99,62), c(310,309), alternative="greater", correct=FALSE)
+
+```
+Because $p-value < \alpha$, Reject $H_{0}:p_{minoxidil} \le  p_{placebo}$. 
+I conclude that minoxidil is effective in treating male pattern baldness.
+
+95 percent confidence interval is from 0.06124968 to 1.
+
+In the context of these data, the p-value is the probability that
+, in another experimental study like this, the$ p_{minoxidil} - p_{Placebo}$ will be smaller than test statistic we have this time, assuming that the null
+hypothesis is true. In this case, p value is 0.0003811, which means the above statement is not likely to happen.
+
+## Q5
+
+**a**
+
+```{r}
+df.q5 = read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/chocnochocratings.csv")
+#df.q5
+``` 
+Treatment effect means that student who got chocolate rate prof. higher than student who did not receive chocolate.
+
+
+
+The statistical hypothesis to be tested is
+
+$$
+\begin{eqnarray}
+{\rm H}_{0}: \mu_{ChocolateQ9} & \leq  & \mu_{NOChocQ9} \hspace{0.2in} \text{(there is not a treatment effect)} \\
+{\rm H}_{A}: \mu_{ChocolateQ9} & >  & \mu_{NOChocQ9} \hspace{0.2in} \text{(there is a treatment effect)} \\
+\end{eqnarray}
+$$
+If Treatment effect is true then:
+$$
+\mu_{ChocolateQ9} > \mu_{NOChocQ9} \longrightarrow \mu_{ChocolateQ9} - \mu_{NOChocQ9} > 0
+$$
+
+I set up the $\alpha = 0.05$
+```{r}
+favstats(~Q9|GroupName, data=df.q5)
+favstats(~Q9|GroupName, data=df.q5)$mean[1]
+favstats(~Q9|GroupName, data=df.q5)$mean[2]
+favstats(~Q9|GroupName, data=df.q5)$n[1]
+favstats(~Q9|GroupName, data=df.q5)$n[2]
+n = favstats(~Q9|GroupName, data=df.q5)$n[1] + favstats(~Q9|GroupName, data=df.q5)$n[2]
+n
+
+#1 cho
+#2 nocho
+
+```
+
+```{r}
+obsdiff5 = favstats(~Q9|GroupName, data=df.q5)$mean[1] - favstats(~Q9|GroupName, data=df.q5)$mean[2]
+N =2000
+outcome5 = numeric(N)
+for (i in 1:N){
+  index = sample(98, 50, replace = FALSE)
+  outcome5[i] = mean(df.q5$Q9[index]) - mean(df.q5$Q9[-index])
+}
+
+hist(outcome5, xlab="Difference Between Mean rate point of Chocolate and Mean rate point of NOChoc", ylab="Frequency", main="Outcome of 2000 Permutation Tests", col='blue')
+abline(v = obsdiff5, col="red")
+
+pvalueq5 = (sum(outcome5 >= obsdiff5))/(N)  #computes P-value
+pvalueq5
+```
+Because $p-value > \alpha$, Fail to Reject $H_{0}$. 
+I conclude that there is not a treatment effect which means that student who got chocolate did not rate prof. higher than student who did not receive chocolate in Q9 on average.
+
+**b**
+The statistical hypothesis to be tested is
+
+$$
+\begin{eqnarray}
+{\rm H}_{0}: \mu_{ChocolateOverall} & \leq  & \mu_{NOChocOverall} \hspace{0.2in} \text{(there is not a treatment effect)} \\
+{\rm H}_{A}: \mu_{ChocolateOverall} & >  & \mu_{NOChocOverall} \hspace{0.2in} \text{(there is a treatment effect)} \\
+\end{eqnarray}
+$$
+
+
+$n > 25$
+Condition satisfied
+I set up the $\alpha = 0.05$
+
+```{r}
+
+t.test(~Overall|GroupName, alternative = "greater", conf.level=0.95, var.equal=FALSE, df.q5)
+
+```
+
+Because $p-value < \alpha$, Reject $H_{0}$. 
+
+I conclude that there is a treatment effect which means that student who got chocolate did not rate prof. higher than student who did not receive chocolate in Overall on average.
+In the context of these data, the p-value is the probability that
+, in another experimental study like this, the$\mu_{ChocolateOverall} - \mu_{NOChocOverall}$ will be larger than test statistic we have this time, assuming that the null
+hypothesis is true.
+
+**c**
+```{r}
+ggplot(filter(df.q5, GroupName =="Chocolate"), aes(sample = Q9)) + stat_qq(col="blue") + stat_qqline(col="red") + ggtitle("Normal Probability Plot")
+ggplot(filter(df.q5, GroupName =="NOChoc"), aes(sample = Q9)) + stat_qq(col="blue") + stat_qqline(col="red") + ggtitle("Normal Probability Plot")
+ggplot(filter(df.q5, GroupName =="Chocolate"), aes(sample = Overall)) + stat_qq(col="blue") + stat_qqline(col="red") + ggtitle("Normal Probability Plot")
+ggplot(filter(df.q5, GroupName =="NOChoc"), aes(sample = Overall)) + stat_qq(col="blue") + stat_qqline(col="red") + ggtitle("Normal Probability Plot")
+```
+
+ t-test not be a recommended statistical method to carry out the test in part (a) because The data is not normal.
+
+##Q6
+
+
+The statistical hypothesis to be tested is:
+
+$$
+\begin{eqnarray}
+{\rm H}_{0}: p_{agree \_2020} & \leq  & p_{agree \_2018} \hspace{0.2in} \text{( the proportion of Alberta residents who support the Alberta’s adoption of a sales tax has no increased since March 2018)} \\
+{\rm H}_{A}: p_{agree \_2020} & >  & p_{agree \_2018} \hspace{0.2in} \text{( the proportion of Alberta residents who support the Alberta’s adoption of a sales tax has increased since March 2018)} \\
+\end{eqnarray}
+$$
+
+I set up the $\alpha = 0.05$
+```{r}
+n20 = 900
+x20 = 358
+n18 = 900
+x18 = 225
+x = x20 + x18
+n = n20 + n18
+obsdiff6 =x20/n20 - x18/n18
+
+obsdiff6
+data=c(rep(1,x),rep(0,n - x))
+
+N = 2000
+outcome6 = numeric(N)
+for(i in 1:N)
+{ index = sample(n, n20, replace=FALSE)
+  outcome6[i] = mean(data[index]) - mean(data[-index]) 
+}
+```
+
+```{r}
+hist(outcome6, xlab="Difference Between Mean of Alberta residents who support the Alberta’s adoption of a sales tax 2020 vs 2018", ylab="Frequency", main="Outcome of 2000 Permutation Tests", col='yellow')
+abline(v = obsdiff6, col="red")
+pvalueq6 = (sum(outcome6 >= obsdiff6))/(N)
+pvalueq6
+```
+Because $p-value < \alpha$, Reject $H_{0}$. 
+I conclude thatthe proportion of Alberta residents who support the Alberta’s adoption of a sales tax has increased since March 2018.
+
+**b**
+```{r}
+prop.test(c(x20,x18), c(n20,n18), alternative="greater", correct=FALSE)
+Zobs = sqrt(44.876)
+Zobs
+```
+test statistic: $Z_{obs} = \sqrt{\chi^{2}_{1}} = \sqrt{44.876} = 6.698955$. It is positive as the observed difference is positive.
+$p-value = 1.049e-11$
+
+Because $p-value < \alpha$, Reject $H_{0}$. 
+I conclude that the proportion of Alberta residents who support the Alberta’s adoption of a sales tax has increased since March 2018.
+
+**c**
+From part b, 95 percent confidence interval is frome 0.1119479 to 1.0000000.
+
+##7
+$$
+R_{StockA,i} = \beta_{0} + \beta_{1}R_{Market, i} + e_{i}   
+$$
+**a**
+```{r}
+df7 = read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/capm.csv")
+#df7
+```
+```{r}
+ggplot(df7, aes(x = TSE.Index, y = Suncor)) + geom_point(col="blue", size = 2) + ylab("the monthly rate of return on Suncor stock") + xlab("% with monthly rate of return on the TSE index") + ggtitle("% of monthly rate of return on the TSE index to % of the monthly rate of return on Suncor stock") + geom_smooth(method="lm", col="red")
+```
+
+**b**
+```{r}
+predictdemovote = lm(Suncor ~ TSE.Index, data=df7)  
+options(scipen=999)
+predictdemovote$coef
+```
+The value of a and b are a=0.01664794   and b=0.53869099  From the training data, we have an estimate of the model:
+$$
+R_{StockA,i} = 0.01664794   + 0.53869099 R_{Market, i} + e_{i}   
+$$
+**c**
+$\beta_{0}$ is the represents the risk-free interest rate. It means that when the monthly rate of return of the TSE Index is 0, the monthly rate of return for a common share of Suncor stock is 0.01664794.
+$\beta_{1}$ is the systematic risk. It measure’s the stocks volatility related to the market volatility. The slope of increase is 0.53869099.
+
+**d**
+```{r}
+predict(predictdemovote, data.frame(TSE.Index=0.04))
+```
+
+
+
+**e**
+**Normality of residuals:**
+```{r}
+predicted.values.demovote = predictdemovote$fitted.values #place the predicted values of y for each observed x into a vector
+eisdemovote = predictdemovote$residuals      #pull out the residuals
+diagnosticdf = data.frame(predicted.values.demovote, eisdemovote) #create a data frame of fitted.values and residuals
+ggplot(diagnosticdf, aes(sample = eisdemovote)) +  stat_qq(col='blue') + stat_qqline(col='red') + ggtitle("Normal Probability Plot of Residuals")
+```
+the residuals are normally distributed
+
+**Homoscedasticity:**
+```{r}
+ggplot(diagnosticdf, aes(x = predicted.values.demovote, y = eisdemovote)) +  geom_point(size=2, col='blue', position="jitter") + xlab("Predicted % of the monthly rate of return on Suncor stock") + ylab("Residuals") + ggtitle("Plot of Fits to Residuals") + geom_hline(yintercept=0, color="red", linetype="dashed")
+```
+homoscedasticity satisfied
+
+
+
+**f**
+
+```{r}
+options(scipen=999)
+coef(summary(predictdemovote))
+Sb= 0.19177963 
+```
+
+The statistical hypothesis to be tested is:
+$$
+{\rm H}_{0}: B(\beta_{1}) \leq 0 \:\: \text{( the monthly rate of return of Suncor stock can not be expressed as a positive linear function of the monthly rate of return of the TSE Index)} \\
+{\rm H}_{A}: B(\beta_{1}) > 0 \:\: \text{( the monthly rate of return of Suncor stock can be expressed as a positive linear function of the monthly rate of return of the TSE Index)} \\
+$$
+I set up the $\alpha = 0.05$
+The value of the test statistic is
+
+```{r}
+Tobs = 0.53869099/ 0.19177963
+Tobs
+```
+
+
+$$
+
+T_{Obs} = \frac{b - B^{*}}{S_{b}} = \frac{0.53869099  - 0}{0.19177963 } = 2.808906
+
+$$
+```{r}
+1-pt(2.808906, 59-2)
+
+```
+The $P$-value is 
+$$
+P-\text{value} = P(T_{59-2} > 2.808906) = 0.003398711
+$$
+Because $p-value < \alpha$, Reject $H_{0}$. 
+I conclude that the monthly rate of return of Suncor stock can be expressed as a positive linear function of the monthly rate of return of the TSE Index.
+
+**g**
+```{r}
+confint(predictdemovote, conf.level=0.95)
+
+```
+95% confidence interval for $\beta_{1}$ is from 0.154658904 to 0.92272309. 
+As the monthly rate of return of the TSE Index increases by 1%, the monthly rate of return for a common share of Suncor stock will increase by an AVERAGE of anywhere between 0.154658904  to 0.92272309.
+
+
+**h**
+
+```{r}
+predict(predictdemovote, newdata=data.frame(TSE.Index=0.03), interval="predict")
+```
+95% confidence interval for the mean monthly rate of return of Suncor stock when the TSE has a monthly rate of return of 3%:
+$$
+-0.1490657  \leq R_{x = 0.535} \leq 0.214683
+$$
+
+
+**i**
+```{r}
+predict(predictdemovote, newdata=data.frame(TSE.Index=0.0116), interval="predict")
+```
+In a month of September, the TSE Index had a rate of return of 1.16%. With 95% confidence, compute the September rate of return for Suncor stock:
+
+$$
+-0.1587618   \leq R_{x = 0.0116} \leq 0.2045553
+$$
+
+**j**
+```{r}
+Nbootstraps = 1000 #resample n =  59, 1000 times
+cor.boot = numeric(Nbootstraps)
+nsize = dim(df7)[1]
+for(i in 1:Nbootstraps)
+{   #start of the loop
+    index = sample(nsize, replace=TRUE)  #randomly picks a number between 1 and n, assigns as index
+    demovote.boot = df7[index, ] #accesses the i-th row of the regressionex1.df data frame
+    #
+    cor.boot[i] = cor(~TSE.Index, ~Suncor, data=df7) #computes correlation for each bootstrap sample
+    votedemocrat.lm = lm(Suncor ~ TSE.Index, data=df7)  #set up the linear model
+}
+#end the loop
+#create a data frame that holds the results of teach of he Nbootstraps 
+bootstrapresultsdf = data.frame(cor.boot)
+head(bootstrapresultsdf, 3)
+
+qdata(~cor.boot, c(0.025, 0.975), data=bootstrapresultsdf)
+
+
+```
+95% bootstrap confidence interavl for the value of the ρ, the population correlation that measures the degree of linear association between Suncor’s monthly rate of return and the TSE Index monthly rate of return is from 0.3486972 to 0.3486972.
+
+##Q8
+**a b c**
+```{r}
+gss = read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/GSS2002.csv")
+#gss
+```
+```{r}
+conttablea1 <- tally(~SpendSci + GunLaw, data=gss) #if margin = TRUE, the chisq.test will count the row totals and column totals as other 'categories' for the row and column categorical variables
+conttablea1
+```
+The statistical hypothesis is
+
+$$
+\begin{align}
+{\rm H}_{0}: & \text{support for gun laws and the government spending on Science are independent of each other} \\
+{\rm H}_{A}: & \text{support for gun laws and the government spending on Science are NOT independent of each other} \\
+\end{align}
+$$
+I set up the $\alpha = 0.05$
+```{r}
+chisq.test(conttablea1,simulate.p.value=TRUE)
+4.1944^2
+```
+from which
+```{r}
+1 - pchisq(17.59299, 6)
+```
+
+$$
+\chi^{2}_{Obs} = 17.59299 \hspace{0.5in} P-\text{value} = P(\chi^{2}_{(4-1)*(3-1)} > 17.59299) = 0.007334053
+$$
+Because $p-value < \alpha$, Reject $H_{0}$. 
+I conclude that the support for gun laws and the government spending on Science are NOT independent of each other.
+
+**d**
+```{r}
+conttablea2 <- tally(~Race + Education , data=gss) #if margin = TRUE, the chisq.test will count the row totals and column totals as other 'categories' for the row and column categorical variables
+conttablea2
+```
+The statistical hypothesis is
+
+$$
+\begin{align}
+{\rm H}_{0}: & \text{one’s level of Education is independent of their Race} \\
+{\rm H}_{A}: & \text{one’s level of Education is not independent of their Race} \\
+\end{align}
+$$
+I set up the $\alpha = 0.05$
+```{r}
+chisq.test(conttablea2,simulate.p.value=TRUE)
+83.575^2
+```
+from which
+```{r}
+1 - pchisq(6984.781, 10)
+```
+
+$$
+\chi^{2}_{Obs} = 6984.781 \hspace{0.5in} P-\text{value} = P(\chi^{2}_{(6-1)*(3-1)} > 6984.781) = 0
+$$
+Because $p-value < \alpha$, Reject $H_{0}$. 
+I conclude that one’s level of Education is not independent of their Race.
+
+##Q9
+```{r}
+q9 = rbind(c(15,7,3,15), c(22, 7,3,11))  #create a table of observed counts called seatbelt
+
+rownames(q9) = c("Fluvoxamine", "Placebo")
+colnames(q9) = c("No Response", "Moderate Response","Marked Response","Remission")
+q9
+```
+The statistical hypothesis is
+
+$$
+\begin{align}
+{\rm H}_{0}: & \text{there is not an association between the type of treatment received and a patient’s response} \\
+{\rm H}_{A}: & \text{there is an association between the type of treatment received and a patient’s response} \\
+\end{align}
+$$
+I set up the $\alpha = 0.05$
+```{r}
+chisq.test(q9,simulate.p.value=TRUE)
+1.8337^2
+```
+```{r}
+1 - pchisq(3.362456, 3)
+```
+$$
+\chi^{2}_{Obs} = 3.362456 \hspace{0.5in} P-\text{value} = P(\chi^{2}_{(3)*(1)} > 3.362456) = 0.3390441
+$$
+Because $p-value > \alpha$, Fail to Reject $H_{0}$. 
+I conclude that there is not an association between the type of treatment received and a patient’s response.
+
+

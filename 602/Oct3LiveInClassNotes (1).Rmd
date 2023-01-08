@@ -1,0 +1,281 @@
+---
+title: "Data 602 - Class Notes for October 3"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+Hypothesis Testing about $p$
+
+**Open Question for Example 1:**
+
+$$
+{\rm H}_{0}: p = (\leq) 0.40 \hspace{0.5in} {\rm H}_{A}: p > 0.40
+$$
+
+Consider the value of $\alpha = 0.0971$ and $beta_{p = 0.45} = 0.7691$.
+
+What would happen if the values of $\alpha$ and $\beta_{p = 0.45}$ if
+the null hypothesis were to be rejected in favour of the alternative
+hypothesis if $$
+\text{Reject} \:\:{\rm H}_{0}: \{X: X \geq 17\} \hspace{0.5in} \text{rather than}\:\: \{X: X \geq 16\}
+$$
+
+$$
+\begin{eqnarray}
+\alpha & = & P(\text{Reject}\:\:{\rm H}_{0} | {\rm H}_{0} \: \text{is true}) \\
+       & = & P(X \geq 17 | p = 0.40) \\
+       & = & \sum_{x = 17}^{30}{30 \choose x}(0.40)^{x}(0.60)^{30 - x} \\
+       & = & 0.0481
+\end{eqnarray}
+$$
+
+```{r}
+sum(dbinom(17:30, 30, 0.40))
+```
+
+Similarly,
+
+$$
+\begin{eqnarray}
+\beta & = & P(\text{Fail to Reject}\:\:{\rm H}_{0} | {\rm H}_{0} \: \text{is false}) \\
+       & = & P(X \leq 16 | p = 0.45) \\
+       & = & \sum_{x = 0}^{16}{30 \choose x}(0.45)^{x}(0.50)^{30 - x} \\
+       & = & 0.8644
+\end{eqnarray}
+$$
+
+```{r}
+sum(dbinom(0:16, 30, 0.45))
+```
+
+**Time to Play With Data 1:**
+
+Revisiting part (a) from the practice with stating statistical
+hypotheses: $p$ was defined as the proportion of Millennial Canadians
+(aged 18 to 34 years of age) who are relying on a financial inheritance
+to reach their financial goals. </br> </br> We wish to test that this
+proportion equates to **at most half** of the persons in this
+group/population. State the statistical hypothesis. The statistical
+hypothesis was stated as </br> </br> **Answer:**
+
+1.  We have formulated the statistical hypothesis early in this class:
+    $$
+    \begin{eqnarray}
+    {\rm H}_{0}: p  & \leq (=) & \:0.50 \hspace{0.25in} {\rm \text{(the proportion of Millenials who rely on an inheritance to reach financial goals is at most 50%)}} \\
+    {\rm H}_{0}: p & >& \:0.50 \hspace{0.25in} {\rm \text{(the proportion of Millenials who rely on an inheritance to reach financial goals is more than 50%)}} \\
+    \end{eqnarray}
+    $$ </br> </br>
+
+2 and 3. Collect the data. Although the breakdown of the sample by age
+cohort was not provided, let's presume that the sample size is
+relatively large and $n_{Millenial} = 759$. From this, the observed
+number who indicated that they were relying on an inheritance to achieve
+their financial goals is $X_{Obs} = 425$. </br> </br>
+
+4.  The Distribution of the Statistic $X_{Obs}$?
+
+::: pink
+```{r}
+plot(seq(300, 759, 1), dbinom(seq(300, 759, 1), 759, 0.50), xlab="Values of Sample Sum", ylab="P(X = X_{Obs})", type="h", col="blue", main="Distribution of the Test Statistic")
+abline(v = 425, col="red")
+```
+:::
+
+5.  Computation of the $P$-value. Under the assumption/condition that
+    the null hypothesis ${\rm H}_{0}: p = 0.50$ is true, the $P$-value
+    is
+
+$$
+\begin{eqnarray}
+P-\text{value} & = &  P(X > \overbrace{425}^{X_{Obs}} | p = 0.50) \\
+               & = & \sum_{x = 426}^{n = 759}{759 \choose x}{0.50^{x}( 1 - 0.50)^{759 - x}}\\
+               & = & 0.0004142 \:\: \text{(see R code below)}\\
+               & \approx & 0.0004
+\end{eqnarray}
+$$
+
+::: pink
+```{r}
+pvalue.ex1 <- 1 - pbinom(425, 759, 0.5) # computes P(X <= 425) with n = 759 and the incorporated assummed value of p = 0.50
+pvalue.ex1
+```
+:::
+
+Note: For a regulated value of $\alpha = 0.05$, the rejection region is
+
+$$
+\text{Reject the null hypothesis if} \:\: \{X_{Obs}: X > 402\}
+$$
+
+```{r}
+qbinom(0.95, 759, 0.50)
+```
+
+5.  What decision can be made? </br> </br> If the null hypothesis *is
+    true*, there is a 0.0004 probability that another random sample of
+    $n = 759$ Millennial Canadians will yield a number who are relying
+    on an inheritance to achieve their financial goals that **is greated
+    than the observed number/value** of $X_{Obs} = 425$. Such an event -
+    $X_{Obs} > 425$ - is not likely *if the null hypothesis is true*. As
+    a result, we have distrust in that assumption and the **null
+    hypothesis is rejected**. </br> </br> As a result we conclude **from
+    these data/this sample**\* that $p > 0.50$, or that more than 50% of
+    Millennial Canadians rely on a financial inheritance to achieve
+    their financial goals.
+
+------------------------------------------------------------------------
+
+# Testing About the Population Mean $\mu$
+
+**Time to Play With Data 2:** Consider your **counties.sampled** data
+from last Tuesday's class, where you created a 95% confidence interval
+for $\mu_{Median.Earnings.2010}$. If possible, refer to your
+counties.sampled data frame.
+
+From your sample of $n = 50$ counties, can you conclude that the
+mean/average median income of all $N = 3143$ counties in the United
+States is more than 26,500?
+
+**Answer:** The statistical hypothesis is $$
+{\rm H}_{0}: \mu_{Median.Earnings.2010} \leq 26000 \hspace{0.5in} {\rm H}_{A}: \mu_{Median.Earnings.2010} > 26000
+$$
+
+Here is my **counties.sampled** from last Tuesday:
+
+```{r}
+head(counties.sampled, 4)
+tail(counties.sampled, 4)
+```
+
+We have already inspected a Normal Probability plot of these data....in
+my case, it appeared to be Normal (for the most part)....
+
+Now that these data are collected, the sample statistics are computed
+with `favstats`:
+
+```{r}
+favstats(~Median.Earnings.2010, data = counties.sampled)
+```
+
+The test statistic is computed with $$
+T_{Obs} = \frac{\overbrace{26156.15}^{\overline{X}} - \overbrace{26000}^{\mu_{0} = 26000}}{\frac{S = 6883.299}{\sqrt{50}}} = 
+$$
+
+```{r}
+mu.0 <- 26000
+dof <- favstats(~Median.Earnings.2010, data = counties.sampled)$n - 1 #set the degrees of freedom to n - 1
+t.obs <- (favstats(~Median.Earnings.2010, data = counties.sampled)$mean - mu.0)/(favstats(~Median.Earnings.2010, data = counties.sampled)$sd /sqrt(favstats(~Median.Earnings.2010, data = counties.sampled)$n))
+t.obs
+```
+
+which produces $T_{Obs} = 0.1604$,
+
+The $P$-value is $P(T_{49} > T_{Obs}) = P(T_{49} > 0.1604)$, which is
+computed with R below.
+
+```{r}
+1 - pt(0.1604, dof)
+```
+
+and $$
+P-\text{value} = P(T_{49} > 0.1604) = 0.4366127
+$$
+
+This can also be obtained with `t.test`:
+
+```{r}
+t.test(~Median.Earnings.2010, mu = 26000, alternative = "greater", data=counties.sampled) # use $stat to obtain the value of T_{Obs} only
+```
+
+------------------------------------------------------------------------
+
+**Time to Play With Data 3:**
+
+```{r}
+oct4ttp3.df <- read.csv("https://people.ucalgary.ca/~jbstall/DataFiles/SalesComparison.csv")
+```
+
+```{r}
+oct4ttp3.df
+```
+
+Given that these data were collected using a **Matched Pairs
+Experimental Design**, the difference is defined as
+
+$$
+d_{i} = x_{Campaign, i} - x_{Without\_Campaign, i}
+$$
+
+the statistical hypothesis to be tested is
+
+$$
+\begin{eqnarray}
+{\rm H}_{0}: \mu_{d} & \leq  (= ) & 0 \hspace{0.2in} \text{(the mean of a population of differences is at most equal to zero)} \\
+{\rm H}_{A}: \mu_{d} & > &  0 \hspace{0.2in} \text{(the mean of a population of differences is at most equal to zero)} \\
+\end{eqnarray}
+$$
+
+Adding a new variable to the **oct4ttp3.df**
+
+```{r}
+oct4ttp3.df <- oct4ttp3.df %>%
+  mutate(DiffWeeklySales = (With.Campaign - Without.Campaign))
+```
+
+```{r}
+oct4ttp3.df
+```
+
+```{r}
+ggplot(oct4ttp3.df, aes(sample = DiffWeeklySales)) + stat_qq(col="blue") + stat_qqline(col="red") + ggtitle("Normal Probability Plot of Differences")
+```
+
+We are computing $$
+T_{Obs} = \frac{\overline{d} - \mu_{d}}{\frac{s_{d}}{\sqrt{n}}}
+$$
+
+```{r}
+favstats(~DiffWeeklySales, data=oct4ttp3.df)
+```
+
+and computing $$
+T_{Obs} = \frac{3.653846 - 0}{\frac{3.185544}{\sqrt{13}}} = 4.1356 \:\: \text{(computed with the t.test command below)}
+$$
+
+```{r}
+t.test(oct4ttp3.df$With.Campaign, oct4ttp3.df$Without.Campaign, mu=0, paired = TRUE, alternative="greater")
+t.test(~DiffWeeklySales, mu = 0, alternative="greater", data = oct4ttp3.df)
+```
+
+The $P$-value is computed as
+
+$$
+P(\overline{d} > 3.653846) = P(T_{13 - 1} > 4.1356) = 0.0006908 \approx 0.00069
+$$
+
+```{r}
+1 - pt(4.1356, 13 - 1)
+```
+
+**Interpretation:** If data were collected using the same methodology as
+the existing/current data, the chance that we would observe a result
+that is "more surprising" - or stronger statistical evidence against the
+null hypothesis than the current sample/data - is $0.00069$ \*if the
+null hypothesis is true.
+
+Because it is highly unlikely to observe stronger statistical evidence
+against ${\rm H_{0}}$ than the current data, the null hypothesis is
+rejected in favour of the alternative hypothesis. One can infer/conclude
+*from these data* that $\mu_{d} > 0$.
+
+A 95% confidence interval for $\mu_{d}$ is then
+
+```{r}
+t.test(~DiffWeeklySales, data=oct4ttp3.df)$conf
+```
+
+$$
+1.7288 \leq \mu_{d} \leq 5.5789
+$$

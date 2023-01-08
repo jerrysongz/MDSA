@@ -1,0 +1,52 @@
+```{r}
+pstsurveydata <- c(rep(0, 759 - 425), rep(1, 425)) #create the data of the observed sample above, 0 'not haves' and 1 'haves'
+pstoutcome <- numeric(1000)
+for(i in 1:1000){
+   pst.simulation <- resample(pstsurveydata) #or, could havev used sample(pstsurveydata, length(pstsurveydata, replace=TRUE))
+   pstoutcome[i] <- sum(pst.simulation) #comutes the number of 'haves' in each resampling of 30 Binomially modeled values
+}
+pstsupport <- data.frame(pstoutcome)
+head(pstsupport, 4)
+
+```
+```{r}
+observed.count <- 425
+#
+counter = 0
+for (i in 1: length(pstsupport$pstoutcome))
+{ 
+  if (pstsupport$pstoutcome[i] > observed.count) counter = counter + 1
+} 
+pstproppvalue = (counter/1000) 
+pstproppvalue  
+```
+```{r}
+sum(dbinom(426:759, 759, 0.5))
+#or
+1-pbinom(425,759,0.5)
+```
+```{r}
+uselectiondata <- read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/USElectionData2016.csv") #reads in the data in the USElectionData2016.csv file
+names(uselectiondata) #provides column/variable names
+```
+7:31
+```{r}
+counties.sampled <- sample(uselectiondata, 50, replace=FALSE) #do not need the is.na argument here to skip over all missing data points...
+#uselectiondata[sample(nrow(uselectiondata),50,replace=FALSE),]
+counties.sampled
+```
+```{r}
+fav_stats(counties.sampled$Median.Earnings.2010)
+```
+```{r}
+samplemean = 25057.75
+samplesd = 4768.553
+
+tobs = (samplemean - 24000)/(samplesd/sqrt(50))
+tobs
+1-pt(tobs,49)
+```
+```{r}
+t.test(counties.sampled$Median.Earnings.2010, mu = 24000, alternative="greater", data=counties.sampled)
+```
+

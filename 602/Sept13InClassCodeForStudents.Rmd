@@ -1,0 +1,350 @@
+---
+title: "DATA 602 - Tuesday, September 13"
+output: html_notebook
+---
+
+**Example 1:** Here is the data
+
+```{r}
+head(SAT_2010, 4)
+tail(SAT_2010, 4)
+```
+
+```{r}
+names(SAT_2010)
+```
+
+A plot of the **expenditure** to average SAT-**math** score shows the following:
+
+```{r}
+ggplot(data=SAT_2010, aes(x = expenditure, y = math)) + geom_point(col="blue", size=2) + xlab("State Expenditure per Student") + ylab("SAT - Math Score") + ggtitle("Scatterplot of Expenditure/Student to State SAT-Score (Average)")
+```
+
+What story does this visualization seem to tell?
+
+Let's look at the proportion/percentage of high school students in the state that write the SAT.
+
+```{r}
+SAT_2010$sat_pct
+```
+
+Let's create a **categorical variable** that assigned a *class* to a percentage. That is
+
+-   if the percentage is $0 < 33$ -\> "low"
+-   if the percentage is $33 < 67$ -\> "medium"
+-   if the percentage is $67 \leq 100$ -\> "high"
+
+To do so, we will use the 'mutate' function to (i) create a new variable and (ii) 'tack' this variable onto the SAT_2010 data frame.
+
+```{r}
+SAT_2010 <- SAT_2010 %>%
+  mutate(SAT_class = cut(sat_pct, breaks=c(0, 33, 67, 100), labels = c("low", "medium", "high")))
+```
+
+```{r}
+head(SAT_2010, 4)
+```
+
+Computing the population mean $\mu_{AveSalary}$ is
+
+```{r}
+mean(~salary, data=SAT_2010)
+```
+
+and the distribution of the **SAT_class**:
+
+```{r}
+table(SAT_2010$SAT_class)
+```
+
+------------------------------------------------------------------------
+
+Now, let's take a look at the same scatterplot, including the "SAT_class":
+
+```{r}
+ggplot(data=SAT_2010, aes(x = expenditure, y = math, color=SAT_class)) + geom_point(size=2) + xlab("State Expenditure per Student") + ylab("SAT - Math Score") + ggtitle("Scatterplot of Expenditure/Student to State SAT-Score (Average)")
+```
+
+We can separate these out:
+
+```{r}
+ggplot(data=SAT_2010, aes(x = expenditure, y = math, color=SAT_class)) + geom_point(size=2) + xlab("State Expenditure per Student") + ylab("SAT - Math Score") + ggtitle("Scatterplot of Expenditure/Student to State SAT-Score (Average)") + facet_wrap(~SAT_class) + geom_smooth(method = "lm")
+```
+
+**Time to Play 1:** In this exercise, we will use the 'flights' data, which consists of all departing flights from the 3-NYC airports in 2013.
+
+```{r}
+head(flights, 4)
+tail(flights, 4)
+names(flights)
+```
+
+(a) Compute $\mu_{distance}$ (in miles)
+
+```{r}
+mean(~distance, data=flights, rm.na=TRUE)
+```
+
+$$
+\mu_{distance} = 1039.913 \ \text{miles}
+$$
+
+(b) Compute $\widetilde{\mu}_{distance}$.
+
+```{r}
+median(~distance, data=flights)
+median(flights$distance)
+```
+
+```{r}
+favstats(~distance, data=flights)
+```
+
+$$
+\widetilde{\mu}_{distance} = 872 \: \text{miles}
+$$
+
+(c) Compute $p_{Delta}$, proportion of all flights leaving the three NYC-area airports that are Delta flights.
+
+```{r}
+table(flights$carrier)
+```
+
+```{r}
+total.flights <- sum(table(flights$carrier))
+total.flights
+```
+
+```{r}
+prop_delta = 48110/total.flights
+prop_delta
+```
+
+$$
+p_{Delta} = \frac{48110}{336776} = 0.1428546 \hspace{0.2in} \text{or} \hspace{0.2in} 14.29\%
+$$
+
+**Time to Play 2:** Consider the two variables **pupil_teacher_ratio** and **salary** (average teacher salary in the state). Use **salary** as the $y$-axis....
+
+(a) What is the relationship between these two variables?
+
+```{r}
+ggplot(SAT_2010, aes(x= pupil_teacher_ratio, y = salary)) + geom_point(col="blue", size=2) + ylab("Average Teacher Salary per State") + xlab("Students/Teacher") + ggtitle("Scatterplot of Student/Teacher Ratio and Average Salary per State") + geom_smooth(method="lm")
+```
+
+(b) Create a variable called **sal_category** which will categorize a state according to: (40K \< 50K, low), (50K \< 60K, med), (60K \< 70K, medhigh), (70K \< 80K, high)
+
+SAT2010 \<- SAT_2010 %\>% mutate(sal_category = cut(salary, c(40, 50, 60, 70, 80), labels = c("low", "med", "medhigh", "high")))
+
+```{r}
+head(SAT_2010, 4)
+```
+
+```{r}
+table(SAT_2010$sal_category)
+```
+
+The scatterplot, which takes into account the distribution of the salary category:
+
+OR
+
+```{r}
+```
+
+```{r}
+ggplot(SAT_2010, aes(x = math, y = write)) + geom_point(size = 2, col="blue") + ylab("State: Write SAT Average") + xlab("State: Math SAT Average") + ggtitle("Scatterplot of Student/Teacher Ratio and Average Salary per State") + geom_smooth(method="lm")
+```
+
+------------------------------------------------------------------------
+
+**Time to Play 2:**
+
+Create a data frame called **demoairline1**
+
+```{r}
+demoairline1 <- select(flights, year, month, day, dep_delay, carrier, arr_delay, distance)
+```
+
+```{r}
+head(demoairline1, 4)
+tail(demoairline1, 4)
+```
+
+Visualizing the variable **dep_delay**, the number of minutes a deparing flight is delayed.
+
+```{r}
+ggplot(demoairline1, aes(x = dep_delay)) + geom_histogram(col="red", fill="blue", binwidth=20, na.rm=TRUE) + xlab("Number of Minutes a Flight is Delayed in Departing") + ylab("Count") + ggtitle("Histogram of Departure Delays from the 3-NYC Area Airports")
+```
+
+```{r}
+count(is.na(demoairline1$dep_delay))
+```
+
+Alternatively, one can create a **density plot**
+
+```{r}
+ggplot(demoairline1, aes(x = dep_delay)) + geom_density(col="red", fill="blue", na.rm=TRUE) + xlab("Number of Minutes a Flight is Delayed in Departing") + ylab("Density") + ggtitle("Density Plot of Departure Delays from the 3-NYC Area Airports")
+```
+
+where the $y$-axis, or density, is
+
+$$
+\text{density}_i = \frac{\text{class count/frequency}_{i}}{\text{class width}_{i}}
+$$
+
+Or, by **carrier**
+
+```{r}
+ggplot(demoairline1, aes(x = dep_delay)) + geom_histogram(col="red", fill="blue", binwidth=20, na.rm=TRUE) + xlab("Number of Minutes a Flight is Delayed in Departing") + ylab("Count") + ggtitle("Histogram of Departure Delays from the 3-NYC Area Airports") + facet_wrap(~carrier)
+```
+
+```{r}
+ggplot(demoairline1, aes(x = dep_delay)) + geom_density(col="red", fill="blue", na.rm=TRUE) + xlab("Number of Minutes a Flight is Delayed in Departing") + ylab("Density") + ggtitle("Density Plot of Departure Delays from the 3-NYC Area Airports") + facet_wrap(~carrier)
+```
+
+Suppose you wanted to filter one one airline, say **DL** and create a histogram of Delta's departure delays.
+
+```{r}
+ggplot(filter(demoairline1, carrier == "DL"), aes(x = dep_delay)) + geom_histogram(col="red", fill="blue", binwidth = 10, na.rm=TRUE) + xlab("Number of Minutes a Flight is Delayed in Departing") + ylab("Density") + ggtitle("Histogram of Departure Delays of Delta Airlines from the 3-NYC Area Airports")
+```
+
+Now, try this for United Airlines, "UA":
+
+```{r}
+ggplot(filter(demoairline1, carrier == "UA"), aes(x = dep_delay)) + geom_histogram(col="red", fill="blue", binwidth = 10, na.rm=TRUE) + xlab("Number of Minutes a Flight is Delayed in Departing") + ylab("Density") + ggtitle("Histogram of Departure Delays of United Airlines from the 3-NYC Area Airports")
+```
+
+Create a subset that consists *only of United flights*
+
+```{r}
+ua.flights <- subset(demoairline1, carrier == "UA")
+```
+
+```{r}
+head(ua.flights, 4)
+tail(ua.flights, 3)
+```
+
+```{r}
+dim(ua.flights)
+```
+
+```{r}
+ggplot(ua.flights, aes(x = dep_delay)) + geom_density(fill="blue", na.rm=TRUE) + xlab("Number of Minutes a Flight is Delayed in Departing") + ylab("Density") + ggtitle("Density Plot of Departure Delays of United Airlines from the 3-NYC Area Airports") + geom_vline(xintercept=0, col="red")
+```
+
+Now, suppose we wanted to compute the proportion of all United Flights that were "late" in departing.
+
+```{r}
+nrow(subset(ua.flights, dep_delay > 0))
+```
+
+in this instance, there are **27261** flights that are late in departing. The number of flights that have data are
+
+```{r}
+count(is.na(ua.flights$dep_delay))
+```
+
+```{r}
+num_ua_flights <- 58665 - 686
+```
+
+```{r}
+num_ua_flights
+```
+
+```{r}
+pua_late <- nrow(subset(ua.flights, dep_delay > 0))/num_ua_flights
+pua_late
+```
+
+and
+
+$$
+p_{UA, late\:in\:departing} = 0.47021875
+$$
+
+**Time to Play 1:**
+
+use the command
+
+```{r}
+cl.limits = seq(-100, 1300, 25)
+```
+
+(a) A histogram of the arrival delays **arr_delay** for all airlines in the **demoairline1** data frame.
+
+```{r}
+ggplot(demoairline1, aes(x = arr_delay)) + geom_histogram(fill="blue", breaks = cl.limits, na.rm=TRUE) + xlab("Minutes a Flight Departing 3-NYC Area Airports is late @ Destination") + geom_vline(xintercept=0, col="red")
+```
+
+```{r}
+dim(demoairline1)
+count(is.na(demoairline1$arr_delay))
+```
+
+There are 9430 missing data points. Therefore
+
+```{r}
+deno <- 336776 - 9430
+nrow(subset(demoairline1, arr_delay < 0))
+```
+
+```{r}
+p_early <- 188933/deno
+p_early
+```
+
+and
+
+$$
+p_{arrive\:\:early} = \frac{188933}{327346} = 0.5771661 \approx 0.5772
+$$
+
+(c) 
+
+```{r}
+aa.flights <- filter(demoairline1, carrier == "AA")
+```
+
+```{r}
+head(aa.flights, 4)
+tail(aa.flights, 4)
+```
+
+```{r}
+dim(aa.flights)
+count(is.na(aa.flights$arr_delay))
+```
+
+```{r}
+ggplot(aa.flights, aes(x = arr_delay)) + geom_density(col="blue", na.rm=TRUE) + geom_vline(xintercept = 0, col="orange")
+```
+
+There are 31947 flights AA flights with valid data (arr_delay)
+
+```{r}
+nrow(subset(aa.flights, arr_delay > 0))
+```
+
+```{r}
+10706/31947
+```
+
+$$
+p_{AA, late\:in\:arriving} = \frac{10706}{31947} = 0.3351175 \approx 0.3351
+$$
+
+**Time to Play 2:**
+
+(a) Relationship between **distance** and **arr_delay**?
+
+```{r}
+ggplot(demoairline1, aes(x = distance, y = arr_delay)) + geom_point(col="blue", position="jitter", size=1, na.rm=TRUE) + ylab("Minutes the Flight is Late in Arriving @ Destination") + xlab("Distance in Miles") + ggtitle("Scatterplot of Arrival Time to Distance") + geom_smooth(method="lm")                                                                                                    
+```
+
+(b) Create a similar visualization for (i) Delta (DL) and (ii) United Airlines (UA)
+
+```{r}
+ggplot(filter(demoairline1, carrier == "UA"|carrier == "DL"), aes(x = distance, y = arr_delay, color=carrier)) + geom_point(position = "jitter", na.rm=TRUE) + xlab("Flight Distance in Miles") + ylab("Minutes Late in Arriving at Destination") + ggtitle("Scatterplot: Distance of Flight and Minutes Late in Arrriving")
+```

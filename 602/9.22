@@ -1,0 +1,73 @@
+---
+title: "Untitled"
+output: pdf_document
+date: "2022-09-22"
+---
+
+```{r}
+uselectiondata <- read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/USElectionData2016.csv") #reads in the data in the USElectionData2016.csv file
+names(uselectiondata) #provides column/variable names
+dim(uselectiondata)
+
+```
+```{r}
+sd(uselectiondata$Median.Earnings.2010)
+```
+```{r}
+timetoplay2.df <- sample(uselectiondata$Median.Earnings.2010, 50, replace=FALSE)
+timetoplay2.df
+```
+```{r}
+var(timetoplay2.df)
+sd(timetoplay2.df)
+```
+```{r}
+(49*4413.942^2)/5078^2
+```
+
+
+```{r}
+1-pchisq(37.02,49)
+```
+```{r}
+nsamples = 1000
+sample.sdn50 = numeric(nsamples)
+for(i in 1:nsamples){
+  sdata = sample(uselectiondata$Median.Earnings.2010, 50, replace = F)
+  sample.sdn50[i] = sd(sdata)
+}
+samplestats.df4 = data.frame(sample.sdn50)
+head(samplestats.df4,5)
+
+```
+```{r}
+
+```
+```{r}
+ntimes = 1000  #number of times to resample
+nsize = 10     #sample size
+dvecmeans = numeric(ntimes)  #create a vector to hold 1000 means
+dvecsds = numeric(ntimes)    #create a vector to hold 1000 sds
+origdata = c(102.66,  88.78, 116.96, 104.98,  93.27, 108.57,  83.23, 108.65, 105.63, 101.76) #read in original data
+for(i in 1:ntimes) #start the for loop, run 1000 times
+{   datavec = sample(origdata, nsize, replace=TRUE)  #data of nsize, sampling w replacement
+    dvecmeans[i] = mean(datavec) #compute the mean of the sample
+        dvecsds[i] = sd(datavec)       #compute the standard deviation of the sample
+} #close the for loop
+boot1 = data.frame(dvecmeans, dvecsds)
+
+head(boot1, 5)
+```
+```{r}
+ggplot(boot1, aes(x = dvecmeans)) + geom_histogram(col="red", fill="blue", binwidth=1) + xlab("Values of Bootstrap Statistic") + ylab("Count") + ggtitle("Histogram of Bootstrap Statistic: Sample mean")
+
+```
+```{r}
+quantile(dvecmeans, c(0.025, 0.975)) #compute two quantiles rather than two separate commands, note means are in a single vector
+```
+```{r}
+library(mosaicData)
+library(mosaic)
+bootstraptrial1.df <- do(1000) * mean(resample(origdata))
+```
+

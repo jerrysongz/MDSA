@@ -1,0 +1,131 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
+```{r}
+car2= read.csv("car.csv")
+head(car2)
+car2 <- na.omit(car2)
+
+```
+```{r}
+library(mctest)
+fullcar2 = lm(price ~ engineSize+mpg+tax+factor(fuelType)+mileage+factor(transmission)+year+factor(brand), data =car2)
+summary(fullcar2)
+
+library(mctest)
+imcdiag(fullcar2, method='VIF')
+```
+```{r}
+#Full Model Test
+reg1 = lm(price ~ 1, data = car2)
+anova(fullcar2,reg1)
+```
+```{r}
+#Partial Test Individual Coefficients Test (t-test)
+summary(fullcar2)
+```
+```{r}
+devtools::install_github("rsquaredacademy/olsrr")
+
+```
+
+```{r}
+#Stepwise Regression Procedure
+#library(olsrr)
+#library(readr)
+#library(dplyr)
+backmodel=ols_step_backward_p(fullcar2, prem = 0.3)
+summary(backmodel$model)
+
+```
+```{r}
+#interactions
+#T-tests:
+#fullcar2 = lm(price ~ engineSize+mpg+tax+factor(fuelType)+mileage+factor(transmission)+year+factor(brand), data =car2)
+interactionmodel = lm(price ~ (engineSize+mpg+tax+factor(fuelType)+mileage+factor(transmission)+year+factor(brand))^2, data =car2)
+summary(interactionmodel)
+
+
+```
+```{r}
+reducedinteractionmodel = lm(price ~ engineSize+mpg+tax+factor(fuelType)+mileage+factor(transmission)+year+factor(brand) + engineSize:mpg + engineSize:tax + engineSize:factor(fuelType) + engineSize:mileage + mpg:factor(transmission) + engineSize:factor(transmission) + mpg:factor(brand) + mpg:factor(transmission) + mpg:factor(brand) + factor(fuelType):mileage + factor(fuelType):factor(transmission) + factor(fuelType):factor(brand) + mileage:year + mileage:factor(brand) + factor(transmission):factor(brand)+ year:factor(brand), data =car2)
+
+summary(reducedinteractionmodel)
+```
+```{r}
+#Second Order Term T-tests:
+qcar2 = lm(price ~ engineSize+I(engineSize^2)+mpg+I(mpg^2)+tax+I(tax^2)+factor(fuelType)+mileage+I(mileage^2)+factor(transmission)+year+I(year^2)+factor(brand), data =car2)
+summary(qcar2)
+```
+```{r}
+qcar2 = lm(price ~ engineSize+I(engineSize^2)+ I(engineSize^3)+mpg+I(mpg^2)+I(mpg^3)+tax+factor(fuelType)+mileage+factor(transmission)+year+I(year^2)+factor(brand)+, data =car2)
+summary(qcar2)
+```
+
+
+
+
+
+
+```{r}
+bestm = lm(price ~ engineSize+I(engineSize^2)+ I(engineSize^3)+mpg+I(mpg^2)+I(mpg^3)+tax+factor(fuelType)+mileage+factor(transmission)+year+I(year^2)+factor(brand)+ engineSize:mpg + engineSize:tax + engineSize:factor(fuelType) + engineSize:mileage + mpg:factor(transmission) + engineSize:factor(transmission) + mpg:factor(brand) + mpg:factor(transmission) + mpg:factor(brand) + factor(fuelType):mileage + factor(fuelType):factor(transmission) + factor(fuelType):factor(brand) + mileage:year + mileage:factor(brand) + factor(transmission):factor(brand)+ year:factor(brand), data =car2)
+summary(bestm)
+```
+```{r}
+#Higher Order Partial F-tests:
+anova(reducedinteractionmodel, bestm)
+```
+```{r}
+#Linearity Assumption
+
+library(ggplot2)
+ggplot(bestm, aes(x=.fitted, y=.resid)) +
+  geom_point() + geom_smooth()+
+  geom_hline(yintercept = 0)+
+  ggtitle("Residual vs Fitted")
+```
+```{r}
+#Normality Assumption
+shapiro.test(residuals(bestm))
+qplot(residuals(bestm),
+      geom="histogram",
+      binwidth = 1000,  
+      main = "Histogram of residuals", 
+      xlab = "residuals", color="red", 
+      fill=I("blue"))
+ggplot(car2, aes(sample=bestm$residuals)) +
+  stat_qq() +
+  stat_qq_line() +
+  ggtitle("Normal Q-Q Plot")
+```
+```{r}
+#Equal Variance Assumption
+library(lmtest)
+bptest(bestm)
+plot(bestm,which=1)
+
+```
+```{r}
+#Multicollinearity Assumption
+library(mctest)
+library(ggplot2)
+library(GGally)
+fullcar2 = lm(price ~ engineSize+mpg+tax+factor(fuelType)+mileage+factor(transmission)+year+factor(brand), data =car2)
+#ummary(fullcar2)
+catfp2 <- data.frame(car2$price,car2$engineSize,car2$mpg,car2$tax,car2$mileage,car2$year)
+ggpairs(catfp2,lower = list(continuous = "smooth_loess", combo = "facethist", discrete = "facetbar", na = "na"),upper = list(continuous = wrap("cor", family="sans")))
+```
+```{r}
+#Influential Outliers
+
+plot(bestm,which=5)
+```
+```{r}
+car2[cooks.distance(bestm)>0.5,]
+plot(bestm,pch=18,col="red",which=c(4))
+
+```
+
+

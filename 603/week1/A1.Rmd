@@ -1,0 +1,504 @@
+---
+output:
+  html_document: default
+  pdf_document: default
+---
+# 603 Assignment 1 Multiple Linear Regression
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(mosaic)
+require(mosaicData)
+library(ggplot2)
+
+```
+## Problem 1
+
+**a**
+
+```{r}
+water=read.csv("water.csv")
+head(water)
+```
+
+```{r}
+reg1<-lm(USAGE~PROD+TEMP+HOUR + DAYS, data=water)
+coefficients(reg1)
+```
+
+The estimated model is $\hat{USAGE}= 5.89162697 +0.04020739Prod+0.16867306Temp-0.07099009Hour -0.02162304Days$
+
+**b** 
+
+The statistical hypothesis to be tested is:
+
+$$
+\begin{aligned}
+H_0&:\beta_1=\beta_2=\beta_3=\beta_4=0\\
+H_a&:\mbox{at least one }\beta_i\mbox{ is not zero } (i=1,2,3,4) 
+\end{aligned}
+$$
+
+I set up the $\alpha = 0.05$
+
+Compute the value of the test statistic.
+
+```{r}
+reg2<-lm(USAGE~1, data=water) # Model with only intercept
+summary(reg1)
+anova(reg2,reg1)
+```
+
+$p-value< 2.2e-16 < \alpha=0.05$,indicating that we should reject the null hypothesis. I conclude that at least one $β_i$ is not zero for $i=1,2,3,4$.
+
+**c**
+The statistical hypothesis to be tested is:
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0\mbox{    (i=1,2,3,4)}
+\end{aligned}
+$$
+I set up the $\alpha = 0.05$
+
+```{r}
+summary(reg1)
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+It shows that the DAYS has $tcal=-0.672$ with the $p-value= 0.502 > 0.05$,
+indicating that we Fail to reject the null hypothesis that the number of operationing day in the month has not significantly influence on sales at $α=0.05$.
+I would not suggest the model in part b for predictive purposes.
+Therefore, the independent variable DAYS should be removed from the model.
+
+**d**
+
+The hypotheses are:
+
+$$
+\begin{aligned}
+
+H_0&:\beta_4=0\mbox{   in the model   } USAGE=\beta_0+\beta_1Prod+\beta_2Temp+\beta_3Hour+\beta_4Days+\epsilon \\
+H_a&:\beta_4\neq0\mbox{   in the model   } USAGE=\beta_0+\beta_1Prod+\beta_2Temp+\beta_3Hour+\beta_4Days+\epsilon\\
+\end{aligned}
+$$
+I set up the $\alpha = 0.05$
+```{r}
+#The estimated model is $\hat{USAGE}= 5.89162697 +0.04020739Prod+0.16867306Temp-0.07099009Hour'
+
+reduced<-lm(USAGE~PROD+TEMP+HOUR, data=water) # dropping a DAYS variable
+anova(reduced,reg1)# test if Ho: DAYS = 0 
+```
+
+It shows $p-value=0.5023 > \alpha=0.05$, indicating that we should not to reject the null hypothesis.
+The independent variable DAYS should be out of the model at significance level 0.05.
+
+
+
+**e**
+```{r}
+confint(reduced)
+```
+The 95% confidence interval of regression coefficient for TEMP from the model in part c is from 0.15310634 to 0.18526907.
+
+Interpretation: The monthly water usage increase between 0.15310634 unit(gallons/minute) to 0.18526907 unit(gallons/minute) for every 1 unit(degree Celsius) INCREASE in average monthly temperature holding PROD and HOUR with 95% of chance.
+
+**f**
+```{r}
+summary(reg1)
+summary(reduced)
+sigma(reg1)
+sigma(reduced)
+
+```
+Full model:
+$R^2_{adj} = 0.8867$ 
+RMSE = 1.7684
+
+Reduced model:
+$R^2_{adj} = 0.8869$ 
+RMSE = 1.7664
+
+The reduced model has higher $R^2_{adj}$ with smaller RMSE.
+Thus, the reduced model form part c is a better model.
+Therefore, I would suggest the reduced model for predictive purpose.
+
+Interpretation: 
+For the model I choose, $R^2_{adj} = 0.8869$ that means the model explains 89.69% of the variation of the repose variable.
+And the standard deviation of unexplained variance is known as RMSE and has the useful property of being in the same units as the response variable. Lower values of RMSE indicate a better fit.
+
+**g**
+
+```{r}
+interacmodel1<-lm(USAGE~(PROD+TEMP+HOUR)^2, data=water)
+summary(interacmodel1)
+
+```
+TEMP:HOUR are not significant, so I remove it form the model.
+
+```{r}
+reducedintermodel = lm(USAGE~PROD+TEMP+HOUR + PROD:TEMP + PROD:HOUR, data=water)
+summary(reducedintermodel)
+```
+I would recommend the interaction model for predictive purposes because The Adjusted R-squared is bigger than the model in part f.
+
+## Problem 2
+
+**a**
+```{r}
+antique=read.csv("GFCLOCKS.csv")
+head(antique)
+```
+
+```{r}
+regq2<-lm(PRICE~AGE+NUMBIDS, data=antique)
+coefficients(regq2)
+summary(regq2)
+```
+The estimated model is $\hat{PRICE}= -1338.9513 + 12.74057AGE +85.95298NUMBIDS$
+
+**b**
+```{r}
+regone<-lm(PRICE~1, data=antique) # Model with only intercept
+anova(regone, regq2)
+```
+$SSE = 516727$
+
+**c**
+
+```{r}
+summary(regq2)
+sigma(regq2)
+```
+
+The standard deviation of the model is 133.4847
+Interpretation: the standard deviation of unexplained variance is known as RMSE and has the useful property of being in the same units as the response variable. Lower values of RMSE indicate a better fit.
+
+**d**
+
+```{r}
+summary(regq2)
+
+```
+
+
+$R^2_{adj} = 0.8849$ 
+Interpretation: 
+For the model, $R^2_{adj} = 0.8849$ that means the model explains 88.49% of the variation of the repose variable.
+
+**e**
+
+
+
+The statistical hypothesis to be tested is:
+
+$$
+\begin{aligned}
+H_0&:\beta_1=\beta_2=0\\
+H_a&:\mbox{at least one }\beta_i\mbox{ is not zero } (i=1,2) 
+\end{aligned}
+$$
+
+I set up the $\alpha = 0.05$
+
+Compute the value of the test statistic.
+```{r}
+anova(regone, regq2)
+
+```
+By using global F test, the out put are:
+Fcal = 120.19, with df = 2 and 29.
+$p-value= 9.216e-15 < \alpha=0.05$,indicating that we should reject the null hypothesis. I conclude that at least one $β_i$ is not zero for $i=1,2$.
+
+**f**
+
+Individual Coefficients Test:
+
+The statistical hypothesis to be tested is:
+
+$$
+\begin{aligned}
+H_0&:\beta_2=0\\
+H_a&:\beta_2\neq0
+\end{aligned}
+$$
+I set up the $\alpha = 0.05$
+
+```{r}
+summary(regq2)
+
+```
+
+It shows that the NUMBIDS has $t_{cal}=9.847$ with the $p-value= 9.34e-11 < 0.05$,
+indicating that we reject the null hypothesis. I conclude that the mean auction price of a clock increases as the number of bidders increases when age is held constant.
+
+**g**
+```{r}
+confint(regq2)
+```
+The 95% confidence interval for $\beta_1$ is from 10.89017 to 14.59098.
+Interpretation: The the auction price  increase between 10.89017 unit(dollar) to 14.59098 unit(dollar) for every 1 unit(year) age of the clock with 95% of chance.
+
+**h**
+
+Individual Coefficients Test:
+The statistical hypothesis to be tested is:
+
+$$
+\begin{aligned}
+H_0&:\beta_3=0\\
+H_a&:\beta_3\neq0
+\end{aligned}
+$$
+I set up the $\alpha = 0.05$
+```{r}
+interacmodelq2<-lm(PRICE~(AGE+NUMBIDS)^2, data=antique)
+summary(interacmodelq2)
+
+```
+From the out put, It shows that the interaction term AGE:NUMBIDS has $t_{cal}=6.112$ with the $p-value= 1.35e-06 < 0.05$,
+indicating that we should clearly reject the null hypothesis which means that we should add the interaction term to the model at $α=0.05$.
+I would recommend the interaction model for predicting y, because The Adjusted R-squared of the is interaction model bigger than the first order model given.
+
+##Question 3 
+
+**a**
+```{r}
+turbines=read.csv("TURBINE.csv")
+head(turbines)
+```
+
+```{r}
+options("scipen"=999)
+regq3<-lm(HEATRATE~RPM+INLET.TEMP+EXH.TEMP + CPRATIO + AIRFLOW , data=turbines)
+coefficients(regq3)
+summary(regq3)
+
+```
+The estimated model is $\hat{HEATRATE}= 13614.46078 +0.08879RPM-9.20087INLET.TEMP+14.3939EXH.TEMP +0.35190CPRATIO -0.84796AIRFLOW $
+
+
+**b**
+The statistical hypothesis to be tested is:
+
+$$
+\begin{aligned}
+H_0&:\beta_1=\beta_2=\beta_3=\beta_4=\beta_5=0 \\
+H_a&:\mbox{at least one }\beta_i\mbox{ is not zero } (i=1,2,3,4,5) 
+\end{aligned}
+$$
+
+I set up the $\alpha = 0.01$
+
+Compute the value of the test statistic.
+
+```{r}
+fulltq3<-lm(HEATRATE~1, data=turbines) # Model with only intercept
+summary(fulltq3)
+anova(fulltq3,regq3)
+```
+$p-value< 0.0000000000000002 < \alpha=0.01$,indicating that we should reject the null hypothesis. I conclude that at least one $β_i$ is not zero for $i=1,2,3,4$.
+
+**c**
+The statistical hypothesis to be tested is:
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0\mbox{    (i=1,2,3,4)}
+\end{aligned}
+$$
+I set up the $\alpha = 0.05$
+
+```{r}
+summary(regq3)
+```
+
+```{r}
+regq3<-lm(HEATRATE~RPM+INLET.TEMP+EXH.TEMP + CPRATIO + AIRFLOW , data=turbines)
+
+reduced1<-lm(HEATRATE~RPM+INLET.TEMP+EXH.TEMP , data=turbines) # dropping a CPRATIO and AIRFLOW variable
+reduced2<-lm(HEATRATE~RPM+INLET.TEMP+EXH.TEMP+ AIRFLOW , data=turbines) # dropping a CPRATIO variable
+summary(reduced1)
+summary(reduced2)
+
+```
+It shows that the CPRATIO has $tcal=0.01$ with the $p-value= 0.9905 > 0.05$,
+indicating that we Fail to reject the null hypothesis that the cycle pressure ratio has not significantly influence on sales at $α=0.05$.
+Therefore, the independent variable CPRATIO should be removed from the model.
+It also shows that the AIRFLOW has $tcal=-1.92$ with the $p-value= 0.0598 > 0.05$,
+indicating that we Fail to reject the null hypothesis that the cycle pressure ratio has not significantly influence on sales at $α=0.05$.
+But adding AIRFLOW variable improves the model performance as the Adjusted R-squared increased to 0.919. As Thuntida said in that case, it should be include in the model.
+Therefore, the independent variable AIRFLOW should not be removed from the model. 
+
+Partial F test:
+The hypotheses are:
+
+$$
+\begin{aligned}
+H_0&:\beta_4=0\mbox{   in the model   } HEATRATE=\beta_0+\beta_1RPM+\beta_2INLET.TEMP+\beta_3EXH.TEMP+ \beta_4CPRATIO + \beta_5AIRFLOW+\epsilon \\
+H_a&:\beta_4\neq0\mbox{   in the model   } HEATRATE=\beta_0+\beta_1RPM+\beta_2INLET.TEMP+\beta_3EXH.TEMP+ \beta_4CPRATIO + \beta_5AIRFLOW+\epsilon 
+\end{aligned}
+$$
+I set up the $\alpha = 0.05$
+```{r}
+
+reduced2<-lm(HEATRATE~RPM+INLET.TEMP+EXH.TEMP+ AIRFLOW , data=turbines) # dropping a CPRATIO variable
+anova(reduced2,regq3)
+```
+It shows $p-value=0.99 > \alpha=0.05$, indicating that we should not to reject the null hypothesis.
+The independent variable CPRATIO should be out of the model at significance level 0.05.
+
+Conclusion: The best model should be
+is $\hat{HEATRATE}= 13617.92419 +0.08882RPM-9.18561INLET.TEMP+14.36283EXH.TEMP -0.84752AIRFLOW $
+
+```{r}
+coefficients(reduced2)
+
+```
+
+**d**
+Individual Coefficients Test (t-test) :
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0\mbox{    (i=1,2,...,p)}\\
+\end{aligned}
+$$
+```{r}
+interacmodelq3<-lm(HEATRATE~(RPM+INLET.TEMP+EXH.TEMP+ AIRFLOW)^2, data=turbines)
+summary(interacmodelq3)
+
+```
+From the out put, It shows that the interaction term RPM:INLET.TEMP has $t_{cal}=-1.30$ with the $p-value= 0.19927> 0.05$,
+
+RPM:EXH.TEMP has $t_{cal}=0.53$ with the $p-value= 0.59731 > 0.05$,
+
+RPM:AIRFLOW  has $t_{cal}=-1.77$ with the $p-value= 0.08141 > 0.05$,
+
+INLET.TEMP:EXH.TEMP has $t_{cal}=1.66$ with the $p-value= 0.10279 > 0.05$,
+
+indicating that we should clearly not to reject the null hypothesis for them which means that we should not those interaction term to the model at $α=0.05$.
+
+From the out put, It shows that the interaction term INLET.TEMP:AIRFLOW has $t_{cal}=3.68$ with the $p-value= 0.00052 < 0.05$ and the interaction term EXH.TEMP:AIRFLOW has $t_{cal}=-3.72$ with the $p-value= 0.00046 < 0.05$,
+indicating that we should clearly reject the null hypothesis for those which means that we should add those two interaction terms to the model at $α=0.05$.
+
+```{r}
+fullinteracmodelq3 = lm(HEATRATE~RPM+INLET.TEMP+EXH.TEMP+ AIRFLOW + RPM:INLET.TEMP + RPM:EXH.TEMP+RPM:AIRFLOW+ INLET.TEMP:EXH.TEMP+INLET.TEMP:AIRFLOW+EXH.TEMP:AIRFLOW , data=turbines)
+reduinteracmodelq3 =  lm(HEATRATE~RPM+INLET.TEMP+EXH.TEMP+ AIRFLOW +INLET.TEMP:AIRFLOW+EXH.TEMP:AIRFLOW , data=turbines)
+summary(fullinteracmodelq3)
+summary(reduinteracmodelq3)
+```
+
+
+*Partial F test:*
+The hypotheses are:
+
+$$
+\begin{aligned}
+H_0&:\beta_5=\beta_6= \beta_7 =\beta_8=0\mbox{   in the model   } HEATRATE=\beta_0+\beta_1RPM+\beta_2INLET.TEMP+\beta_3EXH.TEMP+ \beta_4AIRFLOW + \beta_5RPM:INLET.TEMP + \beta_6RPM:EXH.TEMP+\beta_7RPM:AIRFLOW+ \beta_8INLET.TEMP:EXH.TEMP+\beta_9INLET.TEMP:AIRFLOW+\beta_10EXH.TEMP:AIRFLOW+\epsilon \\
+H_a&:\beta_{5,6,7,8}\neq0\mbox{   in the model   } HEATRATE=\beta_0+\beta_1RPM+\beta_2INLET.TEMP+\beta_3EXH.TEMP+ \beta_4AIRFLOW + \beta_5RPM:INLET.TEMP + \beta_6RPM:EXH.TEMP+\beta_7RPM:AIRFLOW+ \beta_8INLET.TEMP:EXH.TEMP+\beta_9INLET.TEMP:AIRFLOW+\beta_10EXH.TEMP:AIRFLOW+\epsilon \\ 
+\end{aligned}
+$$
+I set up the $\alpha = 0.05$
+```{r}
+anova(reduinteracmodelq3,interacmodelq3)
+coefficients(reduinteracmodelq3)
+
+```
+It shows $p-value=0.21 > \alpha=0.05$, indicating that we should not to reject the null hypothesis.
+The independent variable RPM:INLET.TEMP,RPM:EXH.TEMP,RPM:AIRFLOW and INLET.TEMP:EXH.TEMP should be out of the model at significance level 0.05.
+
+Conclusion: The final model should be:$\hat{HEATRATE}= 13603.30921 +0.04578RPM-12.79883INLET.TEMP+23.27429EXH.TEMP\\ +1.34695AIRFLOW + 0.01613 INLET.TEMP:AIRFLOW -0.04150EXH.TEMP:AIRFLOW$
+
+**e**
+From part d, The final model is:$\hat{HEATRATE}= 13603.30921 +0.04578RPM-12.79883INLET.TEMP+23.27429EXH.TEMP\\ +1.34695AIRFLOW + 0.01613 INLET.TEMP:AIRFLOW -0.04150EXH.TEMP:AIRFLOW$
+
+```{r}
+coefficients(reduinteracmodelq3)
+
+```
+
+*Interpretation of Main Effects:*
+$\hat{\beta_1}=0.04578$ means that for a given amount of INLET.TEMP,EXH.TEMP and AIRFLOW , increase 1 unit of RPM leads to an increase in HEATRATE by approximately 0.04578 units.
+
+INLET.TEMP: as increase additional 1 unit of INLET.TEMP leads to an increase in HEATRATE by approximately $-12.79883 + 0.01613 AIRFLOW$ units.
+
+EXH.TEMP: as increase additional 1 unit of EXH.TEMP leads to an increase in HEATRATE by approximately $23.27429-0.04150 AIRFLOW$ units.
+
+AIRFLOW: as increase additional 1 unit of AIRFLOW leads to an increase in HEATRATE by approximately $1.34695  + 0.01613 INLET.TEMP -0.04150 EXH.TEMP$ units.
+
+
+
+
+**f**
+
+```{r}
+sigma(reduinteracmodelq3) # RMSE for the reduinteracmodelq3 model
+
+```
+RMSE = 401.4
+
+**g**
+```{r}
+summary(reduinteracmodelq3)
+```
+The adjusted-R2 value from the model in part (d) is 0.94
+Interpretation: 
+For the model, $R^2_{adj} = 0.94$ that means the model explains 94% of the variation of the repose variable.
+
+
+**h**
+```{r}
+favstats(~RPM, data=turbines)
+```
+```{r}
+favstats(~INLET.TEMP, data=turbines)
+
+```
+```{r}
+favstats(~EXH.TEMP, data=turbines)
+
+```
+```{r}
+favstats(~AIRFLOW, data=turbines)
+```
+```{r}
+newdata = data.frame(RPM= 273145, INLET.TEMP=1240,EXH.TEMP=920, AIRFLOW =25  )
+predict(reduinteracmodelq3,newdata,interval="predict")
+```
+
+Extrapolation:
+
+RPM: $273145 \notin [3000, 33000]$
+
+EXH.TEMP: $920 \notin [444, 626]$
+
+Interpretation:
+
+When a cycle of speed = 273,145 revolutions per minute, inlet temperature= 1240 degree celsius, exhaust temperature=920 degree celsius, cycle pressure ratio=10 kilograms persecond, and air flow rate=25 kilograms persecond, the fit prediction for heat rate (y) is 31228 (kilojoules per kilowatt per hour) with extrapolation which is bad. 
+
+The 95% confidence interval of the heat rate with the given parameters is between 24068 (kilojoules per kilowatt per hour) and 38388(kilojoules per kilowatt per hour) when a cycle of speed = 273,145 revolutions per minute, inlet temperature= 1240 degree celsius, exhaust temperature=920 degree celsius, cycle pressure ratio=10 kilograms persecond, and air flow rate=25 kilograms persecond.
+

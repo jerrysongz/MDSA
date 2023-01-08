@@ -1,0 +1,445 @@
+---
+title: "Data 602 - Class Notes for September 22"
+output: html_notebook
+editor_options: 
+  markdown: 
+    wrap: 72
+---
+
+------------------------------------------------------------------------
+
+# Distribution of the Sample Variance
+
+## Time To Play 2
+
+Using the **uselectiondata**
+
+```{r}
+timetoplay2.df <- sample(uselectiondata, 50, replace=FALSE)
+```
+
+```{r}
+head(timetoplay2.df, 4)
+tail(timetoplay2.df, 3)
+dim(timetoplay2.df)
+```
+
+```{r}
+favstats(~Median.Earnings.2010, data=timetoplay2.df)
+```
+
+(a) From my sample of $n = 50$ is
+
+$$
+S = 4293.698
+$$
+
+and
+
+```{r}
+var.medianearnings <- favstats(~Median.Earnings.2010, data=timetoplay2.df)$sd^2
+#
+#
+var.medianearnings
+```
+
+$$
+S^{2} = 4293.698^2 = 18435846
+$$
+
+(b) Compute $P(S > 4293.698)$
+
+**Answer:**
+
+$$
+\begin{eqnarray}
+P(S > 4293.698) & = & P(S^{2} > 18435846) \\
+                & = & P\left(\chi^{2}_{50 - 1} > \frac{(50 - 1)*18435846}{5078^2}\right) \\
+                & = & P(\chi^{2}_{49} > 35.0327) \\
+                & = &  0.9336783 \\
+                & \approx & 0.9337
+\end{eqnarray}
+$$
+
+```{r}
+pchisq(35.0327, 50-1)
+1 - pchisq(35.0327, 50-1)
+```
+
+(c) Generate a distribution of the $S$. What proportion of this
+    distribution exceeds $S = 4923.698$? Note: Variable is
+    **Median.Earnings.2010**.
+
+```{r}
+#Note, Nsim <- 1000
+nsize <- favstats(~Median.Earnings.2010, data=timetoplay2.df)$n #set the sample size to n = 50, output from favstats
+vecofvariances <- numeric(Nsim) 
+vecofsds <- numeric(Nsim)
+vecofmeans <- numeric(Nsim)
+#
+for(i in 1:Nsim){
+   data.sampled <- sample(uselectiondata$Median.Earnings.2010, nsize, replace=FALSE)  #sample w/0 replacement  50 counties, observe each's median earning in 2010,
+   vecofvariances[i] <- var(data.sampled)  #compute the sample variance, store in position i
+   vecofsds[i] <- sd(data.sampled) #compute the sample standard deviation, stored in position i
+   vecofmeans[i] <- mean(data.sampled)
+}
+```
+
+```{r}
+ttp2generatedstats.df <- data.frame(vecofvariances, vecofsds, vecofmeans)
+```
+
+```{r}
+head(ttp2generatedstats.df, 4)
+tail(ttp2generatedstats.df, 3)
+```
+
+Below is the distribution of the sample variance $S^{2}$ based on
+$n = 50$ from the population of $N = 3143 counties$.
+
+```{r}
+options(scipen = 999)
+ggplot(ttp2generatedstats.df, aes(x = vecofvariances)) + geom_histogram(col="orange", fill="yellow", binwidth=1000000) + xlab("Values of Sample Variance (n = 50)") + ylab("Count") + ggtitle("Histogram: Distribution of Sample Variance (n = 50)") + geom_vline(xintercept = var.medianearnings, col="blue")
+```
+
+Note: The proportion of $S^{2}$s that exceed the observed value of the
+sample variance $S^{2}_{Observed}$ is
+
+```{r}
+p.exceedingsquared <- nrow(subset(ttp2generatedstats.df, ttp2generatedstats.df$vecofvariances > (4293.698)^{2}))/Nsim
+print(p.exceedingsquared)
+```
+
+The distribution of the sample standard deviation $S$ is
+
+```{r}
+ggplot(ttp2generatedstats.df, aes(x = vecofsds)) + geom_histogram(col="orange", fill="yellow", binwidth=200) + xlab("Values of Sample Standard Deviation (n = 50)") + ylab("Count") + ggtitle("Histogram: Distribution of Sample Standard Deviation (n = 50)") + geom_vline(xintercept = favstats(~Median.Earnings.2010, data=timetoplay2.df)$sd, col="blue")
+```
+
+What proportion of sample standard deviations exceed my observed of
+$S = 4293.698$?
+
+```{r}
+nrow(subset(ttp2generatedstats.df, ttp2generatedstats.df$vecofsds > 4293.698))  #I could have replaced 6423.448 with favstats(~Median.Earnings.2010, data=timetoplay2.df)$sd
+```
+
+To compute the proportion:
+
+```{r}
+p.exceeding <- (nrow(subset(ttp2generatedstats.df, ttp2generatedstats.df$vecofsds > 4293.698)))/(Nsim)
+print(p.exceeding)
+```
+
+In my case, 79.3% of the distribution exceeds the observed value of
+$S = 4293.698$.
+
+The density plot is
+
+```{r}
+ggplot(ttp2generatedstats.df, aes(x = vecofsds)) + geom_density(col="orange", fill="yellow") + xlab("Values of Sample Standard Deviation (n = 50)") + ylab("Count") + ggtitle("Density Plot: Distribution of Sample Standard Deviation (n = 50)") + geom_vline(xintercept = favstats(~Median.Earnings.2010, data=timetoplay2.df)$sd, col="blue")
+```
+
+or
+
+```{r}
+densityplot(ttp2generatedstats.df$vecofsds, xlab="Values of Sample Standard Deviation", main="Density Plot of Sample Standard Deviation (n = 50)")
+```
+
+And, just for the sake of, the distribution of $\overline{X}$ based on
+$n = 50$, where the observed value of the sample mean was
+$\overline{X} = 24581.7$.
+
+```{r}
+ggplot(ttp2generatedstats.df, aes(x = vecofmeans)) + geom_density(col="orange", fill="sky blue") + xlab("Values of Sample Mean (n = 50)") + ylab("Density") + ggtitle("Density Plot: Distribution of Sample Mean (n = 50)") + geom_vline(xintercept = favstats(~Median.Earnings.2010, data=timetoplay2.df)$mean, col="purple")
+```
+
+**Exercise 1**
+
+From the sample of graduates $n = 20$, the variable of interest being
+the student debt.
+
+```{r}
+stdebtdata = c(29063, 23025, 31327, 20638, 31760, 26374, 28199, 25151, 16026, 23243, 23799, 18629, 19841, 28883, 24237, 27573, 26746, 31358, 23490, 33806)
+```
+
+Generate a bootstrap distribution of the sample mean $\overline{X}$,
+then compute the 95% bootstrap confidence interval for the mean debt of
+all students who recently graduated from an undergraduate program.
+
+The bootstrap distribution of $\overline{X}$ is provided, using 1000
+iterations
+
+```{r}
+mean.debt <- numeric(1000)
+n.students <- length(stdebtdata)
+#
+for(i in 1:1000){
+     temp.data <- sample(stdebtdata, n.students, replace=TRUE)
+     mean.debt[i] <- mean(temp.data)
+}
+boot_ex1.df <- data.frame(mean.debt)
+```
+
+```{r}
+head(boot_ex1.df, 4)
+tail(boot_ex1.df, 4)
+```
+
+```{r}
+ggplot(boot_ex1.df, aes(x = mean.debt)) + geom_histogram(col="red", fill="blue", binwidth = 500) + xlab("Values of the Sample Mean") + 
+  ggtitle("Histogram: Distribution of the Bootstrap Statistic: Sample Mean")
+```
+
+```{r}
+favstats(~mean.debt, data=boot_ex1.df)
+qdata(~mean.debt, c(0.025, 0.975), data=boot_ex1.df)
+```
+
+From my result, the 95% bootstrap confidence interval for
+$\mu_{student\_debt}$ is $$
+23632.46 \leq \mu_{student\:debt} \leq 27621.89
+$$
+
+**NOTE:** The same result could have been acheived with the `do`
+function, which is specific to the `mosaic` package....
+
+```{r}
+boot.mean = do(1000) * mean(resample(stdebtdata)) #cresample n = 20 -> compute the mean -> do this 1000 times -> assign results to a ddata frame called boot.mean
+ggplot(data=boot.mean, aes(x = mean)) + geom_histogram(fill='blue', col='red', binwidth=500) + xlab("Bootstrap Statistic - Sample Mean")
+head(boot.mean, 3)
+favstats(~ mean, data=boot.mean)
+qdata(~mean, c(0.025, 0.975), data=boot.mean)
+```
+
+From your result, can you infer that (i) $\mu_{student\:debt} = 25000$?
+(ii) $\mu_{student\:debt} > 20000$? (iii) $\mu_{student\:debt} < 26000$?
+
+------------------------------------------------------------------------
+
+**Time to Play with Data 1**
+
+The water samples and their corresponding dissolved oxygen levels are
+
+```{r}
+diso2 = c(5.4, 5.4, 5.6, 4.2, 4.7, 5.3, 4.4, 4.9, 5.2, 5.9, 4.7, 4.9, 4.8, 4.9, 5.0, 5.5) # read the data into a data vector called diso2
+densityplot(diso2, xlab="Dissolved O2 Content", col='blue', main="Density Plot of n = 16 Water Samples") # graph the data with a density plot
+```
+
+1.  Write the code to create a bootstrap distribution of $\overline{X}$
+    based on 1000 iterations.
+
+```{r}
+Num.Boots <- 1000
+samplesize <- length(diso2)
+meandiso2 <- numeric(Num.Boots)
+vardiso2 <- numeric(Num.Boots)
+#
+for(i in 1:Num.Boots){
+   booted.data <- sample(diso2, samplesize, replace=TRUE) #resample(disco2) would have performed the same function
+   meandiso2[i] <- mean(booted.data)
+   vardiso2[i] <- var(booted.data)
+}
+```
+
+```{r}
+bootstrap_mean.df <- data.frame(meandiso2, vardiso2)
+```
+
+```{r}
+head(bootstrap_mean.df, 4)
+tail(bootstrap_mean.df, 4)
+```
+
+```{r}
+ggplot(bootstrap_mean.df, aes(x = meandiso2)) + geom_histogram(col="red", fill="blue", binwidth=0.05) + xlab("Values of the Sample Mean (n = 16)") + ylab("Count") + ggtitle("Histogram: Distribution of Bootstrap Statistic- Sample Mean")
+```
+
+```{r}
+qdata(~meandiso2, c(0.025, 0.975), data=bootstrap_mean.df)
+```
+
+From these data, the 95% bootstrap confidence interval for $\mu$ - the
+mean amount of dissolved oxygen one-km downstream from the water
+treatment plant is *somewhere* beween 4.8375 and 5.2750, or $$
+4.8438 \leq \mu \leq 5.2814
+$$
+
+------------------------------------------------------------------------
+
+Now, I could used the following code to generate the bootstrap
+distribution required above. Suing the `do` function requires the
+`mosaic` package.
+
+```{r}
+resample(diso2)
+```
+
+```{r}
+bootstrap_mean2.df = do(1000) * mean(resample(diso2)) #the default sample size is the length of the data vector, in this case n = 16
+```
+
+```{r}
+head(bootstrap_mean2.df, 4)
+tail(bootstrap_mean2.df, 4)
+```
+
+```{r}
+ggplot(data=bootstrap_mean2.df, aes(x = mean)) + geom_histogram(fill='blue', col='red', binwidth=0.05) + xlab("Bootstrap Statistic - Sample Mean")
+favstats(~ mean, data=bootstrap_mean2.df)
+qdata(bootstrap_mean2.df$mean, c(0.025, 0.975))
+```
+
+------------------------------------------------------------------------
+
+Bootstrap of the Sample Proportion
+
+**Example 1:**
+
+Here is the code used to generate a 99% confidence interval for $p$, the
+proportion of all Canadians who are confident that the Health Care
+system in Canada will be able to meet the needs of senior citizens.
+
+```{r}
+senhc = c(rep(0, 0.51*500), rep(1, 0.49*500)) 
+```
+
+```{r}
+```
+
+```{r}
+vecphats500 <- numeric(1000)
+for(i in 1:1000){
+     temp.data2 <- resample(senhc)
+     vecphats500[i] <- mean(temp.data2)
+}
+boot_phat500.df <- data.frame(vecphats500)
+```
+
+```{r}
+head(boot_phat500.df, 4)
+tail(boot_phat500.df, 3)
+```
+
+```{r}
+ggplot(boot_phat500.df, aes(x=vecphats500)) + geom_histogram(col="orange", fill="yellow", binwidth=0.01) + xlab("Values of the Sample Proportion") + ylab("Count") + ggtitle("Bootstrap Distribution of Sample Proportion (n = 500)")
+favstats(~vecphats500, data=boot_phat500.df)
+qdata(~vecphats500, c(0.01, 0.99), data=boot_phat500.df)
+```
+
+from which $$
+0.44398 \leq p \leq 0.54002
+$$
+
+**Example 1(b):** How would you result from (a) change if you used
+$n = 1500$ as opposed to $n = 500$?
+
+------------------------------------------------------------------------
+
+**Time to Play with Data 2:** $p = 0.58$, using $n = 1000$.
+
+```{r}
+nairs <- 1000
+value.p <- 0.58
+air.discontent <- c(rep(0, (1 - value.p)*(nairs)), rep(1, (value.p*nairs)))
+```
+
+```{r}
+boot.phats <- numeric(1000)
+for(i in 1:1000){
+   s.data <- sample(air.discontent, nairs, replace=TRUE)
+   boot.phats[i] <- mean(s.data)
+}
+```
+
+```{r}
+sept22ttp2.df <- data.frame(boot.phats)
+```
+
+```{r}
+head(sept22ttp2.df, 4)
+tail(sept22ttp2.df, 3)
+```
+
+```{r}
+ggplot(sept22ttp2.df, aes(boot.phats)) + geom_histogram(col="orange", fill="yellow", binwidth=0.005) + xlab("Sample Proportion (n = 1000)") + ylab("Count") + ggtitle("Distribution of Bootstrap Sample Proportion") + geom_vline(xintercept = value.p, col="black")
+favstats(~boot.phats, data=sept22ttp2.df)
+qdata(~boot.phats, c(0.025, 0.975), data=sept22ttp2.df)
+```
+
+The 95% Bootstrap Confidence Interval for $p_{July}$ is $$
+0.550 \leq p_{July} \leq 0.611
+$$
+
+(b) Can we infer from this finding that $p_{July} > 0.60$? No...
+
+Alternatively,
+
+```{r}
+ncdns = 1000
+example3data = c(rep(0,0.49*ncdns), rep(1, 0.58*ncdns))
+bootstrap_trials7 = do(1000) * mean(resample(example3data, ncdns))
+ggplot(data=bootstrap_trials7, aes(x = mean)) + geom_histogram(col='blue', fill='red', binwidth=0.01) + xlab("Bootstrap Statistic - Sample Proportion")
+qdata(~mean, c(0.025, 0.975), data=boostrap_trials7)
+```
+
+------------------------------------------------------------------------
+
+**Example 1:** Using the data from *diso2*
+
+```{r}
+diso2
+```
+
+From previously done work - **Play with Data 1**
+
+```{r}
+head(bootstrap_mean.df, 3)
+```
+
+The sample variances have been generated from previous coding, and they
+appear in the **vardiso2** column of the **bootstrap_mean.df** data
+frame.
+
+```{r}
+ggplot(bootstrap_mean.df, aes(x = vardiso2)) + geom_histogram(col="orange", fill="yellow", binwidth=0.02) + xlab("Values of the Sample Variance (n = 16)") + ylab("Count") + ggtitle("Histogram: Distribution of Bootstrap Statistic- Sample Variance")
+```
+
+from this
+
+```{r}
+favstats(~vardiso2, data=bootstrap_mean.df)
+qdata(~vardiso2, c(0.025, 0.975), data=bootstrap_mean.df)
+```
+
+From which the 95% Bootstrap Confidence Interval for
+$\sigma_{Dis\:Oxygen}^{2}$ is $$
+0.08999 \leq \sigma_{Dis\:Oxygen}^{2} \leq 0.3113
+$$ **Time to Play with Data 2:** (Student debt data)
+
+```{r}
+stdebtdata
+```
+
+```{r}
+sd.debt <- numeric(1000)
+n.students <- length(stdebtdata)
+#
+for(i in 1:1000){
+     temp2.data <- sample(stdebtdata, n.students, replace=TRUE)
+     sd.debt[i] <- sd(temp2.data)
+}
+```
+
+```{r}
+boot_ex1.df <- data.frame(boot_ex1.df, sd.debt)
+```
+
+```{r}
+head(boot_ex1.df, 4)
+```
+
+```{r}
+ggplot(boot_ex1.df, aes(x = sd.debt)) + geom_histogram(col="orange", fill="yellow", binwidth=500) + xlab("Values of the Sample Standard Deviation (n = 20)") + ylab("Count") + ggtitle("Histogram: Distribution of Bootstrap Statistic- Sample Standard Deviation") + geom_vline(xintercept = 3104.977, col="black") + geom_vline(xintercept=5940.617, col="black")
+favstats(~sd.debt, data=boot_ex1.df)
+qdata(~sd.debt, c(0.01, 0.99), data=boot_ex1.df)
+```

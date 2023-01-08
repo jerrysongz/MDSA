@@ -1,0 +1,1444 @@
+% Options for packages loaded elsewhere
+\PassOptionsToPackage{unicode}{hyperref}
+\PassOptionsToPackage{hyphens}{url}
+%
+\documentclass[
+]{article}
+\usepackage{amsmath,amssymb}
+\usepackage{lmodern}
+\usepackage{iftex}
+\ifPDFTeX
+  \usepackage[T1]{fontenc}
+  \usepackage[utf8]{inputenc}
+  \usepackage{textcomp} % provide euro and other symbols
+\else % if luatex or xetex
+  \usepackage{unicode-math}
+  \defaultfontfeatures{Scale=MatchLowercase}
+  \defaultfontfeatures[\rmfamily]{Ligatures=TeX,Scale=1}
+\fi
+% Use upquote if available, for straight quotes in verbatim environments
+\IfFileExists{upquote.sty}{\usepackage{upquote}}{}
+\IfFileExists{microtype.sty}{% use microtype if available
+  \usepackage[]{microtype}
+  \UseMicrotypeSet[protrusion]{basicmath} % disable protrusion for tt fonts
+}{}
+\makeatletter
+\@ifundefined{KOMAClassName}{% if non-KOMA class
+  \IfFileExists{parskip.sty}{%
+    \usepackage{parskip}
+  }{% else
+    \setlength{\parindent}{0pt}
+    \setlength{\parskip}{6pt plus 2pt minus 1pt}}
+}{% if KOMA class
+  \KOMAoptions{parskip=half}}
+\makeatother
+\usepackage{xcolor}
+\usepackage[margin=1in]{geometry}
+\usepackage{color}
+\usepackage{fancyvrb}
+\newcommand{\VerbBar}{|}
+\newcommand{\VERB}{\Verb[commandchars=\\\{\}]}
+\DefineVerbatimEnvironment{Highlighting}{Verbatim}{commandchars=\\\{\}}
+% Add ',fontsize=\small' for more characters per line
+\usepackage{framed}
+\definecolor{shadecolor}{RGB}{248,248,248}
+\newenvironment{Shaded}{\begin{snugshade}}{\end{snugshade}}
+\newcommand{\AlertTok}[1]{\textcolor[rgb]{0.94,0.16,0.16}{#1}}
+\newcommand{\AnnotationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\AttributeTok}[1]{\textcolor[rgb]{0.77,0.63,0.00}{#1}}
+\newcommand{\BaseNTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\BuiltInTok}[1]{#1}
+\newcommand{\CharTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\CommentTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\CommentVarTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ConstantTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ControlFlowTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\DataTypeTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{#1}}
+\newcommand{\DecValTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\DocumentationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\ErrorTok}[1]{\textcolor[rgb]{0.64,0.00,0.00}{\textbf{#1}}}
+\newcommand{\ExtensionTok}[1]{#1}
+\newcommand{\FloatTok}[1]{\textcolor[rgb]{0.00,0.00,0.81}{#1}}
+\newcommand{\FunctionTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\ImportTok}[1]{#1}
+\newcommand{\InformationTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\newcommand{\KeywordTok}[1]{\textcolor[rgb]{0.13,0.29,0.53}{\textbf{#1}}}
+\newcommand{\NormalTok}[1]{#1}
+\newcommand{\OperatorTok}[1]{\textcolor[rgb]{0.81,0.36,0.00}{\textbf{#1}}}
+\newcommand{\OtherTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{#1}}
+\newcommand{\PreprocessorTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textit{#1}}}
+\newcommand{\RegionMarkerTok}[1]{#1}
+\newcommand{\SpecialCharTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\SpecialStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\StringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\VariableTok}[1]{\textcolor[rgb]{0.00,0.00,0.00}{#1}}
+\newcommand{\VerbatimStringTok}[1]{\textcolor[rgb]{0.31,0.60,0.02}{#1}}
+\newcommand{\WarningTok}[1]{\textcolor[rgb]{0.56,0.35,0.01}{\textbf{\textit{#1}}}}
+\usepackage{graphicx}
+\makeatletter
+\def\maxwidth{\ifdim\Gin@nat@width>\linewidth\linewidth\else\Gin@nat@width\fi}
+\def\maxheight{\ifdim\Gin@nat@height>\textheight\textheight\else\Gin@nat@height\fi}
+\makeatother
+% Scale images if necessary, so that they will not overflow the page
+% margins by default, and it is still possible to overwrite the defaults
+% using explicit options in \includegraphics[width, height, ...]{}
+\setkeys{Gin}{width=\maxwidth,height=\maxheight,keepaspectratio}
+% Set default figure placement to htbp
+\makeatletter
+\def\fps@figure{htbp}
+\makeatother
+\setlength{\emergencystretch}{3em} % prevent overfull lines
+\providecommand{\tightlist}{%
+  \setlength{\itemsep}{0pt}\setlength{\parskip}{0pt}}
+\setcounter{secnumdepth}{-\maxdimen} % remove section numbering
+\ifLuaTeX
+  \usepackage{selnolig}  % disable illegal ligatures
+\fi
+\IfFileExists{bookmark.sty}{\usepackage{bookmark}}{\usepackage{hyperref}}
+\IfFileExists{xurl.sty}{\usepackage{xurl}}{} % add URL line breaks if available
+\urlstyle{same} % disable monospaced font for URLs
+\hypersetup{
+  hidelinks,
+  pdfcreator={LaTeX via pandoc}}
+
+\author{}
+\date{\vspace{-2.5em}}
+
+\begin{document}
+
+\hypertarget{assignment-1-multiple-linear-regression}{%
+\section{603 Assignment 1 Multiple Linear
+Regression}\label{assignment-1-multiple-linear-regression}}
+
+\hypertarget{problem-1}{%
+\subsection{Problem 1}\label{problem-1}}
+
+\textbf{a}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{water}\OtherTok{=}\FunctionTok{read.csv}\NormalTok{(}\StringTok{"water.csv"}\NormalTok{)}
+\FunctionTok{head}\NormalTok{(water)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    PROD TEMP HOUR USAGE DAYS
+## 1 171.3 39.7  9.5  19.0   20
+## 2  19.4 16.0 20.0   6.6   21
+## 3  18.7 12.1 26.0   6.7   21
+## 4  25.6 39.0 24.0   9.5   21
+## 5  25.6 39.0 23.0   9.5   21
+## 6 139.2 14.3 16.0  12.2   21
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reg1}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(USAGE}\SpecialCharTok{\textasciitilde{}}\NormalTok{PROD}\SpecialCharTok{+}\NormalTok{TEMP}\SpecialCharTok{+}\NormalTok{HOUR }\SpecialCharTok{+}\NormalTok{ DAYS, }\AttributeTok{data=}\NormalTok{water)}
+\FunctionTok{coefficients}\NormalTok{(reg1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## (Intercept)        PROD        TEMP        HOUR        DAYS 
+##  5.89162697  0.04020739  0.16867306 -0.07099009 -0.02162304
+\end{verbatim}
+
+The estimated model is
+\(\hat{USAGE}= 5.89162697 +0.04020739Prod+0.16867306Temp-0.07099009Hour -0.02162304Days\)
+
+\textbf{b}
+
+The statistical hypothesis to be tested is:
+
+\[
+\begin{aligned}
+H_0&:\beta_1=\beta_2=\beta_3=\beta_4=0\\
+H_a&:\mbox{at least one }\beta_i\mbox{ is not zero } (i=1,2,3,4) 
+\end{aligned}
+\]
+
+I set up the \(\alpha = 0.05\)
+
+Compute the value of the test statistic.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reg2}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(USAGE}\SpecialCharTok{\textasciitilde{}}\DecValTok{1}\NormalTok{, }\AttributeTok{data=}\NormalTok{water) }\CommentTok{\# Model with only intercept}
+\FunctionTok{summary}\NormalTok{(reg1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = USAGE ~ PROD + TEMP + HOUR + DAYS, data = water)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.4030 -1.1433  0.0473  1.1677  5.3999 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  5.891627   1.028794   5.727  3.0e-08 ***
+## PROD         0.040207   0.001629  24.681  < 2e-16 ***
+## TEMP         0.168673   0.008209  20.546  < 2e-16 ***
+## HOUR        -0.070990   0.016992  -4.178  4.1e-05 ***
+## DAYS        -0.021623   0.032183  -0.672    0.502    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.768 on 244 degrees of freedom
+## Multiple R-squared:  0.8885, Adjusted R-squared:  0.8867 
+## F-statistic:   486 on 4 and 244 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(reg2,reg1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: USAGE ~ 1
+## Model 2: USAGE ~ PROD + TEMP + HOUR + DAYS
+##   Res.Df    RSS Df Sum of Sq      F    Pr(>F)    
+## 1    248 6842.7                                  
+## 2    244  763.1  4    6079.7 486.02 < 2.2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\(p-value< 2.2e-16 < \alpha=0.05\),indicating that we should reject the
+null hypothesis. I conclude that at least one \(β_i\) is not zero for
+\(i=1,2,3,4\).
+
+\textbf{c} The statistical hypothesis to be tested is:
+
+\[
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0\mbox{    (i=1,2,3,4)}
+\end{aligned}
+\] I set up the \(\alpha = 0.05\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(reg1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = USAGE ~ PROD + TEMP + HOUR + DAYS, data = water)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.4030 -1.1433  0.0473  1.1677  5.3999 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  5.891627   1.028794   5.727  3.0e-08 ***
+## PROD         0.040207   0.001629  24.681  < 2e-16 ***
+## TEMP         0.168673   0.008209  20.546  < 2e-16 ***
+## HOUR        -0.070990   0.016992  -4.178  4.1e-05 ***
+## DAYS        -0.021623   0.032183  -0.672    0.502    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.768 on 244 degrees of freedom
+## Multiple R-squared:  0.8885, Adjusted R-squared:  0.8867 
+## F-statistic:   486 on 4 and 244 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+It shows that the DAYS has \(tcal=-0.672\) with the
+\(p-value= 0.502 > 0.05\), indicating that we Fail to reject the null
+hypothesis that the number of operationing day in the month has not
+significantly influence on sales at \(α=0.05\). I would not suggest the
+model in part b for predictive purposes. Therefore, the independent
+variable DAYS should be removed from the model.
+
+\textbf{d}
+
+The hypotheses are:
+
+\$\$
+
+\begin{aligned}
+
+H_0&:\beta_4=0\mbox{   in the model   } USAGE=\beta_0+\beta_1Prod+\beta_2Temp+\beta_3Hour+\beta_4Days+\epsilon \\
+H_a&:\beta_4\neq0\mbox{   in the model   } USAGE=\beta_0+\beta_1Prod+\beta_2Temp+\beta_3Hour+\beta_4Days+\epsilon\\
+\end{aligned}
+
+\$\$ I set up the \(\alpha = 0.05\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\CommentTok{\#The estimated model is $\textbackslash{}hat\{USAGE\}= 5.89162697 +0.04020739Prod+0.16867306Temp{-}0.07099009Hour\textquotesingle{}}
+
+\NormalTok{reduced}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(USAGE}\SpecialCharTok{\textasciitilde{}}\NormalTok{PROD}\SpecialCharTok{+}\NormalTok{TEMP}\SpecialCharTok{+}\NormalTok{HOUR, }\AttributeTok{data=}\NormalTok{water) }\CommentTok{\# dropping a DAYS variable}
+\FunctionTok{anova}\NormalTok{(reduced,reg1)}\CommentTok{\# test if Ho: DAYS = 0 }
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: USAGE ~ PROD + TEMP + HOUR
+## Model 2: USAGE ~ PROD + TEMP + HOUR + DAYS
+##   Res.Df    RSS Df Sum of Sq      F Pr(>F)
+## 1    245 764.47                           
+## 2    244 763.06  1    1.4117 0.4514 0.5023
+\end{verbatim}
+
+It shows \(p-value=0.5023 > \alpha=0.05\), indicating that we should not
+to reject the null hypothesis. The independent variable DAYS should be
+out of the model at significance level 0.05.
+
+\textbf{e}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{confint}\NormalTok{(reduced)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                   2.5 %      97.5 %
+## (Intercept)  4.22519744  6.38982411
+## PROD         0.03692098  0.04330837
+## TEMP         0.15310634  0.18526907
+## HOUR        -0.10419445 -0.03734272
+\end{verbatim}
+
+The 95\% confidence interval of regression coefficient for TEMP from the
+model in part c is from 0.15310634 to 0.18526907.
+
+Interpretation: The monthly water usage increase between 0.15310634
+unit(gallons/minute) to 0.18526907 unit(gallons/minute) for every 1
+unit(degree Celsius) INCREASE in average monthly temperature holding
+PROD and HOUR with 95\% of chance.
+
+\textbf{f}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(reg1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = USAGE ~ PROD + TEMP + HOUR + DAYS, data = water)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.4030 -1.1433  0.0473  1.1677  5.3999 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  5.891627   1.028794   5.727  3.0e-08 ***
+## PROD         0.040207   0.001629  24.681  < 2e-16 ***
+## TEMP         0.168673   0.008209  20.546  < 2e-16 ***
+## HOUR        -0.070990   0.016992  -4.178  4.1e-05 ***
+## DAYS        -0.021623   0.032183  -0.672    0.502    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.768 on 244 degrees of freedom
+## Multiple R-squared:  0.8885, Adjusted R-squared:  0.8867 
+## F-statistic:   486 on 4 and 244 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(reduced)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = USAGE ~ PROD + TEMP + HOUR, data = water)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.5066 -1.1356  0.0469  1.1519  5.3750 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  5.307511   0.549483   9.659  < 2e-16 ***
+## PROD         0.040115   0.001621  24.741  < 2e-16 ***
+## TEMP         0.169188   0.008164  20.723  < 2e-16 ***
+## HOUR        -0.070769   0.016970  -4.170 4.23e-05 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1.766 on 245 degrees of freedom
+## Multiple R-squared:  0.8883, Adjusted R-squared:  0.8869 
+## F-statistic: 649.3 on 3 and 245 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sigma}\NormalTok{(reg1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1.768414
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sigma}\NormalTok{(reduced)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 1.766433
+\end{verbatim}
+
+Full model: \(R^2_{adj} = 0.8867\) RMSE = 1.7684
+
+Reduced model: \(R^2_{adj} = 0.8869\) RMSE = 1.7664
+
+The reduced model has higher \(R^2_{adj}\) with smaller RMSE. Thus, the
+reduced model form part c is a better model. Therefore, I would suggest
+the reduced model for predictive purpose.
+
+Interpretation: For the model I choose, \(R^2_{adj} = 0.8869\) that
+means the model explains 89.69\% of the variation of the repose
+variable. And the standard deviation of unexplained variance is known as
+RMSE and has the useful property of being in the same units as the
+response variable. Lower values of RMSE indicate a better fit.
+
+\textbf{g}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{interacmodel1}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(USAGE}\SpecialCharTok{\textasciitilde{}}\NormalTok{(PROD}\SpecialCharTok{+}\NormalTok{TEMP}\SpecialCharTok{+}\NormalTok{HOUR)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{, }\AttributeTok{data=}\NormalTok{water)}
+\FunctionTok{summary}\NormalTok{(interacmodel1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = USAGE ~ (PROD + TEMP + HOUR)^2, data = water)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.1941 -0.3165 -0.0502  0.2755  7.0985 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  1.294e+01  7.113e-01  18.193   <2e-16 ***
+## PROD        -3.642e-03  2.565e-03  -1.420    0.157    
+## TEMP        -2.389e-02  2.129e-02  -1.122    0.263    
+## HOUR        -2.340e-01  2.512e-02  -9.316   <2e-16 ***
+## PROD:TEMP    1.189e-03  6.932e-05  17.154   <2e-16 ***
+## PROD:HOUR    7.767e-04  7.820e-05   9.933   <2e-16 ***
+## TEMP:HOUR    7.600e-04  7.683e-04   0.989    0.324    
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.9867 on 242 degrees of freedom
+## Multiple R-squared:  0.9656, Adjusted R-squared:  0.9647 
+## F-statistic:  1131 on 6 and 242 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+TEMP:HOUR are not significant, so I remove it form the model.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reducedintermodel }\OtherTok{=} \FunctionTok{lm}\NormalTok{(USAGE}\SpecialCharTok{\textasciitilde{}}\NormalTok{PROD}\SpecialCharTok{+}\NormalTok{TEMP}\SpecialCharTok{+}\NormalTok{HOUR }\SpecialCharTok{+}\NormalTok{ PROD}\SpecialCharTok{:}\NormalTok{TEMP }\SpecialCharTok{+}\NormalTok{ PROD}\SpecialCharTok{:}\NormalTok{HOUR, }\AttributeTok{data=}\NormalTok{water)}
+\FunctionTok{summary}\NormalTok{(reducedintermodel)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = USAGE ~ PROD + TEMP + HOUR + PROD:TEMP + PROD:HOUR, 
+##     data = water)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -6.1423 -0.3148 -0.0358  0.3029  7.2555 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept)  1.243e+01  4.839e-01  25.679   <2e-16 ***
+## PROD        -2.529e-03  2.305e-03  -1.097    0.274    
+## TEMP        -4.737e-03  8.859e-03  -0.535    0.593    
+## HOUR        -2.151e-01  1.624e-02 -13.242   <2e-16 ***
+## PROD:TEMP    1.142e-03  5.009e-05  22.795   <2e-16 ***
+## PROD:HOUR    7.873e-04  7.745e-05  10.165   <2e-16 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 0.9866 on 243 degrees of freedom
+## Multiple R-squared:  0.9654, Adjusted R-squared:  0.9647 
+## F-statistic:  1357 on 5 and 243 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+I would recommend the interaction model for predictive purposes because
+The Adjusted R-squared is bigger than the model in part f.
+
+\hypertarget{problem-2}{%
+\subsection{Problem 2}\label{problem-2}}
+
+\textbf{a}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{antique}\OtherTok{=}\FunctionTok{read.csv}\NormalTok{(}\StringTok{"GFCLOCKS.csv"}\NormalTok{)}
+\FunctionTok{head}\NormalTok{(antique)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   AGE NUMBIDS PRICE
+## 1 127      13  1235
+## 2 115      12  1080
+## 3 127       7   845
+## 4 150       9  1522
+## 5 156       6  1047
+## 6 182      11  1979
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{regq2}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(PRICE}\SpecialCharTok{\textasciitilde{}}\NormalTok{AGE}\SpecialCharTok{+}\NormalTok{NUMBIDS, }\AttributeTok{data=}\NormalTok{antique)}
+\FunctionTok{coefficients}\NormalTok{(regq2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## (Intercept)         AGE     NUMBIDS 
+## -1338.95134    12.74057    85.95298
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(regq2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = PRICE ~ AGE + NUMBIDS, data = antique)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -206.49 -117.34   16.66  102.55  213.50 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -1338.9513   173.8095  -7.704 1.71e-08 ***
+## AGE            12.7406     0.9047  14.082 1.69e-14 ***
+## NUMBIDS        85.9530     8.7285   9.847 9.34e-11 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 133.5 on 29 degrees of freedom
+## Multiple R-squared:  0.8923, Adjusted R-squared:  0.8849 
+## F-statistic: 120.2 on 2 and 29 DF,  p-value: 9.216e-15
+\end{verbatim}
+
+The estimated model is
+\(\hat{PRICE}= -1338.9513 + 12.74057AGE +85.95298NUMBIDS\)
+
+\textbf{b}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{regone}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(PRICE}\SpecialCharTok{\textasciitilde{}}\DecValTok{1}\NormalTok{, }\AttributeTok{data=}\NormalTok{antique) }\CommentTok{\# Model with only intercept}
+\FunctionTok{anova}\NormalTok{(regone, regq2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: PRICE ~ 1
+## Model 2: PRICE ~ AGE + NUMBIDS
+##   Res.Df     RSS Df Sum of Sq      F    Pr(>F)    
+## 1     31 4799790                                  
+## 2     29  516727  2   4283063 120.19 9.216e-15 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\(SSE = 516727\)
+
+\textbf{c}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(regq2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = PRICE ~ AGE + NUMBIDS, data = antique)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -206.49 -117.34   16.66  102.55  213.50 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -1338.9513   173.8095  -7.704 1.71e-08 ***
+## AGE            12.7406     0.9047  14.082 1.69e-14 ***
+## NUMBIDS        85.9530     8.7285   9.847 9.34e-11 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 133.5 on 29 degrees of freedom
+## Multiple R-squared:  0.8923, Adjusted R-squared:  0.8849 
+## F-statistic: 120.2 on 2 and 29 DF,  p-value: 9.216e-15
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sigma}\NormalTok{(regq2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 133.4847
+\end{verbatim}
+
+The standard deviation of the model is 133.4847 Interpretation: the
+standard deviation of unexplained variance is known as RMSE and has the
+useful property of being in the same units as the response variable.
+Lower values of RMSE indicate a better fit.
+
+\textbf{d}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(regq2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = PRICE ~ AGE + NUMBIDS, data = antique)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -206.49 -117.34   16.66  102.55  213.50 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -1338.9513   173.8095  -7.704 1.71e-08 ***
+## AGE            12.7406     0.9047  14.082 1.69e-14 ***
+## NUMBIDS        85.9530     8.7285   9.847 9.34e-11 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 133.5 on 29 degrees of freedom
+## Multiple R-squared:  0.8923, Adjusted R-squared:  0.8849 
+## F-statistic: 120.2 on 2 and 29 DF,  p-value: 9.216e-15
+\end{verbatim}
+
+\(R^2_{adj} = 0.8849\) Interpretation: For the model,
+\(R^2_{adj} = 0.8849\) that means the model explains 88.49\% of the
+variation of the repose variable.
+
+\textbf{e}
+
+The statistical hypothesis to be tested is:
+
+\[
+\begin{aligned}
+H_0&:\beta_1=\beta_2=0\\
+H_a&:\mbox{at least one }\beta_i\mbox{ is not zero } (i=1,2) 
+\end{aligned}
+\]
+
+I set up the \(\alpha = 0.05\)
+
+Compute the value of the test statistic.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(regone, regq2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: PRICE ~ 1
+## Model 2: PRICE ~ AGE + NUMBIDS
+##   Res.Df     RSS Df Sum of Sq      F    Pr(>F)    
+## 1     31 4799790                                  
+## 2     29  516727  2   4283063 120.19 9.216e-15 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+By using global F test, the out put are: Fcal = 120.19, with df = 2 and
+29. \(p-value= 9.216e-15 < \alpha=0.05\),indicating that we should
+reject the null hypothesis. I conclude that at least one \(β_i\) is not
+zero for \(i=1,2\).
+
+\textbf{f}
+
+Individual Coefficients Test:
+
+The statistical hypothesis to be tested is:
+
+\[
+\begin{aligned}
+H_0&:\beta_2=0\\
+H_a&:\beta_2\neq0
+\end{aligned}
+\] I set up the \(\alpha = 0.05\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(regq2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = PRICE ~ AGE + NUMBIDS, data = antique)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -206.49 -117.34   16.66  102.55  213.50 
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) -1338.9513   173.8095  -7.704 1.71e-08 ***
+## AGE            12.7406     0.9047  14.082 1.69e-14 ***
+## NUMBIDS        85.9530     8.7285   9.847 9.34e-11 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 133.5 on 29 degrees of freedom
+## Multiple R-squared:  0.8923, Adjusted R-squared:  0.8849 
+## F-statistic: 120.2 on 2 and 29 DF,  p-value: 9.216e-15
+\end{verbatim}
+
+It shows that the NUMBIDS has \(t_{cal}=9.847\) with the
+\(p-value= 9.34e-11 < 0.05\), indicating that we reject the null
+hypothesis. I conclude that the mean auction price of a clock increases
+as the number of bidders increases when age is held constant.
+
+\textbf{g}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{confint}\NormalTok{(regq2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##                   2.5 %     97.5 %
+## (Intercept) -1694.43162 -983.47106
+## AGE            10.89017   14.59098
+## NUMBIDS        68.10115  103.80482
+\end{verbatim}
+
+The 95\% confidence interval for \(\beta_1\) is from 10.89017 to
+14.59098. Interpretation: The the auction price increase between
+10.89017 unit(dollar) to 14.59098 unit(dollar) for every 1 unit(year)
+age of the clock with 95\% of chance.
+
+\textbf{h}
+
+Individual Coefficients Test: The statistical hypothesis to be tested
+is:
+
+\[
+\begin{aligned}
+H_0&:\beta_3=0\\
+H_a&:\beta_3\neq0
+\end{aligned}
+\] I set up the \(\alpha = 0.05\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{interacmodelq2}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(PRICE}\SpecialCharTok{\textasciitilde{}}\NormalTok{(AGE}\SpecialCharTok{+}\NormalTok{NUMBIDS)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{, }\AttributeTok{data=}\NormalTok{antique)}
+\FunctionTok{summary}\NormalTok{(interacmodelq2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = PRICE ~ (AGE + NUMBIDS)^2, data = antique)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -154.995  -70.431    2.069   47.880  202.259 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(>|t|)    
+## (Intercept) 320.4580   295.1413   1.086  0.28684    
+## AGE           0.8781     2.0322   0.432  0.66896    
+## NUMBIDS     -93.2648    29.8916  -3.120  0.00416 ** 
+## AGE:NUMBIDS   1.2978     0.2123   6.112 1.35e-06 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 88.91 on 28 degrees of freedom
+## Multiple R-squared:  0.9539, Adjusted R-squared:  0.9489 
+## F-statistic:   193 on 3 and 28 DF,  p-value: < 2.2e-16
+\end{verbatim}
+
+From the out put, It shows that the interaction term AGE:NUMBIDS has
+\(t_{cal}=6.112\) with the \(p-value= 1.35e-06 < 0.05\), indicating that
+we should clearly reject the null hypothesis which means that we should
+add the interaction term to the model at \(α=0.05\). I would recommend
+the interaction model for predicting y, because The Adjusted R-squared
+of the is interaction model bigger than the first order model given.
+
+\#\#Question 3
+
+\textbf{a}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{turbines}\OtherTok{=}\FunctionTok{read.csv}\NormalTok{(}\StringTok{"TURBINE.csv"}\NormalTok{)}
+\FunctionTok{head}\NormalTok{(turbines)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        ENGINE SHAFTS   RPM CPRATIO INLET.TEMP EXH.TEMP AIRFLOW POWER HEATRATE
+## 1 Traditional      1 27245     9.2       1134      602       7  1630    14622
+## 2 Traditional      1 14000    12.2        950      446      15  2726    13196
+## 3 Traditional      1 17384    14.8       1149      537      20  5247    11948
+## 4 Traditional      1 11085    11.8       1024      478      27  6726    11289
+## 5 Traditional      1 14045    13.2       1149      553      29  7726    11964
+## 6 Traditional      1  6211    15.7       1172      517     176 52600    10526
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{options}\NormalTok{(}\StringTok{"scipen"}\OtherTok{=}\DecValTok{999}\NormalTok{)}
+\NormalTok{regq3}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(HEATRATE}\SpecialCharTok{\textasciitilde{}}\NormalTok{RPM}\SpecialCharTok{+}\NormalTok{INLET.TEMP}\SpecialCharTok{+}\NormalTok{EXH.TEMP }\SpecialCharTok{+}\NormalTok{ CPRATIO }\SpecialCharTok{+}\NormalTok{ AIRFLOW , }\AttributeTok{data=}\NormalTok{turbines)}
+\FunctionTok{coefficients}\NormalTok{(regq3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    (Intercept)            RPM     INLET.TEMP       EXH.TEMP        CPRATIO 
+## 13614.46078214     0.08878591    -9.20087316    14.39385268     0.35190426 
+##        AIRFLOW 
+##    -0.84795834
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(regq3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = HEATRATE ~ RPM + INLET.TEMP + EXH.TEMP + CPRATIO + 
+##     AIRFLOW, data = turbines)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1007.0  -290.9  -105.8   240.8  1414.0 
+## 
+## Coefficients:
+##                Estimate  Std. Error t value             Pr(>|t|)    
+## (Intercept) 13614.46078   870.01294  15.649 < 0.0000000000000002 ***
+## RPM             0.08879     0.01391   6.382         0.0000000264 ***
+## INLET.TEMP     -9.20087     1.49920  -6.137         0.0000000686 ***
+## EXH.TEMP       14.39385     3.46095   4.159             0.000102 ***
+## CPRATIO         0.35190    29.55568   0.012             0.990539    
+## AIRFLOW        -0.84796     0.44211  -1.918             0.059800 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 458.8 on 61 degrees of freedom
+## Multiple R-squared:  0.9235, Adjusted R-squared:  0.9172 
+## F-statistic: 147.3 on 5 and 61 DF,  p-value: < 0.00000000000000022
+\end{verbatim}
+
+The estimated model is \$\hat{HEATRATE}= 13614.46078
++0.08879RPM-9.20087INLET.TEMP+14.3939EXH.TEMP +0.35190CPRATIO
+-0.84796AIRFLOW \$
+
+\textbf{b} The statistical hypothesis to be tested is:
+
+\[
+\begin{aligned}
+H_0&:\beta_1=\beta_2=\beta_3=\beta_4=\beta_5=0 \\
+H_a&:\mbox{at least one }\beta_i\mbox{ is not zero } (i=1,2,3,4,5) 
+\end{aligned}
+\]
+
+I set up the \(\alpha = 0.01\)
+
+Compute the value of the test statistic.
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fulltq3}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(HEATRATE}\SpecialCharTok{\textasciitilde{}}\DecValTok{1}\NormalTok{, }\AttributeTok{data=}\NormalTok{turbines) }\CommentTok{\# Model with only intercept}
+\FunctionTok{summary}\NormalTok{(fulltq3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = HEATRATE ~ 1, data = turbines)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -2352.4 -1140.9  -410.4   717.6  5176.6 
+## 
+## Coefficients:
+##             Estimate Std. Error t value            Pr(>|t|)    
+## (Intercept)  11066.4      194.9   56.79 <0.0000000000000002 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 1595 on 66 degrees of freedom
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(fulltq3,regq3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: HEATRATE ~ 1
+## Model 2: HEATRATE ~ RPM + INLET.TEMP + EXH.TEMP + CPRATIO + AIRFLOW
+##   Res.Df       RSS Df Sum of Sq     F                Pr(>F)    
+## 1     66 167897208                                             
+## 2     61  12841935  5 155055273 147.3 < 0.00000000000000022 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+\end{verbatim}
+
+\(p-value< 0.0000000000000002 < \alpha=0.01\),indicating that we should
+reject the null hypothesis. I conclude that at least one \(β_i\) is not
+zero for \(i=1,2,3,4\).
+
+\textbf{c} The statistical hypothesis to be tested is:
+
+\[
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0\mbox{    (i=1,2,3,4)}
+\end{aligned}
+\] I set up the \(\alpha = 0.05\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(regq3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = HEATRATE ~ RPM + INLET.TEMP + EXH.TEMP + CPRATIO + 
+##     AIRFLOW, data = turbines)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1007.0  -290.9  -105.8   240.8  1414.0 
+## 
+## Coefficients:
+##                Estimate  Std. Error t value             Pr(>|t|)    
+## (Intercept) 13614.46078   870.01294  15.649 < 0.0000000000000002 ***
+## RPM             0.08879     0.01391   6.382         0.0000000264 ***
+## INLET.TEMP     -9.20087     1.49920  -6.137         0.0000000686 ***
+## EXH.TEMP       14.39385     3.46095   4.159             0.000102 ***
+## CPRATIO         0.35190    29.55568   0.012             0.990539    
+## AIRFLOW        -0.84796     0.44211  -1.918             0.059800 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 458.8 on 61 degrees of freedom
+## Multiple R-squared:  0.9235, Adjusted R-squared:  0.9172 
+## F-statistic: 147.3 on 5 and 61 DF,  p-value: < 0.00000000000000022
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{regq3}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(HEATRATE}\SpecialCharTok{\textasciitilde{}}\NormalTok{RPM}\SpecialCharTok{+}\NormalTok{INLET.TEMP}\SpecialCharTok{+}\NormalTok{EXH.TEMP }\SpecialCharTok{+}\NormalTok{ CPRATIO }\SpecialCharTok{+}\NormalTok{ AIRFLOW , }\AttributeTok{data=}\NormalTok{turbines)}
+
+\NormalTok{reduced1}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(HEATRATE}\SpecialCharTok{\textasciitilde{}}\NormalTok{RPM}\SpecialCharTok{+}\NormalTok{INLET.TEMP}\SpecialCharTok{+}\NormalTok{EXH.TEMP , }\AttributeTok{data=}\NormalTok{turbines) }\CommentTok{\# dropping a CPRATIO and AIRFLOW variable}
+\NormalTok{reduced2}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(HEATRATE}\SpecialCharTok{\textasciitilde{}}\NormalTok{RPM}\SpecialCharTok{+}\NormalTok{INLET.TEMP}\SpecialCharTok{+}\NormalTok{EXH.TEMP}\SpecialCharTok{+}\NormalTok{ AIRFLOW , }\AttributeTok{data=}\NormalTok{turbines) }\CommentTok{\# dropping a CPRATIO variable}
+\FunctionTok{summary}\NormalTok{(reduced1)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = HEATRATE ~ RPM + INLET.TEMP + EXH.TEMP, data = turbines)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1025.8  -297.9  -115.3   225.8  1425.1 
+## 
+## Coefficients:
+##                Estimate  Std. Error t value             Pr(>|t|)    
+## (Intercept) 14359.71682   733.30806  19.582 < 0.0000000000000002 ***
+## RPM             0.10515     0.01071   9.818   0.0000000000000255 ***
+## INLET.TEMP     -9.22263     0.78686 -11.721 < 0.0000000000000002 ***
+## EXH.TEMP       12.42604     2.07090   6.000   0.0000001060203951 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 465 on 63 degrees of freedom
+## Multiple R-squared:  0.9189, Adjusted R-squared:  0.915 
+## F-statistic: 237.9 on 3 and 63 DF,  p-value: < 0.00000000000000022
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(reduced2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = HEATRATE ~ RPM + INLET.TEMP + EXH.TEMP + AIRFLOW, 
+##     data = turbines)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -1007.7  -290.5  -106.0   240.1  1414.8 
+## 
+## Coefficients:
+##                Estimate  Std. Error t value             Pr(>|t|)    
+## (Intercept) 13617.92419   813.30619  16.744 < 0.0000000000000002 ***
+## RPM             0.08882     0.01344   6.608         0.0000000102 ***
+## INLET.TEMP     -9.18561     0.77040 -11.923 < 0.0000000000000002 ***
+## EXH.TEMP       14.36283     2.25963   6.356         0.0000000276 ***
+## AIRFLOW        -0.84752     0.43701  -1.939                0.057 .  
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 455.1 on 62 degrees of freedom
+## Multiple R-squared:  0.9235, Adjusted R-squared:  0.9186 
+## F-statistic: 187.1 on 4 and 62 DF,  p-value: < 0.00000000000000022
+\end{verbatim}
+
+It shows that the CPRATIO has \(tcal=0.01\) with the
+\(p-value= 0.9905 > 0.05\), indicating that we Fail to reject the null
+hypothesis that the cycle pressure ratio has not significantly influence
+on sales at \(α=0.05\). Therefore, the independent variable CPRATIO
+should be removed from the model. It also shows that the AIRFLOW has
+\(tcal=-1.92\) with the \(p-value= 0.0598 > 0.05\), indicating that we
+Fail to reject the null hypothesis that the cycle pressure ratio has not
+significantly influence on sales at \(α=0.05\). But adding AIRFLOW
+variable improves the model performance as the Adjusted R-squared
+increased to 0.919. As Thuntida said in that case, it should be include
+in the model. Therefore, the independent variable AIRFLOW should not be
+removed from the model.
+
+Partial F test: The hypotheses are:
+
+\[
+\begin{aligned}
+H_0&:\beta_4=0\mbox{   in the model   } HEATRATE=\beta_0+\beta_1RPM+\beta_2INLET.TEMP+\beta_3EXH.TEMP+ \beta_4CPRATIO + \beta_5AIRFLOW+\epsilon \\
+H_a&:\beta_4\neq0\mbox{   in the model   } HEATRATE=\beta_0+\beta_1RPM+\beta_2INLET.TEMP+\beta_3EXH.TEMP+ \beta_4CPRATIO + \beta_5AIRFLOW+\epsilon 
+\end{aligned}
+\] I set up the \(\alpha = 0.05\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{reduced2}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(HEATRATE}\SpecialCharTok{\textasciitilde{}}\NormalTok{RPM}\SpecialCharTok{+}\NormalTok{INLET.TEMP}\SpecialCharTok{+}\NormalTok{EXH.TEMP}\SpecialCharTok{+}\NormalTok{ AIRFLOW , }\AttributeTok{data=}\NormalTok{turbines) }\CommentTok{\# dropping a CPRATIO variable}
+\FunctionTok{anova}\NormalTok{(reduced2,regq3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: HEATRATE ~ RPM + INLET.TEMP + EXH.TEMP + AIRFLOW
+## Model 2: HEATRATE ~ RPM + INLET.TEMP + EXH.TEMP + CPRATIO + AIRFLOW
+##   Res.Df      RSS Df Sum of Sq      F Pr(>F)
+## 1     62 12841965                           
+## 2     61 12841935  1    29.845 0.0001 0.9905
+\end{verbatim}
+
+It shows \(p-value=0.99 > \alpha=0.05\), indicating that we should not
+to reject the null hypothesis. The independent variable CPRATIO should
+be out of the model at significance level 0.05.
+
+Conclusion: The best model should be is \$\hat{HEATRATE}= 13617.92419
++0.08882RPM-9.18561INLET.TEMP+14.36283EXH.TEMP -0.84752AIRFLOW \$
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{coefficients}\NormalTok{(reduced2)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##    (Intercept)            RPM     INLET.TEMP       EXH.TEMP        AIRFLOW 
+## 13617.92418593     0.08882334    -9.18560522    14.36283051    -0.84752034
+\end{verbatim}
+
+\textbf{d} Individual Coefficients Test (t-test) : \[
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0\mbox{    (i=1,2,...,p)}\\
+\end{aligned}
+\]
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{interacmodelq3}\OtherTok{\textless{}{-}}\FunctionTok{lm}\NormalTok{(HEATRATE}\SpecialCharTok{\textasciitilde{}}\NormalTok{(RPM}\SpecialCharTok{+}\NormalTok{INLET.TEMP}\SpecialCharTok{+}\NormalTok{EXH.TEMP}\SpecialCharTok{+}\NormalTok{ AIRFLOW)}\SpecialCharTok{\^{}}\DecValTok{2}\NormalTok{, }\AttributeTok{data=}\NormalTok{turbines)}
+\FunctionTok{summary}\NormalTok{(interacmodelq3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = HEATRATE ~ (RPM + INLET.TEMP + EXH.TEMP + AIRFLOW)^2, 
+##     data = turbines)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -779.7 -211.0  -40.7  177.2 1370.3 
+## 
+## Coefficients:
+##                          Estimate    Std. Error t value Pr(>|t|)    
+## (Intercept)         26502.9399273  8891.0350164   2.981 0.004247 ** 
+## RPM                     0.0703727     0.1485406   0.474 0.637512    
+## INLET.TEMP            -23.6602520     7.3641172  -3.213 0.002180 ** 
+## EXH.TEMP               -4.5546847    17.9488003  -0.254 0.800610    
+## AIRFLOW                10.2124689     6.2787488   1.627 0.109455    
+## RPM:INLET.TEMP         -0.0001133     0.0000872  -1.299 0.199266    
+## RPM:EXH.TEMP            0.0001656     0.0003116   0.531 0.597314    
+## RPM:AIRFLOW            -0.0008257     0.0004653  -1.775 0.081414 .  
+## INLET.TEMP:EXH.TEMP     0.0241696     0.0145724   1.659 0.102791    
+## INLET.TEMP:AIRFLOW      0.0141809     0.0038521   3.681 0.000523 ***
+## EXH.TEMP:AIRFLOW       -0.0504915     0.0135731  -3.720 0.000463 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 394.6 on 56 degrees of freedom
+## Multiple R-squared:  0.9481, Adjusted R-squared:  0.9388 
+## F-statistic: 102.3 on 10 and 56 DF,  p-value: < 0.00000000000000022
+\end{verbatim}
+
+From the out put, It shows that the interaction term RPM:INLET.TEMP has
+\(t_{cal}=-1.30\) with the \(p-value= 0.19927> 0.05\), RPM:EXH.TEMP has
+\(t_{cal}=0.53\) with the \(p-value= 0.59731 > 0.05\), RPM:AIRFLOW has
+\(t_{cal}=-1.77\) with the \(p-value= 0.08141 > 0.05\),
+INLET.TEMP:EXH.TEMP has \(t_{cal}=1.66\) with the
+\(p-value= 0.10279 > 0.05\), indicating that we should clearly not to
+reject the null hypothesis for them which means that we should not those
+interaction term to the model at \(α=0.05\).
+
+From the out put, It shows that the interaction term INLET.TEMP:AIRFLOW
+has \(t_{cal}=3.68\) with the \(p-value= 0.00052 < 0.05\) and the
+interaction term EXH.TEMP:AIRFLOW has \(t_{cal}=-3.72\) with the
+\(p-value= 0.00046 < 0.05\), indicating that we should clearly reject
+the null hypothesis for those which means that we should add those two
+interaction terms to the model at \(α=0.05\).
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{fullinteracmodelq3 }\OtherTok{=} \FunctionTok{lm}\NormalTok{(HEATRATE}\SpecialCharTok{\textasciitilde{}}\NormalTok{RPM}\SpecialCharTok{+}\NormalTok{INLET.TEMP}\SpecialCharTok{+}\NormalTok{EXH.TEMP}\SpecialCharTok{+}\NormalTok{ AIRFLOW }\SpecialCharTok{+}\NormalTok{ RPM}\SpecialCharTok{:}\NormalTok{INLET.TEMP }\SpecialCharTok{+}\NormalTok{ RPM}\SpecialCharTok{:}\NormalTok{EXH.TEMP}\SpecialCharTok{+}\NormalTok{RPM}\SpecialCharTok{:}\NormalTok{AIRFLOW}\SpecialCharTok{+}\NormalTok{ INLET.TEMP}\SpecialCharTok{:}\NormalTok{EXH.TEMP}\SpecialCharTok{+}\NormalTok{INLET.TEMP}\SpecialCharTok{:}\NormalTok{AIRFLOW}\SpecialCharTok{+}\NormalTok{EXH.TEMP}\SpecialCharTok{:}\NormalTok{AIRFLOW , }\AttributeTok{data=}\NormalTok{turbines)}
+\NormalTok{reduinteracmodelq3 }\OtherTok{=}  \FunctionTok{lm}\NormalTok{(HEATRATE}\SpecialCharTok{\textasciitilde{}}\NormalTok{RPM}\SpecialCharTok{+}\NormalTok{INLET.TEMP}\SpecialCharTok{+}\NormalTok{EXH.TEMP}\SpecialCharTok{+}\NormalTok{ AIRFLOW }\SpecialCharTok{+}\NormalTok{INLET.TEMP}\SpecialCharTok{:}\NormalTok{AIRFLOW}\SpecialCharTok{+}\NormalTok{EXH.TEMP}\SpecialCharTok{:}\NormalTok{AIRFLOW , }\AttributeTok{data=}\NormalTok{turbines)}
+\FunctionTok{summary}\NormalTok{(fullinteracmodelq3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = HEATRATE ~ RPM + INLET.TEMP + EXH.TEMP + AIRFLOW + 
+##     RPM:INLET.TEMP + RPM:EXH.TEMP + RPM:AIRFLOW + INLET.TEMP:EXH.TEMP + 
+##     INLET.TEMP:AIRFLOW + EXH.TEMP:AIRFLOW, data = turbines)
+## 
+## Residuals:
+##    Min     1Q Median     3Q    Max 
+## -779.7 -211.0  -40.7  177.2 1370.3 
+## 
+## Coefficients:
+##                          Estimate    Std. Error t value Pr(>|t|)    
+## (Intercept)         26502.9399273  8891.0350164   2.981 0.004247 ** 
+## RPM                     0.0703727     0.1485406   0.474 0.637512    
+## INLET.TEMP            -23.6602520     7.3641172  -3.213 0.002180 ** 
+## EXH.TEMP               -4.5546847    17.9488003  -0.254 0.800610    
+## AIRFLOW                10.2124689     6.2787488   1.627 0.109455    
+## RPM:INLET.TEMP         -0.0001133     0.0000872  -1.299 0.199266    
+## RPM:EXH.TEMP            0.0001656     0.0003116   0.531 0.597314    
+## RPM:AIRFLOW            -0.0008257     0.0004653  -1.775 0.081414 .  
+## INLET.TEMP:EXH.TEMP     0.0241696     0.0145724   1.659 0.102791    
+## INLET.TEMP:AIRFLOW      0.0141809     0.0038521   3.681 0.000523 ***
+## EXH.TEMP:AIRFLOW       -0.0504915     0.0135731  -3.720 0.000463 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 394.6 on 56 degrees of freedom
+## Multiple R-squared:  0.9481, Adjusted R-squared:  0.9388 
+## F-statistic: 102.3 on 10 and 56 DF,  p-value: < 0.00000000000000022
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(reduinteracmodelq3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = HEATRATE ~ RPM + INLET.TEMP + EXH.TEMP + AIRFLOW + 
+##     INLET.TEMP:AIRFLOW + EXH.TEMP:AIRFLOW, data = turbines)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -787.68 -189.26  -22.34  145.15 1307.53 
+## 
+## Coefficients:
+##                       Estimate  Std. Error t value             Pr(>|t|)    
+## (Intercept)        13603.30921   993.04287  13.699 < 0.0000000000000002 ***
+## RPM                    0.04578     0.01577   2.902             0.005174 ** 
+## INLET.TEMP           -12.79883     1.09014 -11.741 < 0.0000000000000002 ***
+## EXH.TEMP              23.27429     2.90057   8.024      0.0000000000446 ***
+## AIRFLOW                1.34695     3.49629   0.385             0.701414    
+## INLET.TEMP:AIRFLOW     0.01613     0.00364   4.432      0.0000402888796 ***
+## EXH.TEMP:AIRFLOW      -0.04150     0.01087  -3.816             0.000323 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 401.4 on 60 degrees of freedom
+## Multiple R-squared:  0.9424, Adjusted R-squared:  0.9367 
+## F-statistic: 163.7 on 6 and 60 DF,  p-value: < 0.00000000000000022
+\end{verbatim}
+
+But by adding RPM:AIRFLOW, INLET.TEMP:EXH.TEMP, RPM:INLET.TEMP variable
+improves the model performance as the Adjusted R-squared increased to
+0.94, As Thuntida said in that case, those 3 interaction terms should be
+include in the model. Therefore, the independent variable RPM:AIRFLOW,
+INLET.TEMP:EXH.TEMP, RPM:INLET.TEMP should not be removed from the
+model. The only term need to be removed is RPM:EXH.TEMP.
+
+\emph{Partial F test:} The hypotheses are:
+
+\[
+\begin{aligned}
+H_0&:\beta_5=\beta_6= \beta_7 =\beta_8=0\mbox{   in the model   } HEATRATE=\beta_0+\beta_1RPM+\beta_2INLET.TEMP+\beta_3EXH.TEMP+ \beta_4AIRFLOW + \beta_5RPM:INLET.TEMP + \beta_6RPM:EXH.TEMP+\beta_7RPM:AIRFLOW+ \beta_8INLET.TEMP:EXH.TEMP+\beta_9INLET.TEMP:AIRFLOW+\beta_10EXH.TEMP:AIRFLOW+\epsilon \\
+H_a&:\beta_{5,6,7,8}\neq0\mbox{   in the model   } HEATRATE=\beta_0+\beta_1RPM+\beta_2INLET.TEMP+\beta_3EXH.TEMP+ \beta_4AIRFLOW + \beta_5RPM:INLET.TEMP + \beta_6RPM:EXH.TEMP+\beta_7RPM:AIRFLOW+ \beta_8INLET.TEMP:EXH.TEMP+\beta_9INLET.TEMP:AIRFLOW+\beta_10EXH.TEMP:AIRFLOW+\epsilon \\ 
+\end{aligned}
+\] I set up the \(\alpha = 0.05\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{anova}\NormalTok{(reduinteracmodelq3,interacmodelq3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## Analysis of Variance Table
+## 
+## Model 1: HEATRATE ~ RPM + INLET.TEMP + EXH.TEMP + AIRFLOW + INLET.TEMP:AIRFLOW + 
+##     EXH.TEMP:AIRFLOW
+## Model 2: HEATRATE ~ (RPM + INLET.TEMP + EXH.TEMP + AIRFLOW)^2
+##   Res.Df     RSS Df Sum of Sq      F Pr(>F)
+## 1     60 9664946                           
+## 2     56 8717640  4    947306 1.5213 0.2084
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{coefficients}\NormalTok{(reduinteracmodelq3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        (Intercept)                RPM         INLET.TEMP           EXH.TEMP 
+##     13603.30921159         0.04577613       -12.79882733        23.27428987 
+##            AIRFLOW INLET.TEMP:AIRFLOW   EXH.TEMP:AIRFLOW 
+##         1.34694935         0.01613280        -0.04149806
+\end{verbatim}
+
+It shows \(p-value=0.21 > \alpha=0.05\), indicating that we should not
+to reject the null hypothesis. The independent variable
+RPM:INLET.TEMP,RPM:EXH.TEMP,RPM:AIRFLOW and INLET.TEMP:EXH.TEMP should
+be out of the model at significance level 0.05.
+
+Conclusion: The final model should
+be:\(\hat{HEATRATE}= 13603.30921 +0.04578RPM-12.79883INLET.TEMP+23.27429EXH.TEMP\\ +1.34695AIRFLOW + 0.01613 INLET.TEMP:AIRFLOW -0.04150EXH.TEMP:AIRFLOW\)
+
+\textbf{e} From part d, The final model
+is:\(\hat{HEATRATE}= 13603.30921 +0.04578RPM-12.79883INLET.TEMP+23.27429EXH.TEMP\\ +1.34695AIRFLOW + 0.01613 INLET.TEMP:AIRFLOW -0.04150EXH.TEMP:AIRFLOW\)
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{coefficients}\NormalTok{(reduinteracmodelq3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        (Intercept)                RPM         INLET.TEMP           EXH.TEMP 
+##     13603.30921159         0.04577613       -12.79882733        23.27428987 
+##            AIRFLOW INLET.TEMP:AIRFLOW   EXH.TEMP:AIRFLOW 
+##         1.34694935         0.01613280        -0.04149806
+\end{verbatim}
+
+\emph{Interpretation of Main Effects:} \(\hat{\beta_1}=0.04578\) means
+that for a given amount of INLET.TEMP,EXH.TEMP and AIRFLOW , increase 1
+unit of RPM leads to an increase in HEATRATE by approximately 0.04578
+units.
+
+INLET.TEMP: as increase additional 1 unit of INLET.TEMP leads to an
+increase in HEATRATE by approximately \(-12.79883 + 0.01613 AIRFLOW\)
+units. EXH.TEMP: as increase additional 1 unit of EXH.TEMP leads to an
+increase in HEATRATE by approximately \(23.27429-0.04150 AIRFLOW\)
+units. AIRFLOW: as increase additional 1 unit of AIRFLOW leads to an
+increase in HEATRATE by approximately
+\(1.34695 + 0.01613 INLET.TEMP -0.04150 EXH.TEMP\) units.
+
+\textbf{f}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{sigma}\NormalTok{(reduinteracmodelq3) }\CommentTok{\# RMSE for the reduinteracmodelq3 model}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## [1] 401.3508
+\end{verbatim}
+
+RMSE = 401.4
+
+\textbf{g}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{summary}\NormalTok{(reduinteracmodelq3)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+## 
+## Call:
+## lm(formula = HEATRATE ~ RPM + INLET.TEMP + EXH.TEMP + AIRFLOW + 
+##     INLET.TEMP:AIRFLOW + EXH.TEMP:AIRFLOW, data = turbines)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -787.68 -189.26  -22.34  145.15 1307.53 
+## 
+## Coefficients:
+##                       Estimate  Std. Error t value             Pr(>|t|)    
+## (Intercept)        13603.30921   993.04287  13.699 < 0.0000000000000002 ***
+## RPM                    0.04578     0.01577   2.902             0.005174 ** 
+## INLET.TEMP           -12.79883     1.09014 -11.741 < 0.0000000000000002 ***
+## EXH.TEMP              23.27429     2.90057   8.024      0.0000000000446 ***
+## AIRFLOW                1.34695     3.49629   0.385             0.701414    
+## INLET.TEMP:AIRFLOW     0.01613     0.00364   4.432      0.0000402888796 ***
+## EXH.TEMP:AIRFLOW      -0.04150     0.01087  -3.816             0.000323 ***
+## ---
+## Signif. codes:  0 '***' 0.001 '**' 0.01 '*' 0.05 '.' 0.1 ' ' 1
+## 
+## Residual standard error: 401.4 on 60 degrees of freedom
+## Multiple R-squared:  0.9424, Adjusted R-squared:  0.9367 
+## F-statistic: 163.7 on 6 and 60 DF,  p-value: < 0.00000000000000022
+\end{verbatim}
+
+The adjusted-R2 value from the model in part (d) is 0.94 Interpretation:
+For the model, \(R^2_{adj} = 0.94\) that means the model explains 94\%
+of the variation of the repose variable.
+
+\textbf{h}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{favstats}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{RPM, }\AttributeTok{data=}\NormalTok{turbines)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##   min   Q1 median    Q3   max     mean       sd  n missing
+##  3000 3600   5100 12610 33000 8326.642 7023.311 67       0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{favstats}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{INLET.TEMP, }\AttributeTok{data=}\NormalTok{turbines)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  min   Q1 median   Q3  max     mean       sd  n missing
+##  888 1078   1149 1288 1427 1174.313 137.4331 67       0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{favstats}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{EXH.TEMP, }\AttributeTok{data=}\NormalTok{turbines)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  min    Q1 median    Q3 max     mean       sd  n missing
+##  444 512.5    532 568.5 626 536.0896 44.13984 67       0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\FunctionTok{favstats}\NormalTok{(}\SpecialCharTok{\textasciitilde{}}\NormalTok{AIRFLOW, }\AttributeTok{data=}\NormalTok{turbines)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##  min Q1 median    Q3 max    mean      sd  n missing
+##    3 27    172 442.5 737 240.791 226.714 67       0
+\end{verbatim}
+
+\begin{Shaded}
+\begin{Highlighting}[]
+\NormalTok{newdata }\OtherTok{=} \FunctionTok{data.frame}\NormalTok{(}\AttributeTok{RPM=} \DecValTok{273145}\NormalTok{, }\AttributeTok{INLET.TEMP=}\DecValTok{1240}\NormalTok{,}\AttributeTok{EXH.TEMP=}\DecValTok{920}\NormalTok{, }\AttributeTok{AIRFLOW =}\DecValTok{25}\NormalTok{  )}
+\FunctionTok{predict}\NormalTok{(reduinteracmodelq3,newdata,}\AttributeTok{interval=}\StringTok{"predict"}\NormalTok{)}
+\end{Highlighting}
+\end{Shaded}
+
+\begin{verbatim}
+##        fit      lwr     upr
+## 1 31227.97 24067.74 38388.2
+\end{verbatim}
+
+Extrapolation: RPM: \(273145 \notin [3000, 33000]\) EXH.TEMP:
+\(920 \notin [444, 626]\)
+
+Interpretation: When a cycle of speed = 273,145 revolutions per minute,
+inlet temperature= 1240 degree celsius, exhaust temperature=920 degree
+celsius, cycle pressure ratio=10 kilograms persecond, and air flow
+rate=25 kilograms persecond, the prediction for heat rate (y) is 31228
+(kilojoules per kilowatt per hour).
+
+\end{document}

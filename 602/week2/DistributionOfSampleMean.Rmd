@@ -1,0 +1,438 @@
+---
+title: "DATA 602 - The Distribution of Statistics"
+output: html_notebook
+
+---
+&copy; Jim Stallard 2022
+
+<style>
+div.pink pre { background-color:pink; }
+div.pink pre.r { background-color:skyblue; }
+</style>
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+require(mosaic)
+require(mosaicData)
+#studentsurvey = read.csv("Z:\\Data305\\Stat213StudentSurvey.csv")
+#attach(studentsurvey)
+```
+
+
+Recall the sample of $n = 1000$ flights taken from the $N = 336,776$ data points appearing in the **flights** data set.
+
+```{r}
+head(sampleflights, 4)
+```
+
+# Statistics and Their Properties
+
+We have experienced how statistics such as the sample mean $\overline{X}$, the sample median $\widetilde{X}$, the sample variance $S^{2}$ and sample standard deviation $S$, the first quartile $Q1$, the third quartile $Q3$, the sample minimum $X_{Min}$ and the sample maximum $X_{Max}$ are computed from a subset of data that was chosen from a very large set of *unknown* data (the population).
+</br>
+</br>
+Due to the randomness of the data appearing in the sample *and* that the various sample statistics are computed from such "random" data, the computed statistics and therefore the observed values of these various sample statistics are *random variables*. 
+</br>
+</br>
+It is under this new notion of a statistic being a random variable that we can investigate the distributional properties of some of these statistics. 
+
+## The Sample Mean $\overline{X}$
+
+**Illustration:** In a previous example, we inspected some data that resulted from a random sample of $n = 1000$ flights randomly chosen from all flights that left three NYC-area airports in 2013. 
+
+The data produced from this sample was previously used in the **sampleflights** data frame. At this point we have inspected many of the variables in this data set: **dep_delay**, **arr_delay**, **air_time**. Let's look at the data on a different variable called **distance**, a variable that measures the flight distance (in miles) from the point of departure to the airport of arrival. 
+</br>
+</br>
+
+First, below is the distribution of the distance (in miles) for *all flights appearing in this sample*. 
+<div class = "pink">
+```{r}
+#histogramof data in the sample showing the distribution of flight-distance 
+ggplot(data=sampleflights, aes(x = distance)) + geom_histogram(col='red', fill='blue', binwidth=250, na.rm=TRUE) + xlab("Distance of Flight in Miles") + ylab("Count") + ggtitle("Histogram of Flight Distances from 3-NYC Airports")
+#The density plot
+options(scipen=999) #get rid of the exponential y-axis in the density plot below
+ggplot(data=sampleflights, aes(x = distance)) + geom_density(col='blue', na.rm=TRUE) + xlab("Flight Distance in Miles") + ylab("Density") + ggtitle("Density-Plot of Flight Distances from 3-NYC Airports")
+```
+</div>
+
+The various statistics of this particular sample are obtained with the `favstats` command:
+<div class = "pink">
+```{r echo=TRUE}
+favstats(~ distance, data=sampleflights)
+```
+</div>
+
+$$
+\overline{X} = 1038.116 \: \text{miles}
+$$
+
+Now, recall that this data set is one of ${336776 \choose 1000}$ different possible samples/data sets that can occur. So the value of the sample mean we have observed/computed is one of ${336776 \choose 1000}$ different possible values.
+```{r}
+choose(336776, 1000)
+```
+</br>
+
+So, in theory, there are ${336776 \choose 1000}$ *different possible values* that the sample mean $\overline{X}$ of the variable **distance** can be. Because the flights are chosen by a *random process*, the resulting sample mean $\overline{X}$ to be computed is the result of a random process. What this in turn means is that the sample mean $\overline{X}$ is a *random variable* that will *vary* in its computed value from one sample of $n = 1000$ to another sample of $n = 1000$! 
+</br>
+</br>
+
+Does the sample mean $\overline{X}$ have a certain behaviour, or a certain distribution? If so, does the distribution of the sample mean mirror the distribution of the underlying variable that the average/mean is being computed? 
+</br>
+</br>
+To investigate, let's take a look at a small sample of $n = 5$ flights. The data and the sample mean computed from such data follow. (*Please copy and paste the code below into your current R notebook.*)
+
+<div class = "pink">
+```{r}
+samplemeandf1 = data.frame(samplemeans = sample(na.omit(flights$distance), 5, replace=FALSE)) #selects 5 flight distances, w/o replacement, ignoring N/As
+samplemeandf1 #the data vector with the sample of 5 values
+```
+
+```{r}
+mean(~samplemeans, data=samplemeandf1)
+```
+</div>
+
+We see the value of the variable **distance** (in miles) of the $n = 5$ flights randomly chosen as well as the computed value of $\overline{X}$. 
+</br>
+</br>
+
+Now, suppose another random sample of $n = 5$ is taken. What will this sample look like? 
+<div class = "pink">
+```{r echo=FALSE}
+samplemeandf2 = data.frame(samplemeans = sample(na.omit(flights$distance), 5, replace=FALSE))
+head(samplemeandf2, 5) 
+```
+
+```{r}
+mean(~samplemeans, data=samplemeandf2)
+```
+</div>
+
+The second sample of $n = 5$ flights gives much different data, along with a different value of the sample mean. 
+</br>
+</br>
+These two different random samples of five demonstrate *how* the data resulting from the sampling procedure are "random" data - that is, they are observed values of five elements, in our case flights, chosen from the population of flights.
+</br>
+</br>
+Moreover, the statistic computed from the sample *also* is a random variable, because it is computed from random variables or is a *function* of random variables. 
+</br>
+</br>
+
+What would happen if one continuously continued to sample $n = 5$ and then computed $\overline{X}$. What would the *distribution* of $\overline{X}$ look like? 
+</br>
+</br>
+Below, a simulation was conducted where a sample of $n = 5$ flights and the distance of each was taken, the data observed, and $\overline{X}$ computed each of $1000$ times. 
+
+This produced 1000 *different values* of $\overline{X}$, which is presented in both the form of a histogram and a density plot. 
+</br>
+</br>
+Also, the average and standard deviation of the 1000 $\overline{X}$'s was computed.  The code required is also provided. Note that in this simulation I did create a data frame called **samplestatsdf1** which stores the value of $\overline{X}_{i}$ for each sample of $n = 5$. 
+
+<div class = "pink">
+```{r echo=TRUE}
+nsamples = 1000  #no. of simulations
+xbar = numeric(nsamples) #data vector to hold 1000 sample means
+for(i in 1:nsamples){
+  sdata = sample(na.omit(flights$distance), 5, replace=FALSE) #randomly pick 5 flights w/o replacement
+  xbar[i] = mean(sdata) #compute the mean of the five flights
+}
+samplestatsdf1 = data.frame(xbar)
+head(samplestatsdf1, 4)
+tail(samplestatsdf1, 4)
+```
+</div>
+
+The histogram and density plot showing the *distribution* of $n = 1000$ values of $\overline{X}$ is provided below.
+<div class = "pink">
+```{r}
+ggplot(samplestatsdf1, aes(x = xbar)) + geom_histogram(col='red', fill='blue', binwidth=50) + xlab("Values of the Sample Mean") + ylab("Count") + ggtitle("Distribution of the Sample Mean (n = 5)")
+#density plot
+ggplot(samplestatsdf1, aes(x = xbar)) + geom_density(col='red', fill='blue') + xlab("Values of the Sample Mean") + ylab("Density") + ggtitle("Distribution of the Sample Mean (n = 5)")
+cat("The average of these 1000 values of the sample mean based on n = 5 is", mean(~xbar, data=samplestatsdf1), "and the standard deviation is",sd(~xbar, data=samplestatsdf1),".\n")
+```
+</div>
+
+Now, suppose we were to increase the sample size from $n = 5$ to $n = 15$? How would this affect the *distribution* of $\overline{X}$? 
+</br>
+</br>
+We repeat simulation above in the space below, changing the sample size from $n = 5$ to $n = 15$.   
+</br>
+</br> 
+<div class = "pink">
+```{r echo=TRUE}
+nsamples = 1000  #no. of simulations
+xbar = numeric(nsamples) #data vector to hold 1000 sample means
+for(i in 1:nsamples){
+  sdata = sample(na.omit(flights$distance), 15, replace=FALSE) #randomly pick 15 flights w/o replacement
+  xbar[i] = mean(sdata) #compute the mean of the five flights
+}
+samplestatsdf2 = data.frame(xbar)
+cat("The average of these 1000 values of the sample mean based on n = 15 is", mean(~xbar, data=samplestatsdf2), "and the standard deviation is",sd(~xbar, data=samplestatsdf2),".\n")
+```
+</civ>
+A visualization of the 1000 $\overline{X}$s based on $n = 15$ is provided below.
+<div class = "pink">
+```{r}
+ggplot(samplestatsdf2, aes(x = xbar)) + geom_histogram(col='red', fill='blue', binwidth=50) + xlab("Values of the Sample Mean") + ylab("Count") + ggtitle("Distribution of the Sample Mean (n = 15)")
+#density plot
+ggplot(samplestatsdf2, aes(x = xbar)) + geom_density(col='red', fill='blue') + xlab("Values of the Sample Mean") + ylab("Density") + ggtitle("Distribution of the Sample Mean (n = 15)")
+```
+</div>
+
+We repeat this simulation two more times, one for (i) $n = 25$ and (ii) $n = 50$. 
+<div class = "pink">
+```{r echo=TRUE}
+nsamples = 1000  #no. of simulations
+xbar25 = numeric(nsamples) #data vector to hold 1000 sample means
+xbar50 = numeric(nsamples)
+for(i in 1:nsamples){
+  s25data = sample(na.omit(flights$distance), 25, replace=FALSE) #randomly pick 25 flights w/o replacement
+  s50data = sample(na.omit(flights$distance), 50, replace=FALSE) #randomly picks 50 flights w/o replacement
+  xbar25[i] = mean(s25data) #compute the mean of the 25 flights
+  xbar50[i] = mean(s50data)
+}
+xbars = c(xbar25, xbar50) #combine the two vectors of sample means
+sizemean = c(rep("Xbar25", 1000), rep("Xbar50", 1000)) #1000 Xbar25, 1000 Xbar50
+meansdata = data.frame(sizemean, xbars) #create a data frame
+head(meansdata, 4)
+tail(meansdata, 4)
+```
+
+```{r}
+ggplot(data=filter(meansdata, sizemean=="Xbar25"), aes(x = xbars)) + geom_histogram(fill='blue', col='black', binwidth = 50) + xlab("Sample Mean (n = 25)") + ggtitle("Distribution of the Sample Mean (n = 25)")
+#
+ggplot(data=filter(meansdata, sizemean=="Xbar50"), aes(x = xbars)) + geom_histogram(fill='blue',col='black', binwidth = 50) + xlab("Sample Mean (n = 50)")+ ggtitle("Distribution of the Sample Mean (n = 50)")
+#
+ggplot(data=meansdata, aes(x = xbars, y =..density.., group=sizemean)) + geom_freqpoly(aes(color=sizemean), binwidth=50) + ggtitle("Densityplots: Distributions of Sample Means for (i) n = 25 and (ii) n = 50")
+```
+
+```{r}
+ggplot(meansdata, aes(x = xbars, fill = sizemean)) + geom_histogram(col="black", position = 'identity', alpha = 0.6, binwidth = 50, na.rm=TRUE) + xlab("Values of Sample Mean") + ylab("Count") + ggtitle("Distribution of the Sample Mean")
+```
+</div>
+Looking at the two distributions above, it should be noted that the $\overline{X}_{n=25}$ and $\overline{X}_{n=50}$, computed below, are very close in value. Another attribute, the $S_{n=25}$ and $S_{n=50}$ miles, respectively:  
+
+<div class = "pink">
+```{r}
+favstats(xbars ~ sizemean, data=meansdata)
+```
+
+```{r}
+mean(~xbars| sizemean,  data=meansdata)
+sd(~xbars| sizemean, data=meansdata)
+```
+</div>
+
+This simulation exercise gives us insight into a very important statistical theorem called the **Central Limit Theorem**. In short, the Central Limit Theorem, or CLT, says the following:
+
+**Result:** Let $X$ be a random variable (either discrete or continuous) having a probability distribution with a mean $\mu_{X}$ and a standard deviation $\sigma_{X}$.
+</br>
+</br>
+A random sample of $n$-elements is taken on a population variable described by the probability distribution of $X$. Let $\overline{X}$ represent the mean of this sample, where
+$$
+\overline{X} = \left ( \frac{\sum_{i = 1}^{n}X_{i}}{n} \right ) = \left (\frac{X_{1} + X_{2} + \cdots + X_{n}}{n} \right )
+$$
+
+and
+$X_{1}, X_{2}, \cdots, X_{n}$ simply represent observed values of the sample.
+</br>
+</br>
+
+$\overline{X}$ is a random variable that is
+
+1. approximately follows a Normal model. (If the sample is taken on a population variable that can be modeled by the Normal distribution, 
+then $\overline{X}$ is *exactly* a Normally distributed random variable.
+2. The mean and standard deviation of $\overline{X}$ is given by
+$$
+\mu_{\overline{X}} = \mu_{X} \hspace{1in} \sigma_{\overline{X}} = \frac{\sigma_{X}}{\sqrt{n}}
+$$
+
+```{r}
+mean(~distance, data=flights) #computes the mean of the entire population, mean distance of all flights
+sd(~distance, data=flights)   #computes the standard deviation of the distance of all flights
+```
+
+and the values of the population mean and standard deviation are 
+
+$$
+\mu_{Distance} = 1039.913 \hspace{0.5in} \sigma_{Distance} = 733.233
+$$
+The results of the various simulations, according to $n$ size, are presented below (note: these may be different that was provided above, due to the reiterations..)
+$$
+\begin{array}{rcccc}
+{\rm Sample\:\:Size}:                             & n = 5     &  n = 15    &  n = 25  & n = 50 \\
+\overline{X}:                                     &  1033.882 &   1038.547 & 1041.904 & 1036.996  \\
+\sigma_{\overline{X}} = \frac{733.233}{\sqrt{n}} \approx : & 330.2584 &  189.3842  & 151.7025 & 104.7553 \\
+\end{array}
+$$
+We also see that the sample mean $\overline{X}$ is an *unbiased* statistic that estimates the population mean $\mu$. In order for a statistic to be an unbiased estimator for a parameter, the value of which is unknown, the mean or expected value of the statistic *must equal* the target parameter. That is,
+
+$$
+E(\text{Statistic}) = \text{Parameter}
+$$
+
+In the case of the sample mean, $E(\overline{X}) = \mu$. Therefore $\overline{X}$ is an **unbiased statistic/estimator** for the population mean $\mu$. 
+
+**Example:** A paper[^1] reporting on the usage of GPS to better manage the processing times of garbage truck visits to landfills fond that the amount of time it takes for a truck to be weighed and then offloaded of the garbage it is carrying can be modeled by a Normal distribution with a mean of $\mu_{X} = 13$ minutes and a standard deviation of $\sigma_{X} = 4$ minutes. You are to randomly pick $n = 40$ garbage trucks, and record the processing time of each. The distribution is visualized below.
+
+
+```{r echo=FALSE}
+x = seq(0,26, 0.1)
+plot(x, dnorm(x, 13, 4), xlab="Processing Time of Garbage Truck", ylab="f(x)", main="Normal Distribution with Mean = 13 and Standard Deviation = 4", type="l", col='blue')
+```
+
+
+(a) Compute the probability that the mean processing time of your sample is less than 12 minutes.
+</br>
+</br>
+**Answer:** We wish to compute $P(\overline{X} < 12)$. To do so, we remember that the distribution of the sample mean from $n = 40$ is *approximately* modeled by the Normal probability model, with a mean of $\mu_{X} = 13$ and a standard deviation of $\sigma_{\overline{X}} = \frac{4}{\sqrt{40}} = 0.6325$. To do so in R, we use the `pnorm` command, where a "p" in front computes the cumulative probability of Normal probability model:
+
+```{r}
+pnorm(12, mean=13, sd=0.6324)  #OR
+pnorm(12, mean=13, sd=(4/sqrt(40)))  # computes P(Sample Mean < 12), with mean of 13 and standard deviation of 4/sqrt(40)
+```
+
+and $P(\overline{X} < 12) = 0.0559$. Essentially, what R is doing is the following:
+$$
+\begin{align}
+P(\overline{X} < 12) = & P\left(\frac{12 - \mu_{\overline{X}}}{\sigma_{\overline{X}}} < \frac{12 - \mu_{\overline{X}}}{\sigma_{\overline{X}}}\right) \\
+                   = & P\left(Z <  \frac{12 - 13}{0.6325}\right) \\
+                   = & P(Z < -1.581027) \\
+                   \approx & P(Z < -1.581) \\
+                   \approx & 0.0569
+\end{align}
+$$
+<div class = "pink">
+```{r}
+pnorm(-1.581)
+```
+</div>
+
+</br>
+</br>
+
+(b) 95% of the time, the mean processing time of a sample of $n = 40$ will be at most how long?
+</br>
+</br>
+**Answer:** In this instance, we are required to find the 95th percentile of the distribution of $\overline{X}$ based on $n = 40$. We use the "q" rather than the "p", and use the cumulative probability as the first argument:
+
+<div class = "pink">
+```{r echo=TRUE}
+qnorm(0.95, mean=13, sd=(4/sqrt(40)))  # computes 95 percentile of distribution of Sample Mean with mean of 13 and standard deviation of 4/sqrt(40)
+```
+</div>
+
+From this, 95% of all mean cycling-times of samples of $n = 40$ trucks are at most 14.04 minutes, or $\overline{x}_{95} = 14.04$ minutes.
+</br>
+
+[^1]: ''Estimating Waste Transfer Station Delays using GPS'', *Waste Management*, 2008; 1742 - 1750.
+
+</br>
+</br>
+
+-----------------------
+
+## Exercise 1
+
+Since the year 2000, the number of hurricanes that hit the coast of the United States (or make landfall) varies from year to year. The year-to-year variation can be modeled by the Poisson probability model, with a mean $\lambda = 1.7619$ hurricanes per hurricane season[^2]. 
+
+(a) Suppose you were to randomly select 25 hurricane seasons and count the number "landfall" hurricanes that occurred in those 25 hurricane seasons. Compute the probability that the average number of hurricanes to hit landfall is more than 2.
+</br>
+</br>
+**Answer:**
+
+<div style="margin-bottom:300px;">
+</div>
+
+(b) Now, consider the number of days that pass between each of 25 randomly chosen "landfall" hurricanes. Compute the chance that the mean amount of time passing is between 120 and 140 days, inclusive.
+</br>
+</br>
+**Answer:**
+
+<div style="margin-bottom:300px;">
+</div>
+
+(c) Five-percent (5%) of the time, the mean/average number of hurricanes (in $n = 25$ hurricane seasons) making "landfall" in the United States during hurricane season will be at most how much? 
+**Answer:**
+
+<div style="margin-bottom:300px;">
+</div>
+
+
+[^2]: Hurricane season lasts from June 1 to November 30, a period of six months, or 182 days.  
+
+-----------------------------------
+
+## Playing with Data Exercise 1
+
+In this exercise, we will be using the **uselectiondata**, or recalling from last day....
+
+<div class = "pink">
+```{r}
+uselectiondata <- read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/USElectionData2016.csv") #reads in the data in the USElectionData2016.csv file
+```
+
+```{r}
+head(uselectiondata, 4)
+```
+</div>
+
+and let's strip out the variable **Republicans.2016**, **Democrats.2016**, **Median.Earnings.2010**, and **Total.Population**, and call the resulting data frame **countypop.df**. 
+
+<div class = "pink">
+```{r}
+countypop.df = select(uselectiondata, Republicans.2016, Democrats.2016, Median.Earnings.2010, Total.Population)
+head(countypop.df, 3)
+```
+</div>
+
+(a) For this exercise, imagine that the data in **countypop.df** is the target population. You wish to take a sample of $n =25$ counties and compute the mean/average population of the $n = 25$ sampled counties.
+</br>
+</br>
+Using 1000 replications, generate the distribution of the sample mean/average, $\overline{X}$. If using a histogram, set binwidth=10000. Feel free to refer to code in the notes and examples....
+</br>
+</br>
+**Answer:** 
+<div style="margin-bottom:200px;">
+</div>
+
+
+(b) Repeat part (a), but now use $n = 50$.
+</br>
+</br>
+**Answer:** 
+<div style="margin-bottom:200px;">
+</div>
+
+(c) The mean size of a county in all $N = 3143$ counties is $\mu = 97074$ and with a standard deviation of $\sigma = 311065$.
+</br>
+</br>
+Compute the chance/probability that a random sample of $n = 40$ counties will produce an mean/average county size between 150,000 and 200,000 persons.
+</br>
+</br>
+**Answer:** 
+<div style="margin-bottom:200px;">
+</div>
+
+
+(d) Refer to part (c): 10% of the time, the average population of $n = 50$ randomly chosen counties will be at most how much?
+</br>
+</br>
+**Answer:** 
+<div style="margin-bottom:200px;">
+</div>
+
+
+(e) Suppose you wish to sample $n$-counties so that your estimate of the unknown value of the mean/average population in a county is "off" by at most 20,000 persons with a probability of 0.95.  How many counties should you randomly select?
+</br>
+</br>
+**Answer:** 
+<div style="margin-bottom:200px;">
+</div>
+
+
+
+
+
+
+
+

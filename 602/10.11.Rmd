@@ -1,0 +1,35 @@
+```{r}
+oct6ttp1.df <- read.csv("https://people.ucalgary.ca//~jbstall//DataFiles//baseball.csv")
+head(oct6ttp1.df, 4)
+tail(oct6ttp1.df, 4)
+#create a new variable for the winning percentage, called winpct
+oct6ttp1.df = oct6ttp1.df %>%
+  mutate(winpct = wins/(wins + losses))
+head(oct6ttp1.df, 4)
+```
+```{r}
+ggplot(oct6ttp1.df, aes(x = winpct, y = attendance)) + geom_point(col="blue", size = 1) + xlab("Win prtcentage") + ylab("Season attendance at home games") + ggtitle("Winning % to home attendance") + geom_smooth(method = "lm", col = "red")
+```
+```{r}
+cor(~winpct,~attendance,data = oct6ttp1.df)
+```
+```{r}
+regressionex1.df <- read.csv("https://people.ucalgary.ca//~jbstall//DataFiles//counties.csv")
+regressionex1.df = regressionex1.df %>%
+  mutate(wentfor = ifelse(Democrats.2016 > 50, "wentDemocrat", "wentRepublican"))
+predictdemovote = lm(Democrats.2016 ~ Graduate.Degree, data=regressionex1.df)  
+#Democrats.2016 is the y-variable, Graduate Degree is the x-variable of the SAT_2010 data frame 
+options(scipen=999)
+predictdemovote$coef
+predict(predictdemovote, data.frame(Graduate.Degree=22))  #predcits y for a singular value of x (data.frame(Graduate.Degree=22))
+
+```
+```{r}
+#time to play b
+predictdeha = lm(attendance ~ winpct, data=oct6ttp1.df)  
+options(scipen=999)
+predictdeha$coef
+predict(predictdeha, data.frame(winpct=0.405))  #predcits y for a singular value of x (data.frame(Graduate.Degree=22))
+
+```
+

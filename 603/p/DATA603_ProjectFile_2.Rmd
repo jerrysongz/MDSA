@@ -1,0 +1,165 @@
+
+```{r}
+dataset = read.csv('cleaned603dataset_-_dataset603_1.csv')
+head(dataset)
+options(scipen = 999)
+```
+
+```{r}
+fullmodel <-lm(Site_Energy~factor(Property_Type)+NumberofBuildings+Year_Built+Property_GFA+WeatherNormalizedSiteEnergyUse+SiteEUI+WeatherNormalizedSiteEUI+SourceEnergyUse+WeatherNormalizedSourceEnergyUse+SourceEUI+WeatherNormalizedSource.EUI+Emissions_CO2+Emissions_Intensity+DirectGHGEmissions+DirectGHGEmissionsIntensity+Electricity+Natural_Gas+YearEnding+Precipitation+Corn_Heat_Unit+Heating_Degree_Days+Cooling_Degree_Days, data=dataset)
+
+summary(fullmodel)
+```
+
+```{r}
+library(mctest)
+```
+```{r}
+imcdiag(fullmodel, method='VIF')
+```
+The VIF values are ideally supposed to be less than 5 for us to not take any corrective action. However, here in our fullmodel, we can observe that the VIF values are well above 5. As we suspected, there is considerable multicollinearity in our data! 
+To solve this problem, we just drop the problematic variables. Since the presence of multicollinearity suggests that the information that this variable gives about the response is redundant in the presence of the other variables, this may typically be done without much harm to the regression model.
+After eliminating the problematic variables manually, we end up with: NumberofBuildings, Year_Built, Property_GFA, Natural_Gas, Emissions_CO2. But, we will not use Year_Built as it generates a Time-Series dependancy, which we want to avoid.
+
+```{r}
+newmodel <-lm(Site_Energy~NumberofBuildings+Property_GFA+Natural_Gas+Emissions_CO2,data=dataset)
+summary(newmodel)
+```
+```{r}
+imcdiag(newmodel, method='VIF')
+```
+Here, we can observe that Property_GFA and Emissions_CO2 have a VIF>5, but they are important variables to us in the prediction of Site_Energy, and therefore we decide to keep them as a part of our New Model.
+
+```{r}
+library(olsrr)
+```
+
+```{r}
+stepmod=ols_step_both_p(newmodel,pent = 0.1, prem = 0.3, details=TRUE)
+summary(stepmod$model)
+```
+
+After doing stepwise regression, we get our final model as:
+Site_Energy = 702.127112 + 6.389525(Emissions_CO2) + 0.614171(Natural_Gas) + 0.153195(Property_GFA) - 1183.156115(NumberofBuildings)
+
+```{r}
+#interactions
+#T-tests:
+#Hypothesis:
+#H0= Bi = 0
+#Ha: Bi != 0 (i = 1,2,3...)
+interacmodel <-lm(Site_Energy~(NumberofBuildings+Emissions_CO2+Natural_Gas+Property_GFA)^2, data=dataset)
+summary(interacmodel)
+```
+After including the interaciton terms we can see that not every interaction term contributes to the model. We are removing NumberofBuildings:Emissions_CO2, NumberofBuildings:Natural_Gas but we are going to keep NumberofBuildings:Property_GFA as it lies in the grey zone. Hence we are going to do the T-test again with the predictors that are significant to the model. For the rest of the predictors p-value is less than the alpha value(0.05) hence, we can reject our null hypothesis and accept the alternative.
+```{r}
+#Hypothesis:
+#H0= Bi = 0
+#Ha: Bi != 0 (i = 1,2,3...)
+interacmodel1 <-lm(Site_Energy~NumberofBuildings+Emissions_CO2+Natural_Gas+Property_GFA+NumberofBuildings*Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+
+summary(interacmodel1)
+```
+After removing the insignificant terms yet keeping the grey zone predictor, we see that it also becomes insignificant to the model. Hence we can now safely remove the predictor which once was in the grey zone. Therefore, we are left with NumberofBuildings, Emissions_CO2, Natural_Gas+Property_GFA, Emissions_CO2:Natural_Gas, Emissions_CO2:Property_GFA, Natural_Gas:Property_GFA as our final predictors for our model. As for these predictors the p-value is less than the alpha value(0.05) hence, we can reject our null hypothesis and accept the alternative.
+
+```{r}
+#Hypothesis:
+#H0= Bi = 0
+#Ha: Bi != 0 (i = 1,2,3...)
+interacmodel2 <-lm(Site_Energy~NumberofBuildings+Emissions_CO2+Natural_Gas+Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+
+summary(interacmodel2)
+```
+
+All the remaining predictors are significant to the model. Their p-value is much less than the alpha value(0.05). Hence, we can reject our null hypothesis and accept the alternative.
+
+```{r}
+interacmodel2 <-lm(Site_Energy~NumberofBuildings+Emissions_CO2+I(Emissions_CO2^2)+I(Emissions_CO2^3)+Natural_Gas+Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+
+summary(interacmodel2)
+```
+
+```{r}
+#Linearity Assumption
+
+library(ggplot2)
+ggplot(interacmodel2, aes(x=.fitted, y=.resid)) +
+  geom_point() + geom_smooth()+
+  geom_hline(yintercept = 0)+
+  ggtitle("Residual vs Fitted")
+```
+We can draw the conclusion that, compared to a basic linear regression model, the quadratic model more closely fits the data.
+Model interpretations are meaningless when the independent variable's range is exceeded. Despite the fact that the model seems to back up the data. The value of X must fall inside the range of the independent variable in order to generate a forecast for Y. Otherwise, the prediction won't have any real relevance.
+
+Independence Assumption
+When subsequent errors are correlated, the assumption of independent errors is broken. This often happens when time-series data, which are observations of data for both dependent and independent variables sequentially over a period of time, are used. Since the objects of our experiment were unrelated to time, we may be quite confident that the measurements are independent.
+```{r}
+plot(interacmodel2,which=1)
+```
+```{r}
+library(lmtest)
+```
+```{r}
+#H0: heteroscedacity is not present
+#H1: Heteroscedacity is present
+bptest(interacmodel2)
+```
+From our dataset, the output displays the Breusch-Pagan test that results from the cubic model. The p-value = 0.0000000000000002956 <0.05, indicating that we do reject the null hypothesis. Therefore, the test provides very strong evidence to suggest that heteroscedasticity does exist. Therefore, we do the Shapiro-Wilk test.
+
+```{r}
+#H0: the sample data are significantly normally distributed 
+#Ha: the sample data are not significantly normally distributed 
+shapiro.test(residuals(interacmodel2))
+```
+Shapiro-Wilk normality test also confirms that the residuals are NOT normally distributed as the p-value= 0.00000000000000022< 0.05.
+
+Non-normal and Heteroscedastic means we need to do the Box-Cox transformation.
+
+
+#Influential Outliers
+
+```{r}
+
+#Influential Outliers
+
+plot(interacmodel2,which=5)
+```
+
+
+
+```{r}
+dataset[cooks.distance(interacmodel2)>0.5,]
+plot(interacmodel2,pch=18,col="red",which=c(4))
+```
+
+
+```{r}
+library(MASS)
+```
+```{r}
+bc=boxcox(interacmodel2,lambda=seq(-0.5,3))
+```
+```{r}
+bestlambda=bc$x[which(bc$y==max(bc$y))]
+bestlambda
+```
+
+```{r}
+library(leaps)
+```
+```{r}
+library(leaps)
+best.subset<-regsubsets(Site_Energy~NumberofBuildings+Emissions_CO2+I(Emissions_CO2^2)+I(Emissions_CO2^3)+Natural_Gas+Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data= dataset, nv=9 ) 
+
+summary(best.subset)
+reg.summary<-summary(best.subset)
+
+# for the output interpretation
+rsquare<-c(reg.summary$rsq)
+cp<-c(reg.summary$cp)
+AdjustedR<-c(reg.summary$adjr2)
+RMSE<-c(reg.summary$rss)
+BIC<-c(reg.summary$bic)
+cbind(rsquare,cp,BIC,RMSE,AdjustedR)
+```
+

@@ -1,0 +1,228 @@
+---
+title: "Data 602 - September 15 In Class Notes"
+output: html_notebook
+---
+
+```{r echo=TRUE}
+assessedvalue= c(342.0, 166.5, 406.0, 303.5, 704.5, 540.0, 373, 449.5, 398.5, 394.5, 219, 220.0, 398.5, 480.5, 364.0)
+propassess = data.frame(assessedvalue) #create a data frame to prepare data to be visualzed wtih ggplot
+head(propassess, 3)
+```
+
+```{r}
+computemode = function(x)
+{
+  uniqx = unique(x)  
+  uniqx[which.max(tabulate(match(x, uniqx)))]
+}
+```
+
+Now, run the `computemode` function with the data vector `propassess$assessedvalue`:
+
+```{r}
+computemode(propassess$assessedvalue) #computes the mode of data in data vector propassess$assessedvalue
+```
+
+
+**Time to Play 1:** The following data are the commuting times (in minutes) of $n = 19$ randomly chosen University of Calgary first-year students. 
+$$
+ 0,  0,  5,  6, 10, 10, 15, 15, 15, 20, 20, 25, 30, 40, 45, 60, 60, 60, 60
+$$
+
+
+For the sake of convenience, copy and paste the R code and answer the following components. 
+
+```{r echo=TRUE}
+ct= c(0,  0,  5,  6, 10, 10, 15, 15, 15, 20, 20, 25, 30, 40, 45, 60, 60, 60, 60) # combined these data into a data vector called ct
+ct = sort(ct)  # arranges the data from smallest to largest
+ct# see the data in ascending value
+```
+
+The distribution of this sample is provided below. 
+
+```{r echo=FALSE}
+densityplot(ct, xlab = "Commuting Time in Minutes", main="Distribution of Commuting Time for First-year Students")
+```
+(a) Compute the mean $\overline{X}$ and the median $\widetilde{X}$ of these data.
+</br>
+</br>
+**Answer:** 
+```{r}
+mean(ct)
+median(ct)
+```
+From which
+
+$$
+\mu = 26.10523 \approx 26.11 \: \text{minutes} \hspace{0.5in} \widetilde{\mu} = 20 \: \text{minutes}
+$$
+
+(b) Compute the mode.
+</br>
+</br>
+**Answer:**
+```{r}
+computemode(ct)
+```
+
+(c) Now, what happens if we sample a *twentieth* student, and the commute time of this student is 90 minutes or in the context of our data $x_{20} = 90$. Recompute the mean and median of this sample. Use the code below to add this data point onto the end of the `ct` data vector. Then regenrate the density plot and recompute the sample mean, sample median, and sample mode.
+
+```{r echo=TRUE}
+ct = c(ct, 90) #combines data vector ct with 90
+```
+</br>
+**Answer:**
+
+The $\overline{X}$, $\widetilde{X}$ and $\dot{X}$ are computed below, along with the new density-plot of these data. 
+```{r}
+mean(ct)  #computes the mean of data in new ct
+median(ct)  #computes the median of data in new ct
+computemode(ct)
+densityplot(ct, xlab = "Commuting Time in Minutes", main="Distribution of Commuting Time for First-year Students")
+```
+
+
+and
+$$
+\overline{X} = 29.3 \hspace{0.5in} \widetilde{X} = 20 \hspace{0.5in} \dot{X} = 60
+$$
+
+**Time to Play 2:** Compute the variance and standard deviation of the sample of $n = 20$.
+</br>
+</br>
+**Answer:** The R code below computes the values of $S^{2}$ and $S$.
+```{r echo=TRUE}
+var(ct)
+sd(ct)
+```
+and
+$$
+S^{2} = 642.96 \:\: \text{minutes}^{2} \hspace{0.2in} \text{and} \hspace{0.2in} S = 25.36 \:\: \text{minutes}
+$$
+
+------------------------------
+
+**Time to Play 3:** Consider the variable **arr_delay** in our **sampleflights** data set/frame. 
+
+(a) Create a density plot of these data. 
+</br>
+</br>
+**Answer:** 
+```{r}
+ggplot(data=sampleflights, aes(x = arr_delay)) + geom_density(col="blue", fill='red', na.rm=TRUE) + xlab("Minutes a Flight is Delayed in Arriving To Destination Airport") + ylab("Density") + ggtitle("Density Plot of Departure Delay (n = 974)") + geom_vline(xintercept=0, col="purple")
+#
+densityplot(sampleflights$dep_delay, xlab="Minutes a Flight is Delayed in Arriving To Destination Airport", col='red', main = "Density Plot of Departure Delay (n = 974)")
+```
+
+(b) Compute the mean, median, and standard deviation of these data. 
+</br>
+</br>
+**Answer:**
+```{r echo=TRUE}
+favstats(~arr_delay, data=sampleflights)
+```
+
+```{r}
+mean(~arr_delay, data=sampleflights, na.rm=TRUE)
+median(~arr_delay, data=sampleflights, na.rm=TRUE)
+sd(~arr_delay, data=sampleflights, na.rm=TRUE)
+```
+
+$$
+\overline{X} = 7.285 \: \text{minutes} \hspace{0.5in} \widetilde{X} = -4 \: \text{minutes} \hspace{0.5in} S = 42.996 \approx 43 \: \text{minutes}
+$$
+
+----------------------------------
+
+**Time to Play 4:** Compute both the 20th percentile and the 90th percentiles of the 2018 residential property assessments in the City of Calgary (2022). 
+</br>
+</br>
+**Answer:** The 20th and 90th percentiles, $x_{20}$ and $x_{90}$ are computed as
+```{r echo=TRUE}
+quantile(assessedvalue, 0.20, data=propassess) # computes the 20th percentile
+quantile(assessedvalue, 0.90, data=propassess) # computes the 90th percentile
+```
+
+Answer for $x_{20} = 286.8$ (\$1000s) and  $x_{90} = 516.2$ in \$1000s. 
+
+Alternatively, the **mosaic** package has the `qdata` command. This can be used when your data is in a data frame, rather than a data vector. 
+
+```{r}
+qdata(~assessedvalue, c(0.20, 0.30, 0.50, 0.67, 0.90, 0.99), data=propassess) #computes the 20th and 90th percentiles for data in assessedvalue variable of df propassess
+```
+Rather than returning the 20th and 90th percentiles as individual data vectors with the `quantile` command, the `qdata` command returns these statistics in the form of a data frame.
+
+----------------------------------------------------
+
+**Time to Play 5:** Refer to the **sampleflights** data set/data frame. 
+
+10% of flights leaving any of the 3-NYC airports are at most how early/late in arriving at the destination airport? What about 95%? 
+
+**Answer:** Using the `qdata` command
+```{r}
+qdata(~arr_delay, c(0.10, 0.95), sampleflights)
+```
+From these data, we can infer that 10% of all flights leaving the 3-NYC airports are **at most** 25 minutes *early* in arriving at their respective destination airports. Also, 95% of such flights are at most 94.3 minutes *late* in arriving to their destination airports. 
+
+----------------------------------
+
+**Wrap-Up:** Refer to the **sampleflights** data In this wrap-up exercise and consider the **air_time** variable, a variable that measures the time duration of each flight, in minutes. For this particular variable
+
+```{r eval=FALSE, include=FALSE}
+head(sampleflights, 4)
+```
+
+
+(a) create a *both* a histogram and a density plot from the sample of flights. Use 30 minutes as the width of each bin. Comment on the nature of flights from the three NYC-area airports. 
+</br>
+</br>
+**Answer:**
+```{r echo=TRUE}
+ggplot(data=sampleflights, aes(x = air_time)) + geom_histogram(col='red', fill='blue', binwidth=30, na.rm=TRUE) + xlab("Minutes in the Air") + ggtitle("Histogram of Flight Time (in Minutes)")
+#
+#
+ggplot(data=sampleflights, aes(x = air_time)) + geom_density(fill='blue', na.rm=TRUE) + xlab("Minutes in the Air") + ggtitle("Density Plot of Flight Time (in miles)")
+#density plot with data imposed 
+#
+densityplot(sampleflights$air_time, xlab="Flight Duration (in minutes)", main="Density Plot of Flight Time")
+```
+
+
+(b) Compute the summary statistics $\overline{X}, \widetilde{X}, S, Q1, Q3, x_{min}$ and $x_{max}$ for the "air-time" variable. Which of these summary statistics best represents the "typical" time that a flight leaving one of the three NYC-area airports is in the air? 
+</br>
+</br>
+**Answer:**
+```{r echo=TRUE}
+favstats(~air_time, data=sampleflights, na.rm=TRUE)
+```
+
+(c) create a series of boxplots - one for each of the following airlines "UA", "AA", "EV", "B6", and "DL" - to compare the air time between these five passenger carrier airlines. Do any of these airlines fly "longer" in terms of duration of the flight? 
+</br>
+</br>
+**Answer:**
+```{r echo=TRUE}
+ggplot(data=filter(sampleflights, carrier == "UA" | carrier == "AA"| carrier =="EV" | carrier == "B6" | carrier == "DL"), aes(x = carrier, y = air_time)) + geom_boxplot(col='red', fill='blue', na.rm=TRUE) + xlab("Carrier") + ylab("Minutes in the Air") + coord_flip() 
+```
+</br>
+</br>
+
+(d) for the five airlines listed in (c), find the various summary statistics listed in part (c).
+</br>
+</br>
+**Answer:**
+```{r echo=TRUE}
+airdistancestats = favstats(~air_time | carrier, data=filter(sampleflights, carrier == "UA" | carrier == "AA"| carrier =="EV" | carrier == "B6" | carrier == "DL"))
+airdistancestats
+```
+
+```{r}
+airdistancerefinedstats = filter(airdistancestats, carrier=="AA" | carrier == "UA" | carrier == "EV" | carrier == "B6" | carrier =="DL")
+airdistancerefinedstats
+```
+
+
+
+
+
+
+

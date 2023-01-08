@@ -1,0 +1,245 @@
+---
+title: "Project 603"
+author: "Jannatul Naeema"
+date: "2022-12-04"
+output: html_document
+---
+
+```{r}
+
+library(ggplot2)
+library(lmtest)
+library(mctest) 
+library(GGally)
+library(olsrr)
+```
+
+
+
+```{r}
+dataset= read.csv("cleaned603dataset_-_dataset603_1.csv")
+dataset
+options(scipen = 999)
+dataset <- na.omit(dataset)
+
+```
+
+Model:
+```{r}
+library(mctest)
+
+fullmodel <-lm(Site_Energy~factor(Property_Type)+NumberofBuildings+Year_Built+Property_GFA+WeatherNormalizedSiteEnergyUse+SiteEUI+WeatherNormalizedSiteEUI+SourceEnergyUse+WeatherNormalizedSourceEnergyUse+SourceEUI+WeatherNormalizedSource.EUI+Emissions_CO2+Emissions_Intensity+DirectGHGEmissions+DirectGHGEmissionsIntensity+Electricity+Natural_Gas, data=dataset)
+
+summary(fullmodel)
+imcdiag(fullmodel, method='VIF')
+```
+
+
+
+
+```{r}
+
+#fullmodel <-lm(Site_Energy~factor(Property_Type)+NumberofBuildings+Year_Built+Property_GFA+WeatherNormalizedSiteEnergyUse+SiteEUI+WeatherNormalizedSiteEUI+SourceEnergyUse+WeatherNormalizedSourceEnergyUse+SourceEUI+WeatherNormalizedSource.EUI+Emissions_CO2+Emissions_Intensity+DirectGHGEmissions+DirectGHGEmissionsIntensity+Electricity+Natural_Gas, data=dataset)
+
+fullmodel <-lm(Site_Energy~NumberofBuildings+Property_GFA+Emissions_CO2+ Natural_Gas, data=dataset)
+#fullmodel = lm(Site_Energy ~ NumberofBuildings+Year_Built+SourceEnergyUse+SourceEUI+Natural_Gas
+#                  , data =energy)
+summary(fullmodel)
+imcdiag(fullmodel, method='VIF')
+```
+```{r}
+fullmodel1 <-lm(Site_Energy~NumberofBuildings+Year_Built+SourceEnergyUse+SourceEUI+
+                 Electricity, data=dataset)
+#fullmodel = lm(Site_Energy ~ NumberofBuildings+Year_Built+SourceEnergyUse+SourceEUI+Natural_Gas
+#                  , data =energy)
+summary(fullmodel1)
+imcdiag(fullmodel1, method='VIF')
+```
+
+```{r}
+library(olsrr)
+
+stepmod=ols_step_both_p(fullmodel,pent = 0.1, prem = 0.3, details=TRUE)
+summary(stepmod$model)
+```
+
+Our fullmodel:
+$$
+\begin{aligned}
+Y_{SiteEnergy}&=\beta_0 +  \beta_1 X_{SourceEnergyUse}  +\beta_2 X_{Electricity} +\beta_3 X_{SourceEUI}+\beta_4 X_{NumberofBuildings} +\epsilon  \\
+
+\end{aligned}
+$$
+##Global F Test on Full Model:
+Hypothesis Statement for Individual T-test:
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\mbox{at least one }\beta_i\mbox{ is not zero } (i=1,2,3,4) 
+\end{aligned}
+$$
+
+We set up the significance level at 0.05($\alpha = 0.05$).
+
+Full Model Global F Test:
+```{r}
+#Full Model Test
+fullmodel <-lm(Site_Energy~NumberofBuildings+Property_GFA+Emissions_CO2+ Natural_Gas, data=dataset)
+reg<-lm(Site_Energy~1, data=dataset) # Model with only intercept
+
+anova(fullmodel,reg) # We compare the NULL model with the full model
+```
+By using global F test, the output shows that $F_{cal}= 25794$ with df= -4, and $p-value< 0.00000000000000022 < \alpha=0.05$,indicating that we should clearly reject the null hypothesis. It provides compelling evidence against the null hypothesis. The Global F-test suggests that at least one of the independent variables must be related to Site Energy. Based on the p-value, we also have extremely strong evidence that at least one of the independent variables is associated with increased Site_Energy.
+
+After we check the global F-test and reject the null hypothesis, we are checking the test statistics for the individual coefficients and particular subsets of the full model test in the following steps.
+
+##Individual Coefficients Test:
+
+###Hypothesis Statement:
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0 (i=1,2,3,4)
+\end{aligned}
+$$
+I set up the $\alpha = 0.05$
+
+```{r}
+summary(fullmodel)
+```
+From the out put, It shows that the variables
+NumberofBuildings has $t_{cal}=-6.182$ with the $p-value = 0.00000000218 < 0.05$,
+Property_GFA has $t_{cal}=11.761$ with the $p-value< 0.0000000000000002 < 0.05$  ,
+Emissions_CO2 has $t_{cal}=58.698$ with the $p-value< 0.0000000000000002 < 0.05$,
+Natural_Gas has $t_{cal}=122.447$ with the $p-value< 0.0000000000000002 < 0.05$ ,
+indicating that we should clearly reject the null hypothesis for variable NumberofBuildings, Property_GFA,Emissions_CO2 and Natural_Gas, which means that we should keep those variables to the model at the significance level at $α=0.05$.
+
+
+## Stepwise Regression Procedure
+
+```{r}
+#Stepwise Regression Procedure
+library(olsrr)
+library(readr)
+library(dplyr)
+backmodel=ols_step_backward_p(fullmodel, prem = 0.3)
+summary(backmodel$model)
+
+```
+
+# Interaction Model
+## Interaction Term T-tests:
+
+```{r}
+#interactions
+#T-tests:
+fullmodel <-lm(Site_Energy~NumberofBuildings+Property_GFA+Emissions_CO2+
+                 Natural_Gas, data=dataset)
+interactionmodel = lm(Site_Energy ~ (NumberofBuildings+Property_GFA+Emissions_CO2+
+                 Natural_Gas)^2, data =dataset)
+summary(interactionmodel)
+```
+```{r}
+interactionmode2 = lm(Site_Energy ~ NumberofBuildings+Property_GFA+Emissions_CO2+
+                 Natural_Gas+NumberofBuildings:Property_GFA+Property_GFA:Emissions_CO2+Property_GFA:Natural_Gas+Emissions_CO2:Natural_Gas, data =dataset)
+summary(interactionmode2)
+```
+
+
+```{r}
+interactionmode2 = lm(Site_Energy ~ NumberofBuildings+Property_GFA+Emissions_CO2+
+                 Natural_Gas+Property_GFA:Emissions_CO2+Property_GFA:Natural_Gas+Emissions_CO2:Natural_Gas, data =dataset)
+summary(interactionmode2)
+```
+
+
+
+```{r}
+#Second Order Term T-tests:
+
+qmodel = lm(Site_Energy ~ Number.of.Buildings+I(Number.of.Buildings^2)+Source.Energy.Use..GJ.+I(Source.Energy.Use..GJ.^2)+Source.EUI..GJ.m..+I(Source.EUI..GJ.m..^2)+Electricity+I(Electricity^2)
+                  , data =energy)
+
+summary(qmodel)
+```
+```{r}
+qmodel2 = lm(Site_Energy ~ Number.of.Buildings+Source.Energy.Use..GJ.+I(Source.Energy.Use..GJ.^2)+I(Source.Energy.Use..GJ.^3)+I(Source.Energy.Use..GJ.^4)+Source.EUI..GJ.m..+Electricity+I(Electricity^2)+I(Electricity^3)+I(Electricity^4)+I(Electricity^5)+I(Electricity^6)+I(Electricity^7)
+                  , data =energy)
+
+summary(qmodel2)
+
+```
+
+
+
+
+
+
+```{r}
+bestm = lm(Site_Energy ~ Number.of.Buildings+Source.Energy.Use..GJ.+I(Source.Energy.Use..GJ.^2)+I(Source.Energy.Use..GJ.^3)+I(Source.Energy.Use..GJ.^4)+Source.EUI..GJ.m..+Electricity+I(Electricity^2)+I(Electricity^3)+I(Electricity^4)+I(Electricity^5)+I(Electricity^6)+I(Electricity^7)+ Number.of.Buildings:Source.Energy.Use..GJ. + Source.Energy.Use..GJ.:Electricity + Source.EUI..GJ.m..:Electricity
+                  , data =energy)
+summary(bestm)
+```
+```{r}
+bestm = lm(Site_Energy ~ Number.of.Buildings+Source.Energy.Use..GJ.+I(Source.Energy.Use..GJ.^2)+I(Source.Energy.Use..GJ.^3)+Source.EUI..GJ.m..+Electricity+I(Electricity^2)+ Number.of.Buildings:Source.Energy.Use..GJ. + Source.EUI..GJ.m..:Electricity
+                  , data =energy)
+summary(bestm)
+```
+```{r}
+#Higher Order Partial F-tests:
+anova(reducedinteractionmodel2, bestm)
+```
+```{r}
+#Linearity Assumption
+
+library(ggplot2)
+ggplot(bestm, aes(x=.fitted, y=.resid)) +
+  geom_point() + geom_smooth()+
+  geom_hline(yintercept = 0)+
+  ggtitle("Residual vs Fitted")
+```
+```{r}
+#Normality Assumption
+shapiro.test(residuals(bestm))
+qplot(residuals(bestm),
+      geom="histogram",
+      binwidth = 100,  
+      main = "Histogram of residuals", 
+      xlab = "residuals", color="red", 
+      fill=I("blue"))
+
+ggplot(energy, aes(sample=bestm$residuals)) +
+  stat_qq() +
+  stat_qq_line() +
+  ggtitle("Normal Q-Q Plot")
+```
+```{r}
+#Equal Variance Assumption
+library(lmtest)
+bptest(bestm)
+plot(bestm,which=1)
+
+```
+```{r}
+#Multicollinearity Assumption
+library(mctest)
+library(ggplot2)
+library(GGally)
+fullmodel = lm(Site_Energy ~ Number.of.Buildings+Year_Built+Source.Energy.Use..GJ.+Source.EUI..GJ.m..+Electricity
+                  , data =energy)#ummary(fullcar2)
+catfp2 <- data.frame(energy$Number.of.Buildings,energy$Year_Built,energy$Source.Energy.Use..GJ.,energy$Source.EUI..GJ.m..,energy$Electricity)
+ggpairs(catfp2,lower = list(continuous = "smooth_loess", combo = "facethist", discrete = "facetbar", na = "na"),upper = list(continuous = wrap("cor", family="sans")))
+```
+```{r}
+#Influential Outliers
+
+plot(bestm,which=5)
+```
+```{r}
+car2[cooks.distance(bestm)>0.5,]
+plot(bestm,pch=18,col="red",which=c(4))
+
+```
+
+

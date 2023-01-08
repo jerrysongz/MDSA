@@ -1,0 +1,274 @@
+---
+title: "Data 602 - Assignment Four"
+output:
+  html_notebook: default
+  pdf_document: default
+date: "Due: Saturday, October 15, 2022 @ 11:59pm"
+---
+
+Attempt all problems below. You will be required to complete this assignment in R Notebook or R Markdown. Convert your work to a .pdf file and submit to [Gradescope.ca](https://www.gradescope.ca/). 
+</br>
+</br>
+Ensure you justify all computation and data visualizations with accompanying code. 
+</br>
+</br>
+
+
+**1.** A pharmaceutical company conducted an experiment to compare the mean amount of time (in days) necessary for a patient to recover from the effects and complications that follow the onset of the common cold. In this experiment,  thirty-one healthy females between the ages of 25 and 34 years of age were randomly divided into two groups. 
+
+In the first group, $n_{VitC} = 15$ females received a daily dose of 500 milligrams of Vitamin C. The second group consisted of $n_{Placebo} = 16$ females, each of which was given a *placebo*, or rather a "fake" Vitamin C tablet.  The recovery time - the time until the common cold symptoms had disappeared - for each of the thirty-one females was observed (in days). The data are provided below.
+
+**Received 500 mgs of Vitamin C:** 6,  7, 7,  7,  8,  7,  7,  8,  7,  8, 10,  6,  8,  5,  6
+
+**Received a placebo:**  10, 12,  8,  6,  9,  8, 11,  9, 11,  8, 12, 11,  9,  8, 10,  9
+</br>
+</br>
+
+(a) Do these data indicate that the recovery time is quicker with Vitamin C than without? Carry out the appropriate statistical investigation with a permutation test. Ensure you show "where" your permutation test statistic lies on the distribution. Report your (empirical) $P$-value and your statistical inference. 
+
+(b) Re-test your statistical hypothesis in part (a) using the $t$-test. In doing so, state any assumptions about these data or conditions you are imposing on these data and conduct the necessary diagnostics to either confirm or refute such assumptions. Ensure you provide both the $P$-value and its interpretation related to these data.
+
+</br>
+</br>
+
+**2.** In a 1988[^1] case , *McCleskey v. Zant*, lawyers for the defendent demonstrated that amongst all African-American convicted murderers in the state of Georgia, 35% were found guilty of killing caucasians and 6% of those who killed African-Americans received the death penalty. As a result, the lawyers claimed that racial discrimination was a factor in sentencing. This was contested by lawyers for the State of Georgia. They argued that "murders of black victims were more likely to be unaggravated bar-room brawls, liquor-induced arguments, or lovers quarrels" - crimes that rarely result in a death sentence. But, amongst white-victims, there was a higher proportion of killings committed in the course of an armed robbery or involving torture - which more often result in death sentences. 
+
+The table below summarizes data for all African-American convicted murders in Georgia, resulting from difference categories of crime. (For example, Agggravation Level 1 consists of bar-room brawls, liquor-induced arguments, etc., Aggravation Level 6 includes the most vicious, cold-blooded, unprovoked crimes).
+
+$$
+\begin{array}{lcc}
+                    & \text{Sentenced to Death} &  \text{Not Sentenced to Death}  \\
+\text{Victim was Caucasian}   & 45            & 85                 \\
+\text{Victim was African-American}   & 14            & 218                 \\
+\end{array}
+$$
+
+(a) Visualize these data with a bar-graph (see Assignment One) that appropriately summarizes these counts.
+
+(b) Do these data suggest that the race of the victim does appear to affect whether an African-American convicted of murder in Georgia will receive a death sentence? Interpret your findings. Should you reject the null hypothesis, provide an interval with 95% coverage/confidence. 
+
+[^1]:https://caselaw.findlaw.com/us-supreme-court/499/467.html
+
+</br>
+</br>
+
+
+**3.** The data appearing in this [file](http://people.ucalgary.ca/~jbstall/DataFiles/CloudSeedingData.csv) were collected in southern Florida between 1968 and 1972 to test the claim that a massive injection of silver iodide into cumulus clouds can lead to increased rainfall[^2]. On each of 52 days that were deemed suitable for cloud seeding, a random mechanism was used to decide whether to seed the target cloud on that day or to leave it unseeded as a control. An airplane flew through the cloud in *both instances*, since the experimenters and the pilot were themselves unaware of whether on a particular day the seeding mechanism in the plane was loaded or not. 
+</br>
+</br>
+Precipitation was measured as the total rain volume falling from the cloud base following the airplane seeding run, as measured by radar. Did cloud seeding have an effect on rainfall in this experiment? If so, by how much?
+
+(a) carry out the *appropriate* statistical method that will investigate if, on average, cloud seeding does have an effect on rainfall. Should you find an effect, provide a 95% interval that will capture the amount of this effect. Ensure that your choice of statistical method is justified. 
+
+(b) You wish to test that the standard deviation in the rainfall amounts, in this case measured in acre-feet (the volume of water required to cover 1-acre of land with depth of 1-foot of water), between clouds that are seeded and unseeded is the same. Test this by carrying out a permutation test. 
+(Hint: Review and consider your findings from Assignment 3, Question 2.)
+
+(c) Consider the following **statistical result**:
+</br>
+</br>
+$\widetilde{X}_{1}$ and $\widetilde{X}_{2}$ are medians computed from a random sample of $n_{1}$-items observed from Population 1 and $n_{2}$-items observed from Population 2. Consider the *transformed* data $ln(X_{i})$ for $i = 1, 2$. If such *log*-transformed data produced symmetric distributions, then the following relationships hold:
+
+1. $\overline{ln(X_{i})} = \widetilde{ln(X_{i})}$, and since the $ln$ transformation preserves the order of the data
+
+2. $\widetilde{ln(X_{i})} = ln(\widetilde{X_{i}})$ 
+
+
+This states that the *population median* of the log-transformation of the original data is the log of the *median* of the original/untransformed data. A result of this is that 
+$$
+\overline{ln(X_{1})} - \overline{ln(X_{2})} \:\:\:\: \text{estimates} \:\:\:\: ln\left(\frac{\widetilde{\mu}_{1}}{\widetilde{\mu}_{2}} \right)
+$$
+
+Use this result to estimate how *many more times* as large is the median rainfall from seeded clouds as the median rainfall from unseeded clouds.
+</br>
+</br>
+(Hint: What can you do to go from *ln* scale to $\frac{\widetilde{\mu}_{1}}{\widetilde{\mu}_{2}}$?)
+
+[^2]: https://www.jstor.org/stable/1268346?seq=1#metadata_info_tab_contents
+
+</br>
+</br>
+
+**4.** Is there a remedy for male pattern baldness? Minoxidil - a compound that claimed to cure male pattern baldness - was investigated in a large experimental study where 619 males demonstrating male pattern baldness were randomly split into two groups: One group of males were to receive topical minoxidil, the other were to receive an identical-appearing placebo. Preliminary results produced the following: Of the 310 males who received the topical minoxidil, 99 demonstrated new hair growth. Of the 309 who received the placebo, 62 demonstrated new hair growth. 
+</br>
+</br>
+
+Do these data suggest that minoxidil is effective in treating male pattern baldness (or stimulates new hair growth)? Carry out the appropriate statistical test. In your findings, ensure you provide your statistical hypotheses, $P$-value and its interpretation, and a confidence interval using an appropriate statistical method should you deem this to be necessary. 
+
+</br>
+</br>
+
+**5.** A  study conducted by Youmans and Jee[^3] looked at students who took a research methods class in psychology. Two lecture sections of the same course were taught by the same instructor.  Students in each lecture section were required to register in one of two Friday afternoon discussion sections, or a  tutorial. During the ninth week of instruction, all students were asked to fill out an informal midsemester evaluation in their Friday afternoon discussion session. 
+
+In half of the Friday afternoon discussion sections, the experimenter (not the professor/instructor!) passed around a bag containing small bars of chocolate that he simply had 'left-over' and 'wanted to get rid of'  so that students would not think the chocolate was a gift from their professor/instructor. The evaluation was a survey that contained nine questions. For each question the student provided a rating from 1 (very poor) to 5 (excellent). 
+
+Question 9 posed the following:
+
+</br>
+<center>
+**``Compared to other instructors you have had at this university, this instrutor is:''  1 (very poor) to 5 (excellent)**
+</center>
+</br>
+
+Compliments to the authors, they have provided me with the data in this particular study. In the [file](http://people.ucalgary.ca/~jbstall/DataFiles/chocnochocratings.csv) you will find the raw data providing the student responses for Question 9 (**Q9**) and the overall average response for Questions 1 through 9 (**Overall**) for each student. 
+
+(a) Pertaining to Question 9: Do these data suggest there is a treatment effect? Test the existance of a treatment effect using a permutation test. If a treatment effect is discovered, explain its meaning in the context of these data. 
+</br>
+(You will have to carefully consider "what a treatment effect" is in this scenario.)
+
+(b) Consider the variable **Overall**. Is there a treatment effect with respect to the professor's overall rating as a teacher? Apply the $t$-test to these data. Interpret the meaning of the $P$-value.
+
+(c) Consider the test suggested in part (a). Why would a $t$-test not be a recommended statistical method to carry out the test in part (a)? Explain your answer in a few sentences. 
+
+[^3]:Fudging the Numbers: Distributing Chocolate Influences Student Evaluations in an Undergraduate Course, *Teaching of Psychology*, Volume 34, Number 7, pgs.~45 - 247, 2007.
+
+</br>
+</br>
+
+**6.** A poll carried out by Janet Brown Opinion Research[^4] in June of 2020 involved the random selection of $n = 900$ Alberta residents. Each was asked the question
+
+<center>
+"Given the effects of COVID-19 on government finances, do you strongly agree, somewhat agree, somewhat disagree, or strongly disagree that Alberta shouldadopt a provincial sales tax."
+</center>
+
+Three-hundred and fifty-eight (358) responded agree (209 "somewhat agree", 149 "strongly agree").
+
+A similar themed poll of Albertans was carried out in *March of 2018*, based on a presumed to be equal sample size of $n = 900$. 225 persons respnded "agree" (72 "strongly agree", 153 "somewhat agree", 72 "strongly agree"). 
+
+Does the latest poll of Albertans suggest that the proportion of Alberta residents who support the Alberta's adoption of a sales tax has increased since March 2018? 
+
+(a) Apply a permutation test (2000) to these data. Ensure you state your statistical hypotheses, then "address" which hypothesis statement is supported by these two random, independent samples. Also, provide your code. 
+
+(b) Re-test the null hypothesis in part (a) via a $Z$-test. What can you conclude? Ensure you provide the value of the test statistic and the $P$-value. 
+
+(c) Part (c) is conditional upon your finding(s) in parts (a) and (b): If you concur from these data that $p_{Now} > p_{March2018}$, compute a 95% confidence interval for $p_{Now} - p_{March2018}$ using *one method* of your choice. 
+
+
+[^4]: (http://planetjanet.ca/wp-content/uploads/2020/06/2020-06-12-Supporting-Data-for-PST-Story.pdf)
+
+</br>
+</br>
+
+
+**7.** The Capital Asset Price Model (CAPM) is a financial model that attempts to predict the 
+rate of return on a financial instrument, such as a common stock, in such a way that it is
+linearly related to the rate of return on the overal market. Specifically
+
+$$
+R_{StockA,i} = \beta_{0} + \beta_{1}R_{Market, i} + e_{i}   
+$$
+
+(Note: To align the notation with a stock's ``beta'', $\beta_{0} = A$ and $\beta_{1} = B$)
+
+
+You are to study the relationship between the two variables and estimate the above model:
+
+$R_{SUNCOR, i}$ - rate of return on Stock A for month $i$, $i = 1, 2, \cdots, 59$.
+
+$R_{Market, i}$ - market rate of return for month $i$, $i = 1, 2, \cdots, 59$.
+
+
+$\beta_{1}$ represent's the stocks `beta' value, or its *systematic risk*. It measure's the stocks volatility related
+to the market volatility.  $\beta_{0}$ represents the risk-free interest rate.
+
+The data appeaing in the [file](http://people.ucalgary.ca/~jbstall/DataFiles/capm.csv) contains the data on Suncor's rate of return and the Toronto Composite Index rate of return for 59 randomly selected months.  
+
+Therefore $R_{SUNCOR, i}$ represents the monthly rate of return for a common share of Suncor stock; 
+$R_{TSE, i}$ represents the monthly rate of return (increase or decrease) of the TSE Index for the same month, month $i$.
+The first column in this data file contains the monthly rate of return on Suncor stock; the second column contains the monthly rate of return on the TSE index for the *same month*. 
+
+Read this data into R Studio and answer the questions posed below. 
+```{r}
+capmdata = read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/capm.csv")
+head(campdata, 3)  #to get a sense of what the data look like
+```
+
+
+(a) Appropriately visualize these data. What can you infer from your graph? Provide a brief commentary.
+
+(b) Estimate the model above.  
+
+(c) In the context of these data, interpret the meaning of your estimates of $\beta_{0}$ and $\beta_{1}$, in the context of these data.
+
+(d) Refer to your answer in (b) In a certain month, the rate of return on the TSE Index was 4%. Predict the rate of return on Suncor stock for the same month. 
+
+(e) Think about the conditions of this model *in the context* of these data. Create the visualizations that inspect each of the two conditions and provide commentary that addresses the validity (or invalidity) of each. 
+
+(f) From these data, can you infer that the monthly rate of return of Suncor stock can be expressed as a positive linear function of the monthly rate of return of the TSE Index? State your statistical hypotheses, compute (and report) both the test statistic and the $P$-value and provide your decision. 
+
+(g) Compute a 95% confidence interval for $\beta_{1}$, then interpret its meaning in the context of these data. 
+
+(h) Compute a 95% confidence interval for the mean monthly rate of return of Suncor stock when the TSE has a monthly rate of return of 3%. 
+
+(i) In a month of September, the TSE Index had a rate of return of 1.16%. With 95% confidence, compute the September rate of return for Suncor stock. 
+
+(j) Consider the bootstrap statistic $r_{boot}$. Using 1000 bootstraps, provide a 95% bootstrap confidence interavl for the value of the $\rho$, the *population correlation* that measures the degree of linear association between Suncor's monthly rate of return and the TSE Index monthly rate of return. 
+
+</br>
+</br>
+
+**8.** Refer to Question 9 of Assignment 1, where you were asked to refer to certain variables of the General Society Survey of 2002. For your convenience, the data file is linked below. 
+```{R}
+gss = read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/GSS2002.csv")
+```
+
+(a) Is there a relationship between one's support for gun laws (variable name is **GunLaw**) and their opinion about current government spending on Science (variable name is **SpendSci**)? State the appropriate statistical hypotheses.
+
+(b)  Carry out the appropriate statistical test, providing both the test statistic and the $P$-value.
+
+(c) What can you conclude? Do these data support your null hypothesis in part (a)? State your decision and conclusion.
+
+(e) Re-trace your result, in the form of a bar-graph, that was provided in Assignment 1, Question 9. Can you infer from these data that one's level of **Education** is independent of their **Race**? Present your findings in the form of a paragraph, outlining the decision you have made, why you made the decision you made, and the $P$-value. 
+
+</br>
+</br>
+
+**9.** A group of patients with a binge-eating disorder were randomly assigned to take either the experimental drug fluvoxamine or the placebo in a nine-week-long, double-blinded clinical trial. At the end of the trial the condition of each patient was classified into one of four categories: no response, moderate response, marked response, or remission. The table below shows a cross-classification, or contingency table, of these data. 
+$$
+\begin{array}{lcccc}
+             & \text{No Response}  & \text{Moderate Response}  & \text{Marked Response}  & \text{Remission}  \\
+             \hline
+\text{Fluvoxamine}  &   15         &     7                     &    3                    &   15              \\
+\text{Placebo}      &   22         &     7                     &    3                    &   11              \\
+\end{array}
+$$
+
+Do these data provide statistically significant evidence to conclude that there is an association between the type of treatment received and a patient's response? 
+
+</br>
+</br>
+
+**10.** Was Barry Bonds using Steroids? The following bivariate data set gives the year and the number of home runs divided by the number of at bats - attempts to hit the ball - for each season. The number of homeruns is not used as later in his career he was given intential walks, which do not count as an at bat. 
+
+In this exercise, you will build on your learning of model building and attempt to predict the number of home runs Barry Bonds would have hit in the 2001 season. These data are stored in the [data file](http://people.ucalgary.ca/~jbstall/DataFiles/bondsdata.csv). 
+
+
+<center>
+![Bonds Just After He Signed His San Fransico Contract](BondsPre.jpg)
+
+![Circa 2000](BondsPost.jpg)
+
+</center>
+
+</br>
+</br>
+Read these data into a data frame called **Ass5ques5data**, then look at the first three and the last three rows as a "check".
+```{r}
+Ass4ques10data = read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/bondsdata.csv")
+```
+
+Remove the data point that corresponds to the **season == 2001**. After which, you are attempting to build a statistical model of the following form:
+$$
+HRAT_{i} = A + B*Year_{i} + e_{i} \hspace{0.5in} i = 1987, 1988, \cdots, 2000.
+$$
+
+
+
+
+
+
+
+
+
+
+
+

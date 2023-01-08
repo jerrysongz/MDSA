@@ -1,0 +1,360 @@
+---
+title: "Data 602 - Class Notes for September 20"
+output: html_notebook
+---
+
+# Exercise 1
+
+The number of hurricanes that hit landfall in the US various from one hurricane season to the next, and can be modeled with the Poisson distribution with $\lambda = 1.7619$. 
+
+(a) Required to compute $P(\overline{X} > 2)$.
+
+The distribution of the mean/average number of hurricanes to hit landfall in a season will be *approximately* Normal, by the Central Limit theorem:
+$$
+\overline{X} \sim Normal\left(\mu_\overline{X} = 1.7619, \sigma_{\overline{X}} = \frac{\sqrt{1.7619}}{\sqrt{25}} = 0.2654732 \approx 0.2655 \right)
+$$
+
+```{r}
+mu.landfall <- 1.7619
+sd.landfall <- sqrt(1.7619)/(sqrt(25))
+#
+mu.landfall
+sd.landfall
+```
+
+$$
+\begin{eqnarray}
+P(\overline{X} > 2) & = & P\left( Z > \frac{2 - 1.7619}{\frac{\sqrt{1.7619}}{\sqrt{25}}}\right) \\
+                    & = & P(Z > 0.8969) \\
+                    & = & 0.184889 \\
+                    & \approx & 0.1849
+\end{eqnarray}
+$$
+
+
+```{r}
+z1 <- (2 - mu.landfall)/sd.landfall
+z1
+```
+
+```{r}
+pnorm(z1)
+1 - pnorm(z1)
+```
+
+```{r}
+1 - pnorm(2, mu.landfall, sd.landfall) #set mean = 1.7619, sd = 0.2654732
+```
+
+
+(b) In this case, the amount of time passing between successive hurricanes that hit landfall can be modeled by the Exponential distribution, where
+$$
+Y_{i} \sim Exponential\left(\beta = \frac{1}{\lambda} = \frac{1}{1.7619} \right) = 0.567869 \hspace{0.5in} \text{of a hurricane season (182 days)}
+$$
+
+Converting this to days, we obtain:
+
+$$
+\beta = \frac{1}{1.7619} = 0.567869 * 182 \: \text{days} = 103.352158 \approx 103.32 \:\: \text{days}
+$$
+
+The standard deviation of the Exponential distributino is $\beta = 103.32$.
+
+Therefore, the mean number of days passing between each landfall hitting hurricane in 25 randomly chosen landfall hurricanes is 
+$$
+\overline{Y} \sim Normal\left(\mu_{\overline{Y}} = 103.32, \sigma_{\overline{Y}} = \frac{130.32}{\sqrt{25}} = 26.064\right)
+$$
+
+or,
+
+```{r}
+mu.timetolandfall <- 130.32
+sd.timetolandfall <- 130.32/sqrt(25)
+#
+mu.timetolandfall
+sd.timetolandfall
+```
+
+To compute $P(20 < \overline{Y} > 30)$
+
+$$
+\begin{eqnarray}
+P(120 \leq \overline{Y} \leq 140) & = & P\left(\frac{120 - 130.32}{\frac{130.32}{\sqrt{25}}}   \leq \frac{\overline{Y} - \mu_{\overline{Y}}}{\sigma_{\overline{Y}}} \leq \frac{140 - 130.32}{\frac{130.32}{\sqrt{25}}}            \right) \\
+ & = & P(-0.9359 \leq Z \leq 0.3714) \\
+ & = & 0.2987562 \\
+ & \approx & 0.2988
+\end{eqnarray}
+$$
+```{r}
+z2 <- (120 - mu.timetolandfall)/sd.timetolandfall
+z3 <- (140 - mu.timetolandfall)/sd.timetolandfall
+#
+z2
+z3
+#
+pnorm(z3) - pnorm(z2)
+#OR
+pnorm(140, mu.timetolandfall, sd.timetolandfall) - pnorm(120, mu.timetolandfall, sd.timetolandfall)
+```
+
+(c) Refer to part (a), we wish to find $\overline{X}_{5}$:
+
+$$
+\begin{eqnarray}
+0.05 & = & P\left(\overline{X} \leq \overline{x}_{5}     \right) \\
+0.05   & = & P\left( Z \leq \frac{\overline{x}_{5} - \mu_{\overline{X}}}{\sigma_{\overline{X}}} \right) \\
+\end{eqnarray}
+$$
+Given that the 5th percentile of the *Standard Normal Distribution*, or $Z$, is $z_{0.05} = -1.6449 \approx -1.645$. 
+```{r}
+qnorm(0.05)
+```
+
+We set:
+
+$$
+-1.645 = \frac{\overline{x}_{5} - 1.7619}{\frac{1.7619}{\sqrt{25}}} \hspace{0.5in} \longrightarrow \hspace{0.5in} \overline{x}_{5} = 1.325196 \approx 1.325
+$$
+
+```{r}
+mu.landfall
+sd.landfall
+```
+
+```{r}
+qnorm(0.05, mu.landfall, sd.landfall)
+```
+
+----------------------
+
+# Playing With Data Exercise 1
+
+```{r}
+head(uselectiondata, 4)
+```
+
+(a) Consider the variable **Total.Population**. Take 1000 random samples of $n = 25$ counties. 
+
+Here is the code:
+
+```{r}
+countypop.df <- select(uselectiondata, Republicans.2016, Democrats.2016, Median.Earnings.2010, Total.Population)
+```
+
+```{r}
+head(countypop.df, 4)
+tail(countypop.df, 4)
+```
+
+```{r}
+Nsims <- 1000
+nsize <- 25
+mean.countpop <- numeric(Nsims)
+#
+for(i in 1:Nsims){
+  sdata <- sample(countypop.df$Total.Population, nsize, replace=FALSE)
+  mean.countpop[i] <- mean(sdata)
+}
+
+sim.df1 <- data.frame(mean.countpop)
+```
+
+
+```{r}
+head(sim.df1, 4)
+tail(sim.df1, 3)
+```
+```{r}
+favstats(~mean.countpop, data=sim.df1)
+```
+
+```{r}
+options(scipen=999)
+ggplot(sim.df1, aes(x = mean.countpop)) + geom_histogram(col="red", fill="blue", binwidth=10000) + xlab("Values of the Sample Mean") + ylab("Count") + ggtitle("Histogram: Distribution of Mean County Size (n = 25)")
+```
+
+(b) Repeat (a), using $n = 50$. 
+
+Using the same code:
+
+```{r}
+nsize <- 50 #change from 25 to 50
+mean.countpop2 <- numeric(Nsims)
+#
+for(i in 1:Nsims){
+  sdata <- sample(countypop.df$Total.Population, nsize, replace=FALSE)
+  mean.countpop2[i] <- mean(sdata)
+}
+
+sim.df2 <- data.frame(mean.countpop2)
+```
+
+```{r}
+head(sim.df2, 4)
+tail(sim.df2, 3)
+```
+```{r}
+favstats(~mean.countpop2, data=sim.df2)
+```
+
+```{r}
+options(scipen=999)
+ggplot(sim.df2, aes(x = mean.countpop2)) + geom_histogram(col="red", fill="blue", binwidth=10000) + xlab("Values of the Sample Mean") + ylab("Count") + ggtitle("Histogram: Distribution of Mean County Size (n = 50)")
+```
+
+(c) (Use $n = 50$ here...) If $\mu = 97074$ and $\sigma = 311065$, compute $P(150000 < \overline{X} < 200000)$
+
+**Answer:** The probability computation is an approximation..
+
+$$
+\begin{eqnarray}
+P(150000 < \overline{X} < 200000) & = & P\left(\frac{150000 - 97074}{\frac{311065}{\sqrt{50}}} < Z <  \frac{2000000 - 97074}{\frac{311065}{\sqrt{50}}}      \right) \\
+                                  & = & P(1.203 < Z < 2.339) \\
+                                  & = & 0.1048184 \\
+                                  & \approx & 0.1048
+\end{eqnarray}
+$$
+
+```{r}
+ave.countysize <- 97074
+sd.countysize <- 311065
+#
+sd.countysizen50 <- sd.countysize/sqrt(50)
+sd.countysizen50
+```
+
+```{r}
+z5 <- (150000 - ave.countysize)/sd.countysizen50
+z5
+z6 <- (200000 - ave.countysize)/sd.countysizen50
+z6
+#
+#
+pnorm(z6) - pnorm(z5)
+#OR
+pnorm(200000, ave.countysize, sd.countysizen50) - pnorm(150000, ave.countysize, sd.countysizen50)
+```
+
+(d) Find $\overline{X}_{10}$ for $n = 50$. 
+
+**Answer:**
+Theoretically,
+
+```{r}
+qnorm(0.10, ave.countysize, sd.countysizen50)
+```
+
+10% of the time, the mean/average of $n = 50$ randomly chosen counties will have an average size of at most 40697, or $\overline{X}_{10} = 40696.96$. 
+
+Alternatively, *this can be estimated from the simulation*:
+
+```{r}
+qdata(~mean.countpop2, c(0.10), data=sim.df2)
+```
+
+(e) Find $n$ when $P(|\overline{X} - \mu_{X}| \leq 20000) = 0.95$. 
+
+**Answer:**  some algebra will find that the minimum sample size is
+$$
+n \geq \frac{(Z*)^2\sigma^2}{e^2} \hspace{0.5in} \text{where Z* corresonds to the} \: P(Z \leq Z*) = 1 - \frac{0.05}{2} = 0.975
+$$
+```{r}
+qnorm(0.975)
+```
+
+and
+$Z* = 1.96$, $\sigma = 311065$
+
+$$
+n \geq \frac{(1.96)^2 311065^2}{20000^2} = 930
+$$
+```{r}
+ceiling(qnorm(0.975)^2 * (311065)^{2}/(20000^2))
+```
+
+-----------------------------------------------------------------------
+
+# Distribution of Sample Proportion
+
+## Time to Play 1
+
+In Roulette, you would expect to win the best of RED 
+$$
+\mu_{\widehat{p}} = p = \frac{18}{38} = 0.473684 \hspace{0.5in} \sigma_{\widehat{p}} = \sqrt{\frac{p(1 - p)}{n}} = \sqrt{\frac{\frac{18}{38}(1 - \frac{18}{38})}{100}} =  0.0499307 \approx 0.05
+$$
+
+These are computed below.
+
+```{r}
+mean.wins <- 18/38
+sd.wins <- sqrt(mean.wins*(1 - mean.wins)/100)
+#
+mean.wins
+sd.wins
+```
+
+Generate the distribution of the sample proportion $\widehat{p}$. 
+
+```{r}
+rbinom(1, 1, 18/38)
+```
+
+```{r}
+Nsim <- 1000
+n.games <- 100
+p.hats <- numeric(Nsim)
+for(i in 1:Nsim){
+  game.outcome <- numeric(n.games)
+  for(j in 1:n.games)
+  {
+    game.outcome[j] <- rbinom(1, 1, 18/38)
+  }
+  p.hats[i] = sum(game.outcome)/(n.games)
+}
+```
+
+```{r}
+sim.df3 <- data.frame(p.hats)
+```
+
+```{r}
+head(sim.df3, 4)
+tail(sim.df3, 3)
+```
+
+```{r}
+ggplot(sim.df3, aes(x = p.hats)) + geom_histogram(col="orange", fill="yellow", binwidth = 0.02) + xlab("Proportion of Games Won (out of 100)") + ylab("Count") + ggtitle("Histogram Showing Distribution of Sample Proportion (n = 100)") + geom_vline(xintercept = 0.60, col="red")
+```
+
+
+(b) Aaron's claim: $P(\widehat{p} > 0.60)$. Evaluate claim.
+
+$$
+\begin{eqnarray}
+P(\widehat{p} > 0.60) & = & P\left(Z > \frac{0.60 - 0.4737}{0.0499}   \right) \\
+                      & = & P(Z > 2.5298) \\
+                      & = & 0.00571
+\end{eqnarray}
+$$
+
+```{r}
+z4 <- (0.60 - mean.wins)/sd.wins
+z4
+#
+1 - pnorm(z4)
+#
+# Or
+1 - pnorm(0.60, mean.wins, sd.wins)
+```
+
+-----------------------------
+
+
+
+
+
+
+
+
+
+

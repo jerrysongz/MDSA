@@ -1,0 +1,9 @@
+Ground,Destination City,Departure City,Departure Times,Trip Name
+East Train,Calgary,Vancouver,0930,Western Canadian Adventure
+East Train,Calgary,Vancouver,1412,Western Canadian Adventure
+Scenic Bus,Banff,Calgary,0700,Mountain Excursion
+Scenic Bus,Banff,Calgary,0800,Mountain Excursion
+Scenic Bus,Banff,Calgary,0900,Mountain Excursion
+Scenic Bus,Banff,Calgary,1000,Mountain Excursion
+Scenic Bus,Banff,Calgary,1100,Mountain Excursion
+Quick Train,Banff,Calgary,1800,Mountain Excursion

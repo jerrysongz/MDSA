@@ -1,0 +1,362 @@
+---
+title: "Data 602 - In Class Notes for October 5"
+output: html_notebook
+---
+
+**Time to Play With Data 1 (Permutation Test)**
+
+Using the code provided in class:
+
+**(a)** The statistical hypothesis is that
+
+$$
+\begin{eqnarray}
+{\rm H}_{0}& : &\text{The differences between the two sample means are the result of randomness} \hspace{0.2in} \mu_{300mg} = \mu_{600mg}  \\
+{\rm H}_{A}& : & \text{The differences between the two sample means are NOT the result of randomness, but rather due to the difference in the dosage} \hspace{0.2in} \mu_{300mg} > \mu_{600mg}
+\end{eqnarray}
+$$
+If the 600 mg dose is more effective, than the 
+$$
+\mu_{300mg} > \mu_{600mg} \longrightarrow \mu_{300mg} - \mu_{600mg} > 0
+$$
+
+```{r}
+mg300 = c(284, 279, 289, 292, 287, 295,  285, 279, 306, 298)
+mg600 = c(298, 307, 297, 279, 291, 335, 299, 300, 306, 291)
+p24levels = c(mg300, mg600)
+treat = c(rep("300mg", 10), rep("600mg", 10))
+hivdata = data.frame(treat, p24levels)
+dim(hivdata)
+head(hivdata, 4)
+
+favstats(~ p24levels | treat, data=hivdata) #computes the various statistics broken down by dose
+```
+**(b)**
+
+```{r}
+p24diff = mean(~p24levels, data=filter(hivdata, treat=="300mg"))  - mean(~p24levels, data=filter(hivdata, treat=="600mg")) #computes diff in sample means, consistent with the difference in pop means
+p24diff  #mean(300mg) - mean(600mg)
+```
+
+The observed difference is $\overline{X}_{300mg} - \overline{X}_{600mg} = -10.9$
+
+**(c)**
+
+The code below generates 2000 permutation tests:
+
+```{r}
+nperms <- 2000
+perm.outcome <- numeric(nperms)
+mean.300mg <- numeric(nperms)
+mean.600mg <- numeric(nperms)
+for(i in 1:nperms){
+  index <- sample(1:20, 10, replace=FALSE)
+  mean.300mg[i] <- mean(hivdata$p24levels[index])
+  mean.600mg[i] <- mean(hivdata$p24levels[-index])
+  perm.outcome[i] <- mean.300mg[i] - mean.600mg[i]
+}
+```
+
+```{r}
+oct6.permutationtest1 <- data.frame(mean.300mg, mean.600mg, perm.outcome)
+```
+
+```{r}
+head(oct6.permutationtest1, 4)
+```
+
+```{r}
+ggplot(oct6.permutationtest1, aes(x = perm.outcome)) + geom_histogram(col="red", fill="blue", binwidth=2) + xlab("Difference between Mean(300mg) - Mean(600mg") + ylab("Count") + ggtitle("Outcome of 2000 Permutation Tests") + geom_vline(xintercept = p24diff, col="orange")
+```
+
+**(d)** What is the *empirical* $P$-value? It is **0.9815**.
+
+```{r}
+(sum(oct6.permutationtest1$perm.outcome >= p24diff))/2000
+```
+
+Now, if one were to test the idea that $\mu_{300mg} < \mu_{600mg}$, then the empirical $P$-value is
+
+```{r}
+(sum(oct6.permutationtest1$perm.outcome < p24diff))/2000
+```
+
+or $0.0185$
+
+-----------------------------------
+
+**Time to Play With Data 2:** Using previously encounted data....
+
+```{r}
+fibredata = read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/dieteffects.csv") #read the data from .csv into data frame
+head(fibredata, 4) #the first 4 rows
+tail(fibredata, 4)
+```
+Inquiry? Does caloric intake *decrease* for persons who have a high-fibre (hf) breakfase? 
+The statistical hypothesis is
+```{r}
+
+```
+
+$$
+{\rm H}_{0}: \mu_{CaloricIntake, hf} = \mu_{CaloricIntake, no\_hf} \equiv (\mu_{CaloricIntake, hf} - \mu_{CaloricIntake, no\_hf} = 0) \\
+{\rm H}_{A}: \mu_{CaloricIntake, hf} < \mu_{CaloricIntake, no\_hf} \equiv (\mu_{CaloricIntake, hf} - \mu_{CaloricIntake, no\_hf} < 0) \\
+$$
+```{r}
+t.test(~caloricintake|diet, alternative="less", data=fibredata)
+```
+```{r}
+pt(-2.0911, 122)
+```
+
+from this output,
+
+$$
+
+T_{Obs} = -2.0911 \hspace{0.5in} P-\text{value} = P(T_{122} < -2.0911) = 0.01929
+$$
+The null hypothesis is rejected in favour of the alternative hypothesis. We can conclude from this data that
+$$
+\mu_{CaloricIntake, hf} < \mu_{CaloricIntake, no\_hf}
+$$
+
+If the null hypothesis is true, there is a $0.01929$ probability of another data collection method will produce more condemning "numerical evidence" against the null hypothesis than the present data/sample. 
+
+----------------------
+
+**Time to Play With Data 3:**
+
+
+```{r}
+oct6ttp3.df = read.csv("http://people.ucalgary.ca/~jbstall/DataFiles/studentsurvey.csv")
+head(oct6ttp3.df, 4)
+
+fees <- select(oct6ttp3.df, Gender, DiffFees)  # 0 - male, 1 - female; 0 - do not support, 1 - support
+head(fees, 4) 
+```
+
+```{r}
+table(fees$Gender, fees$DiffFees)
+#Or
+tally(~Gender + DiffFees, margins=TRUE, data=oct6ttp3.df) #margins = TRUE provides the categorical variable names 
+```
+Gender is the rows, support differential tuition fees are the columns..
+
+From which there were $n_{m} = 51$ and $X_{m} = 29$; $n_{F} = 58$ and $X_{F} = 32$
+
+The statistical hypothesis to be tested is
+
+$$
+{\rm H}_{0}: p_{M} = p_{F} \longrightarrow p_{m} - p_{f} = 0 \hspace{0.1in} \text{the proportions are the same, indicating there is no relationship between sex and one's view on differential fees}  \\
+{\rm H}_{A}: p_{M} \ne p_{F} \longrightarrow p_{m} - p_{f} \ne 0 \hspace{0.1in} \text{the proportions are NOT the same, indicating there IS relationship between sex and one's view on differential fees}  \\
+$$
+To compute the value of the test statistic, I am going to use `prop.test`
+
+```{r}
+prop.test(c(29, 26), c(51, 58), alternative="two.sided", correct=FALSE)
+```
+```{r}
+sqrt(1.5724)
+```
+from which
+$$
+Z_{Obs} = \pm \sqrt{\chi^{2}_{Obs}} = + \sqrt{1.5724} = +1.253954 
+$$
+$P$-value = $P(Z > Z_{Obs})*2$.
+
+```{r}
+(1 - pnorm(1.253954))*2
+```
+and
+
+$$
+P-\text{value} = 0.20986 \approx 0.2099
+$$
+
+---------------------------
+
+**Time to Play With Data A:**
+
+**(a)**
+
+```{r}
+oct6ttp1.df <- read.csv("https://people.ucalgary.ca//~jbstall//DataFiles//baseball.csv")
+```
+
+```{r}
+oct6ttp1.df = oct6ttp1.df %>%
+  mutate(winpct = wins/(wins + losses))
+```
+
+```{r}
+head(oct6ttp1.df, 4)
+tail(oct6ttp1.df, 4)
+```
+The scatterplot of the two variables **winpct** and average home **attendance** is provided below, where **attendance** is the total season attendance @ home games for a MLB team.  
+
+```{r}
+options(scipen=999)
+ggplot(oct6ttp1.df, aes(x = winpct, y = attendance)) + geom_point(col="blue", size=1, position = "jitter") + xlab("Winning Percentage") + ylab("Season Attendance at Home Games") + ggtitle("Plot: Winning % to Home Attendance") + geom_smooth(method="lm", col="red")
+```
+
+```{r}
+favstats(~attendance, data=oct6ttp1.df)
+favstats(~winpct, data=oct6ttp1.df)
+```
+
+**(b)**
+The correlation coefficient is computed with
+
+```{r}
+cor(~winpct, ~attendance, data=oct6ttp1.df)
+```
+and
+$$
+r = 0.436598 \approx 0.4366
+$$
+
+Note how the sign on $r$ is positive? And note the "numerical value" of $r$.....
+
+---------------------------------
+
+**Time to Play With Data B:**
+
+**(a)**
+Estimate the least squares line that estimates the model
+$$
+SeasonAttendance_{i} = A + B*WinPct_{i} + e_{i}
+$$
+
+Using the `lm` command:
+
+```{r}
+predict.seasonattendance <- lm(attendance ~ winpct, data = oct6ttp1.df)
+```
+
+```{r}
+predict.seasonattendance$coef
+```
+from which the estimate of the above model is:
+
+$$
+\widehat{SeasonAttendance}_{i} = -612607.7 + (4782137.1*WinPct_{i}) \hspace{0.5in} \text{(Note: There is no}\:\: e_{i} \:\:\text{term on the estimate of the model)}
+$$
+**Interpretation of b, estimate of B:** As the winning percentage increases by 1 unit, in this case a full 1.0 (1000%), then the season home attendance will increase by an *average* of 4782137 persons. Scaling this back, we can say that as the winning percentage increases by 0.01 (ie, 0.605 is 60.5% winning percentage), then
+$$
+\frac{4782137.1}{100} = 47821.371
+$$
+In other words, as a baseball team's winning percentage increases by 1% (or 0.01), the home attendance over the course of the sesason will **increase by an average/mean** of 47821.37, or approximatley 47821 persons. 
+
+**(b)** Winning percentage of **winpct = 0.405**?
+
+$$
+\begin{eqnarray}
+\widehat{SeasonAttendance}_{i} & = & -612607.7 + (4782137.1*0.405) \\
+                               & = & 1324158 \:\: \text{persons/fans}
+\end{eqnarray}
+$$
+```{r}
+-612607.7 + (4782137.1*0.405)
+```
+
+This can be done with the `predict` command:
+
+```{r}
+predict(predict.seasonattendance, data.frame(winpct=0.405))
+```
+
+Meaning? Consider all MLB baseball teams that have a winning percentage of 0.405: The mean/average home attendance for such baseball teams is 1324158 persons/fans in a season. 
+
+Consider **winpct = 0.608?
+
+```{r}
+predict(predict.seasonattendance, data.frame(winpct=0.608))
+```
+
+$$
+\widehat{SeasonAttendance}_{i} = 2294932 \:\:\text{persons/fans}
+$$
+-------------------
+
+**Time to Play With Data C:**
+
+Check the conditions of the model.
+
+
+In this instance, I am going create a data frame called **ttpdiagnostic.df**:
+
+```{r}
+attendance.fits <- predict.seasonattendance$fitted.values #assigns predicted values to one vector
+attendance.values <- oct6ttp1.df$attendance #assigns observed values of y to another vector
+attendance.residuals <- predict.seasonattendance$residuals #assigns residuals to another vectdor
+```
+
+
+```{r}
+ttpdiagnostic.df <- data.frame(attendance.fits, attendance.values, attendance.residuals)
+```
+
+```{r}
+ttpdiagnostic.df
+```
+
+**(a)** A Normal probability plot of the residuals
+
+```{r}
+ggplot(ttpdiagnostic.df, aes(sample = attendance.residuals)) + stat_qq(col="blue", size = 1) + stat_qqline(col="red") + ggtitle("Normal Probability Plot of Residuals/Error Terms")
+```
+This checks the condition of *normalcy* in the residuals - AKA, the $y$-variable home season attendance fluctuates from one team to the next in accordance with a Normal distribution.
+
+**(b)**
+
+A residual plot:
+
+```{r}
+ggplot(ttpdiagnostic.df, aes(x = attendance.fits, y = attendance.residuals)) + geom_point(col="blue", size=1) + xlab("Predicted Values of Home Attendance in a Season") + ylab("Residuals") + ggtitle("Residual Plot") + geom_hline(yintercept=0, col="red", linetype="dashed")
+```
+
+**Time to Play With Data D:**
+
+1. Compute the value of $S_{e}$, which is used to estimate the common standard deviation $\sigma$ in the $y$-variable (home season attendance), regardless of the value of the $x$-variable (winning percentage)
+
+```{r}
+sum(ttpdiagnostic.df$attendance.residuals^2)
+sqrt(sum(ttpdiagnostic.df$attendance.residuals^2)/(838 - 2))  #note, n = 838
+```
+
+from which
+
+$$
+S_{e} = \sqrt{\frac{SSE}{n - 2}} = \sqrt{\frac{ 387058460537948}{838 - 2}} = 680432.6
+$$
+Alternatively, this can be obtained with the `aov` function
+
+```{r}
+aov(predict.seasonattendance)
+```
+
+from which
+$$
+SSR = 91156224715423 \hspace{0.5in} \text{and} \hspace{0.5in} SSE = 387058460537948 \hspace{0.5in} S_{e} = 680432.6
+$$
+
+The coefficient of determination $r^{2}$ is
+
+```{r}
+rsquared(predict.seasonattendance)
+```
+and
+$$
+r^{2} = \frac{91156224715423}{91156224715423 + 387058460537948} = 0.1906178
+$$
+
+19.06% of the variation in the season attendance can be explained by its linear relationship with/dependency on the MLB team's winning percentage. 
+
+---------------------------
+
+
+
+
+
+
+

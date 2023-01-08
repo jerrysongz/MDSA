@@ -1,0 +1,723 @@
+---
+title: 'Data 603: Statistical Modelling with Data'
+fontsize: 14pt
+header-includes:
+- \usepackage{fontspec}
+- \usepackage{setspace}
+- \doublespacing
+- \usepackage[margin=0.25in]{geometry}
+output: html_notebook
+---
+
+```{r, setup, include=T}
+# If you want to change the working directory for all code chunks, 
+# you may set it via a setup code chunk in the beginning of your document:
+knitr::opts_knit$set(root.dir = 
+"c:/Users/thunt/OneDrive - University of Calgary/dataset603/")
+```
+
+
+
+## Part1: Introduction to Experimental Design 
+
+&copy; Thuntida Ngamkham 2022
+
+## What Is Experimentation?
+
+Experimentation is part of everyday life. Will leaving 30 minutes earlier than usual in the morning make it easier to find a legal parking space at work? How about 20 minutes earlier? Or only 10 minutes earlier? Can I increase my gas mileage by using synthetic oil? Will my  employees make more of an effort to be on time if I make it a practice to stop by their office to chat at the start of the day? Will a
+chemical reaction be faster if the amount of a specific reagent is increased threefold? How about if the temperature is increased by 10 degree celcius? Will the yield increase if an extraction is carried for 40 minutes instead of 20 minutes?
+
+We're frequently interested to learn if and how a measure of performance is influenced by our manipulation of the factors that might affect that measure. Usually we undertake these activities in an informal manner, typically not even thinking of them as experimentation, and the stakes are such that an informal, unstructured approach is quite appropriate. Not surprisingly, as the consequences grow, if the performance improvement means a substantial increase in profitability, or the running of the experiment involves a significant expenditure of time and resources, the adoption of a more structured experimental approach becomes more important. In a research setting, __experimentation is a tool to identify the effect of a factor (with statistical significance) on a response__. On the other hand, the purpose of experimentation in an industrial context is often to obtain the maximum amount of information about different factors that can affect a process with the fewest number of observations possible.
+
+We learned that a regression analysis of observational data has some limitations. In particular, establishing a cause-and-effect relationship between an independent variable $X$ and the response $y$ is difficult since the values of other relevant independent variables-both those in the model and those omitted from the model-are not controlled. 
+
+## Experimental Design Terminology
+
+The study of experimental design is `originated with R. A. Fisher in the early 1900s in England. During these early years, it was associated solely with agricultural experimentation. The need for experimental design in agriculture was very clear: different fertilizer blends were applied to a crop in an effort to find the particular blend that maximized crop yield. Similar motivations led to its subsequent acceptance and wide use in all fields of scientific experimentation. 
+
+The terminology associated with experimental design clearly indicates its early association with the biological sciences. We will call the process of collecting sample data __an experiment__ and the (dependent) variable to be measured, the response $y$. The planning of the sampling procedure is called __the design of the experiment__. The object upon which the response measurement $y$ is taken is called __an experimental unit__.
+
+
+*Definition 1*:  The process of collecting sample data is called __an experiment__.
+
+*Definition 2*:  The plan for collecting the sample is called __the design of the experiment.__
+
+*Definition 3*:  The variable measured in the experiment is called __the response variable.__
+
+*Definition 4*:  The object upon which the response y is measured is called __an experimental unit.__
+
+*Definition 5*:  The independent variables, quantitative or qualitative, that are related to a response variable $y$ are called __factors.__
+
+*Definition 6*:  The intensity setting of a factor (i.e., the value assumed by a factor in an experiment) is called __a level.__
+
+*Definition 7*:  __A treatment__ is a particular combination of levels of the factors involved in an experiment.
+
+
+The three important concepts of Design of Experiment (DOE) are
+
+(I) Randomization
+
+(II) Replication
+
+(III) Blocking
+
+## The Six Steps of Experimental Design
+One can frame the experimental-design process as a six-step process, as following
+
+1. Plan the experiment.
+
+2. Design the experiment.
+
+3. Perform the experiment.
+
+4. Analyze the data from the experiment.
+
+5. Confirm the results of the experiment.
+
+6. Evaluate the conclusions of the experiment
+
+
+## Completely Randomized Designs (The CRD Model )
+
+## The Statistical Model
+
+Let $Y_{ij}$ denote the $j^{th}$ experimental unit for the $i^{th}$ treatment, with $j=1,2,3,...,r$ and $i=1,2,3,...c$. We assume that the number of observations for each treatment is the same as for any other treatment. The model for a complete randomized design with a single factor can be written as
+
+$$
+\begin {aligned}
+Y_{ij}&=\mu_i+\epsilon_{ij}\\
+j&=1,2,3,...r\\
+i&=1,2,3,...c
+\end{aligned}
+$$
+
+where $\epsilon_{ij}$ is random error with mean 0 and variance $\sigma^2$.  This model is known as the **means model**. The more general and useful mathematical model for CRD is
+
+$$
+\begin {aligned}
+Y_{ij}&=\mu+\tau_i+\epsilon_{ij}\\
+where\\
+j&=1,2,3,...r\\
+i&=1,2,3,...c\\
+\mu&=\mbox{overall average (mean)}\\
+  \tau_i&=\mbox{a reflection of the effect due to the treatment i}
+\end{aligned}
+$$
+The CRD model in this form is known as __the effects model__. The effects model is more feasible from a practical point of view. In this form, the mean $\mu$ is a parameter common to all treatments. This parameter is also known as the baseline or control treatment. The parameter values $\tau_i$ are a reflection of the effect due to the treatment $i$. The error component, or the noise factor, $\epsilon_{ij}$ are noise factors associated with treatment $i$ and experimental unit $j$. We will assume that the errors are iid as N(0,$\sigma^2$)
+
+In both models each treatment receives an equal number of experimental units, that is, each treatment $i$ receives $r$ number of units. These kinds of models are called *balanced designs*. In practical set ups, it may not be feasible to allocate equal numbers of units, and we allow the $i^{th}$ treatment of $r_i,i = 1,2,...,c$ number of units. In this case, the model is called __the unbalanced design__. The inferential aspects of balanced or unbalanced models do not vary drastically from each other, at least for the CRD model.
+
+## Inference for the CRD Models
+
+![Typical Data for a single-factor Experiment](c:/Users/thunt/OneDrive - University of Calgary/dataset603/typicaldata.png)
+
+__For example__
+
+Assume that an experiment is performed involving 120 patients. The objective of the experiment is to test a blood pressure medication against a purported placebo, but the placebo is actually garlic, suitably disguised. Sixty patients are randomly assigned to the medication, with the other 60 patients assigned to the placebo. The study is double blinded so that the investigators do not know the patient-medication/placebo assignment, and of course the patients don't know this either. The correct assignment is known only by the person who numbered the bottles, with this information later used to properly guide the computer analysis. "P" denoting the placebo and "M" denoting the medication, the results are given in  __bloodpressure.csv__ data file. 
+
+![Data for blood pressure experiment](c:/Users/thunt/OneDrive - University of Calgary/dataset603/crd.png)
+
+A few standard notations and the composition of the total sum of squares are as following;
+
+The $i^{th}$ treatment sample sum (resp. mean), denoted by $y_{i.}(resp.\ \bar{y}_{i.})$ are defined by
+
+$$
+\begin {aligned}
+y_{i.}=\sum_{j=1}^{r}y_{ij}\\
+\bar{y}_{i.}=\frac{y_{i.}}{r}
+\end{aligned}
+$$
+
+The $i^{th}$ total sample sum (mean), denoted by $y_{..}(resp.\ \bar{y_{..}})$ are defined by
+$$
+\begin {aligned}
+y_{..}=\sum_{i=1}^{c}y_{i.}\\
+\bar{y}_{..}=\frac{y_{..}}{rc}
+\end{aligned}
+$$
+
+__The total (corrected) sum of squares__, denoted by __SST__, as
+
+$$
+\begin {aligned}
+SST=\sum_{i=1}^{c}\sum_{j=1}^{r}(y_{ij}-\bar{y}_{..})^2.
+\end{aligned}
+$$
+
+The ANOVA technique partitions the SST as the sum of two components 
+
+(I) the sum of squares due to treatments SSTr, and
+
+(II) the sum of squares due to error SSE
+
+Here, SSTr and SSE  are defined respectively by 
+$$
+\begin {aligned}
+SSTr&=r\sum_{i=1}^{c}(\bar{y}_{i.}-\bar{y}_{..})^2,\\
+SSE&=\sum_{i=1}^{c}\sum_{j=1}^{r}(y_{ij}-\bar{y}_{i.})^2.\\
+SST&=SSTr+SSE
+\end{aligned}
+$$
+Define
+$$
+\begin {aligned}
+S^2_i&=\frac{\sum_{j=1}^{r}(y_{ij}-\bar{y}_{i.})^2}{r-1}\\
+i&=1,2,...,c\\
+&\mbox{That is, }S^2_i\mbox{ is the sampling variance of the $i$-th treatment.}\\
+&\mbox{We can pool these $c$ sampling variances and obtain the following:}\\
+MSE&=\frac{(r-1)S_1^2+(r-1)S_2^2+(r-1)S_3^2+...+(r-1)S_c^2}{(r-1)+...(r-1)}=\frac{SSE}{N-c}
+\end{aligned}
+$$
+
+
+where 
+
+$MSE$ denotes the mean error sum of squares, and $N=rc$. Note that $S^2_i$ is an estimator of the variance $\sigma^2$  for the $i$-th treatment.
+
+
+$$
+\begin {aligned}
+MSTr&=\frac{SSTr}{c-1}
+\end{aligned}
+$$
+MSTr denotes the mean treatment sum of squares
+
+## The Analysis of (the) Variance (ANOVA)
+
+![The Anova Table for CRD](c:/Users/thunt/OneDrive - University of Calgary/dataset603/ANOVA.png)
+
+## Forming the F Statistic: Logic and Derivation
+
+We are interested in testing the quality of the $c$ treatment means; that is 
+$$
+\begin {aligned}
+H_o:&\mu_1=\mu_2=\mu_3=...=\mu_c\\
+H_a:&\mbox{ at least one }\mu_i \mbox{ is different } i=1,2,3,...,c
+\end{aligned}
+$$
+
+Note that if $H_0$ is true, all treatments have a common mean $\mu$. An equivalent way to write to the above hypotheses is in terms of the treatment effect $\tau_i$, say
+$$
+\begin {aligned}
+H_o:&\tau_1=\tau_2=\tau_3=...=\tau_c=0\\
+H_a:&\tau_i\neq 0\mbox{ for at least one i  } i=1,2,3,...,c
+\end{aligned}
+$$
+Thus, we may speak of testing the equality of treatment means or testing that the treatment effects (the $\tau_i=0$) are zero. The appropriate procedure for testing the equality of $c$ treatment means is the analysis of variance.
+
+### Statistical Analysis
+
+Now we investigate how a formal test of the hypothesis of no difference in treatment means can be performed. Under the assumption that the error $\epsilon_{ij}$ are normally and independently distributed with mean = 0 and variance $\sigma^2$. Therefore, if the null hypothesis of no difference in treatment means is true, the ratio 
+$$
+\begin {aligned}
+F=\frac{MSTr}{MSE}
+\end{aligned}
+$$
+
+is distributed as $F$ (Fisher) with $c-1$ and $N-c$ degrees of freedom. It is the test statistic for the hypothesis of no differences in treatment means.
+
+We reject $H_0$ and conclude that there are differences in the treatment means if  $F>F_{\alpha,c-1,N-c}$ Alternatively we could use the p-value approach for decision making.
+
+__Example for one factor, Two levels:__ Assume that an experiment is performed involving 120 patients. The objective of the experiment is to test a blood pressure medication against a purported placebo, but the placebo is actually garlic, suitably disguised. Sixty patients are randomly assigned to the medication, with the other 60 patients assigned to the placebo. The study is double blinded so that the investigators do not know the patient-medication/placebo assignment,and of course the patients don't know this either. The correct assignment is known only by the person who numbered the bottles, with this information later used to properly guide the computer analysis. "P" denoting the placebo and "M" denoting the medication, the results are givenin  __bloodpressure.csv__ data file. Test if there were differences in the average blood pressure between  a blood pressure medication against a purported placebo.
+
+```{r}
+bloodpressure=read.csv("bloodpressure.csv")
+str(bloodpressure) #Read your data set and double check that dependent and independent variables are correctly read by R
+CRD<-aov(bloodpressure~treatment, data=bloodpressure) #Perform ANOVA for CRD
+summary(CRD)
+boxplot(bloodpressure~treatment, data=bloodpressure, main="Boxplot diagram for the different Levels") #a visual comparison of the data obtained at the different levels
+```
+
+From the blood pressure example, we test 
+$$
+\begin {aligned}
+H_o:&\mu_1=\mu_2\\
+H_a:&\mu_1\neq \mu_2
+\end{aligned}
+$$
+An equivalent way to write to the above hypotheses is in term of the treatment effect $\tau_i$, say
+$$
+\begin {aligned}
+H_o:&\tau_1=\tau_2=0\\
+H_a:&\tau_i\neq 0\mbox{ for at least one $i$,  } i=1,2
+\end{aligned}
+$$
+
+
+The output provide the Anova table as following,
+![The Anova Table for the blood pressure example](c:/Users/thunt/OneDrive - University of Calgary/dataset603/examplecrd.png)
+
+From the Anova table, it can be seen that the Fcal=16.19 with the p-value =0.000102 < $\alpha=0.05$, so we reject the null hypothesis. Therefore, there is sufficient evidence to indicate that the average blood pressure between a blood pressure medication against a purported placebo are different at $\alpha=0.05$.
+
+
+Note! One of the most common tests in statistics, the t-test, is used to determine whether the means of two groups are equal to each other. We also could use this test as well.
+
+```{r}
+bloodpressure=read.csv("bloodpressure.csv", header=TRUE)
+t.test(bloodpressure~treatment, data = bloodpressure,var.equal = T) 
+```
+
+__Example for one factor, more than two levels:__ The Merrimack Valley Pediatric Clinic (MVPC) conducted a customer satisfaction study at its four locations: Amesbury, Andover, and Methuen in Massachusetts, and Salem in southern New Hampshire. A series of questions were asked, and a respondent's "overall level of satisfaction" (using MVPC's terminology) was computed by adding together the numerical responses to the various questions. The response to each question was 1, 2, 3, 4, or 5, corresponding to, respectively, "very unsatisfied," "moderately unsatisfied," "neither unsatisfied nor satisfied," "moderately satisfied," and "very satisfied." In our discussion, we ignore the possibility that responses can be treated as an interval scale.
+
+There were 16 questions with the possibility of a 5-rating on each, so the minimum score total was 16 and the maximum score total was 80. (For proprietary reasons, we cannot provide the specific questions.) Marion Earle, MVPC's medical director, wanted to know (among other things) if there were differences in the average level of satisfaction among customers in the four locations. Data from a random sample of 30 responders from each of the four locations are provided in __MVPC data file__
+
+
+```{r}
+MVPC=read.csv("MVPC.csv", header=TRUE)
+str(MVPC)#Read your data set and double check that dependent and indepent variables are correctly read by R
+CRD<-aov(Score~Treatment, data=MVPC) #Perform ANOVA for CRD
+boxplot(Score~Treatment, data=MVPC, main="Boxplot diagram for the different Levels") #a visual comparison of the data obtained at the different levels
+summary(CRD)
+```
+
+As it can be seen in the output that the $F$ value is quite large (205.3) with a p-value (called "Prob > F") <2e-16, indicating that at any practical significance level, we reject the hypothesis that there is no difference among mean satisfaction levels for the four locations, in favor of there being differences among them.
+
+## Inclass Practice Problem 23
+
+Suppose that we wish to inquire how the mean lifetime of a certain manufacturer's AA-cell battery under constant use is affected by the specific device in which it is used. It is well known that batteries of different devices have different mean lifetimes that depend on how the battery is used - constantly, intermittently with certain patterns of usage. The results of battery lifetime testing are necessary to convince a TV network to run an advertisement that claims superiority of one device over another. The testing is traditionally carried out by an independent testing agency, and the data are analyzed by an independent consultant. Suppose that we choose a production run of AA high-current-drain alkaline batteries and put to each of eight test devices; all test devices have the same nominal load impedance. Our dependent variable (yield, response, quality indicator), Y, is lifetime of the battery, measured in hours. Data __lifetime.csv file__ from a random sample of 24 responders from each of the 8 brands are provided.
+
+![Sample data for battery lifetime example](c:/Users/thunt/OneDrive - University of Calgary/dataset603/lifetimecrd.png)
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+----------------------------------------------------------------
+
+## Estimation of the Model Parameters
+We now present estimators for the parameters in the single-factor model and confidence intervals on treatment means
+$$
+\begin {aligned}
+y_{ij}&=\mu_i+\epsilon_{ij}\\
+y_{ij}&=\mu+\tau_i+\epsilon_{ij}\\
+\end{aligned}
+$$
+
+and confidence intervals on treatment means. A point estimator of $\mu_i$ would be
+$$
+\begin {aligned}
+\hat{\mu_i}=\hat{\mu}+\hat{\tau_i}=\bar{y}_{i.}
+\end{aligned}
+$$
+
+
+Therefore, a 100(1-$\alpha$)% confidence interval on the $i^{th}$ treatment mean $\mu_i$ is
+$$
+\begin {aligned}
+\bar{y}_{i.}\pm t_{\alpha/2,N-c} \sqrt{MSE/r}
+\end{aligned}
+$$
+
+
+Assume that we wish to compute the confidence interval for batteries used on device6
+
+```{r}
+lifetime=read.csv("lifetime.csv", header=TRUE)
+CRD<-aov(hrs~device, data=lifetime) #Perform ANOVA for CRD
+summary(CRD)
+ybar<-mean(lifetime$hrs[lifetime$device == "device6"])
+tcrit<-qt(0.025,CRD$df.residual, lower.tail = F) 
+MSE<-sum((CRD$residuals)^2/CRD$df.residual)  #CRD$df.residual=24-8=16
+r<-length(lifetime$hrs[lifetime$device == "device6"])
+#construct a 95% CI
+LowerCI<-ybar-tcrit*sqrt(MSE/r)
+UpperCI<-ybar+tcrit*sqrt(MSE/r)
+CI<-cbind(LowerCI,UpperCI)
+print(CI)
+```
+
+
+Therefore, a 95% confidence interval for a mean life time of device6 is between 2.508551 hours to 6.691449 hours.
+
+## Inclass Practice Problem 24
+
+From the Merrimack Valley Pediatric Clinic (MVPC), construct a 99% confidence Interval on the average customer satisfaction at Amesbury.
+
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+
+-----------------------------------------------------------------
+
+## Inclass Practice Problem 25
+
+A state securities laws was wondering  whether five brokers have a difference average on stock price (hundreds dollars). The Data __brokerstudy.csv__ from a random sample of 30 observations from each of the 5 brokers are provided. Based on the data, formally test a claim that average prices are the same for all brokers at $\alpha$=0.05. 
+
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+
+-----------------------------------------------------------------
+
+## Multiple-Comparison Testing
+
+So far, we have seen a couple of statistical tests which can indicate if a factor has an impact on the response or not, and which would make us reject or accept $H_0$ however, they do not show how the means differ, if, indeed, they do differ. In this section, we will discuss the multiple-comparison testing. We then present several procedures which can be used for multiple comparison of means, such as pair t test, Fisher's Least Significant Difference (LSD) test, Tukey's HSD test, the Newman-Keuls test, and Dunnett's test. Finally, we discuss the Scheffe test as a post hoc study for multiple comparisons.
+
+
+Having learned that the device in which the AA-cell battery is used affects the battery's average lifetime, for example, we would likely want to know more details. Is it a case of all eight devices simply having different average battery lifetimes? 
+
+## Pairwise Comparisons
+Several multiple-comparison tests have as their basic procedure the comparison of all pairs of column means. Pairwise comparison tests are likely the most frequently used type of multiple-comparison tests.
+
+For a variety of reasons, not necessarily identical for each test discussed, all of these tests should be used only when the original F-test has indicated the rejection of $H_0$. Indeed, one can reasonably argue that if the original F-test indicates that we cannot reject equality of all of the column means, what more is there to explore?
+
+## Pairwise tests of mean differences
+
+The paired t-test is commonly used. It compares the means of two populations  by testing if the difference between pairs is statistically different from zero. 
+
+## Unadjusted Paired t tests
+
+Example: A state securities laws was wondering  whether five brokers have a difference average on stock price ($hundreds). The Data __brokerstudy.csv__ from a random sample of 30 observations from each of the 5 brokers are provided. 
+
+```{r}
+brokerstudy=read.csv("brokerstudy.csv", header=TRUE)
+str(brokerstudy)
+CRD<-aov(price~broker, data=brokerstudy) #Perform ANOVA for CRD
+summary(CRD)
+pairwise.t.test(brokerstudy$price,brokerstudy$broker, p.adj = "none")
+```
+
+*R function*
+
+*pairwise.t.test(y,x, p.adj = "none"): is used to compare the means between two related groups of samples*
+
+*Note!*
+
+*p.adjust 	:Adjust P-values for Multiple Comparisons . it returns p-values adjusted using one of several methods.*
+
+Using p.adj = "none" in the pairwise.t.test() function makes no correction for the Type I error rate across the pairwise tests. The problem when you do a multiple comparisons you inflate this Type I error. For example, if you have 3 means (A, B and C) and you want to make all possible piarwise comparisons i.e. A vs B, A vs C, and B vs C (i.e. 3 comparisons), then the total type I error will be 0.05*3 = 0.15. Therefore, some post-hoc tests come with a solution to this problem by making some adjustments for p-values.
+
+
+## Adjust Pair t test
+
+__1. Bonferroni Adjustment__
+
+The Bonferroni adjustment simply divides the Type I error rate (.05) by the number of tests. For example, if we compare 3 tests, the p-value is tested at the .05/3 level. Hence, this method is often considered overly conservative. The Bonferroni adjustment can be made using p.adj = "bonferroni" in the pairwise.t.test() function.
+
+```{r}
+brokerstudy=read.csv("brokerstudy.csv", header=TRUE)
+str(brokerstudy)
+CRD<-aov(price~broker, data=brokerstudy) #Perform ANOVA for CRD
+summary(CRD)
+pairwise.t.test(brokerstudy$price,brokerstudy$broker, p.adj = "bonferroni")
+#pvalue (brok 1 vs brok 2)=0.03863* 10 number of comparisons=0.38630.
+```
+
+__2. Holm Adjustment__
+
+The Holm adjustment sequentially compares the lowest p-value with a Type I error rate that is reduced for each consecutive test. For example, if we compare 3 tests, the  smallest p-value is tested at the .05/3 level (.017), the second smallest at the .05/2 level (.025), and third at the .05/1 level (.05). This method is generally considered superior to the Bonferroni adjustment and can be employed using p.adj = "holm" in the pairwise.t.test() function.
+
+
+```{r}
+brokerstudy=read.csv("brokerstudy.csv", header=TRUE)
+str(brokerstudy)
+CRD<-aov(price~broker, data=brokerstudy) #Perform ANOVA for CRD
+summary(CRD)
+pairwise.t.test(brokerstudy$price,brokerstudy$broker, p.adj = "holm")
+#the smallest p-value (brok 3 vs brok 5) was 9.9e-05*10=0.00099
+```
+
+## Inclass Practice Problem 26
+
+From the MVPC experiment, compare the average level of satisfaction among customers in the four locations by using pairwise comparison t test.
+
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR
+---------------------------------------------------------
+
+## Inclass Practice Problem 27
+
+From the lifetime of AA battery experiment, compare the average life times for 8 devices by using pairwise comparison t test.
+
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR
+-----------------------------------------------------------
+
+## Fisher's Least Significant Difference Test
+
+This procedure was devised by R. A. Fisher and called Fisher's least significant difference (LSD) test, essentially involves performing a series of pairwise t-tests, each with a specified value of $\alpha$.
+
+Recall that in any hypothesis test, we establish an acceptance region for $H_0$ and accept $H_0$ if the appropriate test statistic falls within that region. If it falls in the critical region, we reject $H_0$. Here, for each pair of columns, $i$ and $j$, the test statistic is the difference between the column means, ($\bar{y}_i-\bar{y}_j$). If this difference is small, we conclude that the true means are equal (that is, their true difference is really zero, $\mu_i=\mu_j$, and any difference in the observed column means is just that due to statistical fluctuation). If the difference is not small, we conclude that the two levels of the factor being tested produce different true means
+
+To find a confidence interval for the difference between two of the column means, we use
+
+$$
+\begin {aligned}
+&\bar{y}_i-\bar{y}_j \pm t_{\alpha/2,rc-c}\sqrt{MSE}\sqrt{\frac{1}{r_i}+\frac{1}{r_j}}\\
+where\\
+&t_{\alpha/2,rc-c}\sqrt{MSE}\sqrt{\frac{1}{r_i}+\frac{1}{r_j}}\mbox{ is called Fisher's least significant difference (LSD)}\\
+\end{aligned}
+$$
+
+
+
+With the same number of data points, r, in each column, the LSD formula reduces to 
+$$
+\begin {aligned}
+LSD=&t_{\alpha/2,rc-c}\sqrt{\frac{2MSE}{r}}
+\end{aligned}
+$$
+
+
+```{r}
+brokerstudy=read.csv("brokerstudy.csv", header=TRUE)
+str(brokerstudy)#Read your data set and double check that dependent and indepent variables are correctly read by R
+CRD<-aov(price~broker, data=brokerstudy) #Perform ANOVA for CRD
+summary(CRD)
+#example for constructing the difference in two means for broker1&3
+ybar1<-mean(brokerstudy$price[brokerstudy$broker == "broker1"])
+ybar3<-mean(brokerstudy$price[brokerstudy$broker == "broker3"])
+tvalue<-qt(0.025,CRD$df.residual, lower.tail = F) 
+MSE<-sum((CRD$residuals)^2/CRD$df.residual)
+r<-length(brokerstudy$price[brokerstudy$broker == "broker1"])
+LSD<-tvalue*sqrt((2*MSE)/r)
+LowerCI<-(ybar1-ybar3)-LSD#construct a 95% Lower CI
+UpperCI<-(ybar1-ybar3)+LSD#construct a 95% Lower CI
+CI<-cbind(LowerCI,UpperCI)
+print(CI)
+
+#example for constructing the difference in two means for broker1&2
+ybar1<-mean(brokerstudy$price[brokerstudy$broker == "broker1"])
+ybar2<-mean(brokerstudy$price[brokerstudy$broker == "broker2"])
+tvalue<-qt(0.025,CRD$df.residual, lower.tail = F) 
+MSE<-sum((CRD$residuals)^2/CRD$df.residual)
+r<-length(brokerstudy$price[brokerstudy$broker == "broker1"])
+LSD<-tvalue*sqrt((2*MSE)/r)
+LowerCI<-(ybar1-ybar2)-LSD#construct a 95% Lower CI
+UpperCI<-(ybar1-ybar2)+LSD#construct a 95% Lower CI
+CI<-cbind(LowerCI,UpperCI)
+print(CI)
+
+#example for constructing the difference in two means for broker2&5
+ybar2<-mean(brokerstudy$price[brokerstudy$broker == "broker2"])
+ybar5<-mean(brokerstudy$price[brokerstudy$broker == "broker5"])
+tvalue<-qt(0.025,CRD$df.residual, lower.tail = F) 
+MSE<-sum((CRD$residuals)^2/CRD$df.residual)
+r<-length(brokerstudy$price[brokerstudy$broker == "broker2"])
+LSD<-tvalue*sqrt((2*MSE)/r)
+LSD
+LowerCI<-(ybar2-ybar5)-LSD#construct a 95% Lower CI
+UpperCI<-(ybar2-ybar5)+LSD#construct a 95% Lower CI
+CI<-cbind(LowerCI,UpperCI)
+print(CI)
+```
+We can use the r package *agricolae* to compute LSD with the function *LSD.test*.
+```{r,warning=F}
+library(agricolae)
+LS=LSD.test(CRD,trt="broker")
+LS
+```
+
+Conclusions: We would say by using LSD approach, brokers 1 and 3 are equivalent (their difference is not statistically significant, and, hence, we cannot reject their equality) with respect to buying price index, Y; similarly for brokers in the second subset (brokers 2, 4, and 5). 
+
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR
+
+## Tukey's Honestly Significant Difference Test
+
+The honestly significant difference (HSD) test, devised by J. W. Tukey, focuses on the experimentwise error rate, a. It is a post hoc test used when __there are equal numbers of subjects contained in each group__ for which pairwise comparisons of the data are being made. Post hoc tests, like this one, literally mean after the fact. They are used to determine whether any group or set of treatment conditions significantly differs from one or more others. The Tukey HSD test is more likely to identify statistically significant differences than other post hoc tests. This entry discusses the utility of the Tukey HSD post hoc test, gives a thorough developmental overview, and then provides further elaboration.
+
+To construct a confidence interval for the difference between two of the column means, we use
+$$
+\begin {aligned}
+&\bar{y}_i-\bar{y}_j \pm q(c,df)_{\alpha/2}\sqrt{\frac{MSE}{r}}\\\
+where\\
+HSD&=q(c,df)_{\alpha/2}\sqrt{\frac{MSE}{r}}
+\end{aligned}
+$$
+
+![Figure](c:/Users/thunt/OneDrive - University of Calgary/dataset603/HSD.png)
+
+```{r}
+brokerstudy=read.csv("brokerstudy.csv", header=TRUE)
+str(brokerstudy)#Read your data set and double check that dependent and indepent variables are correctly read by R
+CRD<-aov(price~broker, data=brokerstudy) #Perform ANOVA for CRD
+summary(CRD)
+TukeyHSD(CRD, conf.level = 0.95)
+plot(TukeyHSD(CRD, conf.level = 0.95),las=1, col = "red")
+```
+
+
+Thus, we need to check each of the 10 differences in column means, as shown in the output. What does the story tell? If we ignore the column two mean for the moment, we conclude that column means three and one are the same, but different from (smaller than) column means four and five, which are themselves the same; that is,
+
+![Figure](c:/Users/thunt/OneDrive - University of Calgary/dataset603/HSD1.png)
+
+However, column mean two is "the same as column means three and one," but also "the same as column means four and five."  We have an inconsistency of the type expressed earlier. In a consulting capacity, we would tell a client that "column means three and one cannot be said to be different, column means four and five cannot be said to be different, but the former two column means can be said to be different from (smaller than) the latter two; we cannot determine the role of column mean two." We would express this thought diagrammatically as
+
+![Figure](c:/Users/thunt/OneDrive - University of Calgary/dataset603/HSD2.png)
+
+It should be noted that one potential reason for obtaining different results from those of the Fisher's LSD analysis is that the per-comparison error rates are very different. In the immediately preceding Tukey's HSD analysis, with 10 comparisons and alpha= .05, each comparison error rate is, relatively speaking, very small; if they were independent comparisons, which they're not, each would be only .005. The per comparison error rate for the Fisher's LSD analysis was $\alpha$=.05, about ten times larger. 
+
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+
+## Inclass Practice Problem 28
+
+From the MVPC experiment, compare the average level of satisfaction among customers in the four locations by Tukey's HSD. Compare your results with pair t test.
+
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+----------------------------------------------------------------
+
+## Inclass Practice Problem 29
+
+From the lifetime of AA battery experiment, compare the average life times for 8 devices by Tukey's HSD. Compare your result with pair t test
+
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR
+----------------------------------------------------------------
+
+## Newman-Keuls Test 
+
+The Newman-Keuls and Tukey HSD work with different distributions (Newman-Keuls with the studentized range) but that doesn't necessarily mean that one is better than the other. In fact, there's no consensus on how to choose between the two. Although the N-K test was designed to have more power than Tukey's HSD, the probability of making a Type I error can't be calculated for the N-K test, nor it is possible to calculate confidence intervals around difference between means.
+
+The Newman-Keuls test is an alternative to Tukey's HSD test. It is similar to the HSD test
+
+```{r}
+library(agricolae)# SNK.test() is avalible in the agricolae package for Newman-Keuls (SNK)
+brokerstudy=read.csv("brokerstudy.csv", header=TRUE)
+head(brokerstudy)
+str(brokerstudy)#Read your data set and double check that dependent and independent variables are correctly read by R
+CRD<-aov(price~broker, data=brokerstudy) #Perform ANOVA for CRD
+summary(CRD)
+print(SNK.test(CRD,"broker",group=TRUE))#SNK.test() function can be used for Newman-Keuls test in R, 
+```
+
+We observe that the Newman-Keuls (N-K) test finds two results that are different from those of the HSD test: column means three and two, as well as column means one and two, are now concluded to be different, whereas the HSD test did not conclude that they were different. 
+
+![Figure](c:/Users/thunt/OneDrive - University of Calgary/dataset603/SNK.png)
+
+## The Scheffe Test
+
+The Scheffe Test (also called Scheffe's procedure or Scheffe's method) is a post-hoc test used in Analysis of Variance. It is named for the American statistician Henry Scheffe. After you have run ANOVA and got a significant F-statistic (i.e. you have rejected the null hypothesis that the means are the same), then you run Sheffe's test to find out which pairs of means are significant. 
+
+For pair-wise comparisons, Scheffe's can be computed as follows:
+
+$$
+\begin {aligned}
+S=\sqrt{(k-1)F_{\alpha,df_1,df_2}}\\
+\bar{y_i}-\bar{y_j}\pm S\sqrt{MSE(\frac{1}{n_i}+\frac{1}{n_j})}
+\end{aligned}
+$$
+
+In this class, we use R software to calculate all multiple comparison.
+```{r}
+library(agricolae)
+brokerstudy=read.csv("brokerstudy.csv", header=TRUE)
+str(brokerstudy)#Read your data set and double check that dependent and indepent variables are correctly read by R
+CRD<-aov(price~broker, data=brokerstudy) #Perform ANOVA for CRD
+scheffe.test(CRD,"broker", group=TRUE,console=TRUE)
+```
+
+```{r}
+library(agricolae)
+MVPC=read.csv("MVPC.csv", header=TRUE)
+str(MVPC)#Read your data set and double check that dependent and indepent variables are correctly read by R
+CRD<-aov(Score~Treatment, data=MVPC) #Perform ANOVA for CRD
+scheffe.test(CRD,"Treatment", group=TRUE,console=TRUE)
+```
+
+```{r}
+lifetime=read.csv("lifetime.csv", header=TRUE)
+str(lifetime)#Read your data set and double check that dependent and indepent variables are correctly read by R
+CRD<-aov(hrs~device, data=lifetime) #Perform ANOVA for CRD
+summary(CRD)
+scheffe.test(CRD,"device", group=TRUE,console=TRUE)
+```
+
+That is, column means three and one are the same, and are different from (smaller than) column means two,four,and five,the latter three column means being the same. 
+
+## Inclass Practice Problem 30
+
+From the MVPC experiment, compare the average level of satisfaction among customers in the four locations by Newman-Keuls Test. Compare your result with pair t test and Tukey's HSD.
+
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+----------------------------------------------------------------
+
+## Inclass Practice Problem 31
+
+From the lifetime of AA battery experiment, compare the average life times for 8 devices by Tukey's HSD. Compare your result with pair t test and Tukey's HSD.
+
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+<BR>
+----------------------------------------------------------------
+
+

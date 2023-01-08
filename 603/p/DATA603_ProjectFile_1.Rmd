@@ -1,0 +1,455 @@
+
+```{r}
+dataset = read.csv('cleaned603dataset_-_dataset603_1.csv')
+head(dataset)
+options(scipen = 999)
+dataset <- na.omit(dataset)
+
+```
+
+```{r}
+fullmodel <-lm(Site_Energy~factor(Property_Type)+NumberofBuildings+Year_Built+Property_GFA+WeatherNormalizedSiteEnergyUse+SiteEUI+WeatherNormalizedSiteEUI+SourceEnergyUse+WeatherNormalizedSourceEnergyUse+SourceEUI+WeatherNormalizedSource.EUI+Emissions_CO2+Emissions_Intensity+DirectGHGEmissions+DirectGHGEmissionsIntensity+Electricity+Natural_Gas+YearEnding+Precipitation+Corn_Heat_Unit+Heating_Degree_Days+Cooling_Degree_Days, data=dataset)
+
+summary(fullmodel)
+```
+
+```{r}
+library(mctest)
+```
+```{r}
+imcdiag(fullmodel, method='VIF')
+```
+The VIF values are ideally supposed to be less than 5 for us to not take any corrective action. However, here in our fullmodel, we can observe that the VIF values are well above 5. As we suspected, there is considerable multicollinearity in our data! 
+To solve this problem, we just drop the problematic variables. Since the presence of multicollinearity suggests that the information that this variable gives about the response is redundant in the presence of the other variables, this may typically be done without much harm to the regression model.
+After eliminating the problematic variables manually, we end up with: NumberofBuildings, Year_Built, Property_GFA, Natural_Gas, Emissions_CO2. But, we will not use Year_Built as it generates a Time-Series dependancy, which we want to avoid.
+
+
+
+
+```{r}
+newmodel <-lm(Site_Energy~NumberofBuildings+Property_GFA+Natural_Gas+Emissions_CO2,data=dataset)
+summary(newmodel)
+```
+```{r}
+imcdiag(newmodel, method='VIF')
+```
+Here, we can observe that Property_GFA and Emissions_CO2 have a VIF>5, but they are important variables to us in the prediction of Site_Energy, and therefore we decide to keep them as a part of our New Model.
+
+###Our full model:
+$$
+\begin{aligned}
+Y_{SiteEnergy}&==\beta_0 +  \beta_1 X_{EmissionsCO2}  +\beta_2 X_{Natural_Gas} +\beta_3 X_{Property_GFA}+\beta_4 X_{NumberofBuildings} +\epsilon  \\
+
+\end{aligned}
+$$
+##Global F Test on Full Model:
+###Hypothesis Statement for Individual T-test:
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\mbox{at least one }\beta_i\mbox{ is not zero } (i=1,2,3,4) 
+\end{aligned}
+$$
+
+We set up the significance level at 0.05($\alpha = 0.05$).
+
+Full Model Global F Test:
+```{r}
+#Full Model Test
+fullmodel <-lm(Site_Energy~NumberofBuildings+Property_GFA+Emissions_CO2+ Natural_Gas, data=dataset)
+reg<-lm(Site_Energy~1, data=dataset) # Model with only intercept
+
+anova(fullmodel,reg) # We compare the NULL model with the full model
+```
+By using global F test, the output shows that $F_{cal}= 25794$ with df= -4, and $p-value< 0.00000000000000022 < \alpha=0.05$,indicating that we should clearly reject the null hypothesis. It provides compelling evidence against the null hypothesis. The Global F-test suggests that at least one of the independent variables must be related to Site Energy. Based on the p-value, we also have extremely strong evidence that at least one of the independent variables is associated with increased Site_Energy.
+
+After we check the global F-test and reject the null hypothesis, we are checking the test statistics for the individual coefficients and particular subsets of the full model test in the following steps.
+
+##Individual Coefficients Test:
+
+###Hypothesis Statement for Individual T-test:
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0 (i=1,2,3,4)
+\end{aligned}
+$$
+We set up the significance level at 0.05($\alpha = 0.05$).
+
+```{r}
+summary(fullmodel)
+```
+From the out put, It shows that the variables
+NumberofBuildings has $t_{cal}=-6.182$ with the $p-value = 0.00000000218 < 0.05$,
+Property_GFA has $t_{cal}=11.761$ with the $p-value< 0.0000000000000002 < 0.05$  ,
+Emissions_CO2 has $t_{cal}=58.698$ with the $p-value< 0.0000000000000002 < 0.05$,
+Natural_Gas has $t_{cal}=122.447$ with the $p-value< 0.0000000000000002 < 0.05$ ,
+indicating that we should clearly reject the null hypothesis for variable NumberofBuildings, Property_GFA,Emissions_CO2 and Natural_Gas, which means that we should keep those variables to the model at the significance level at $α=0.05$.
+
+
+```{r}
+library(olsrr)
+```
+
+```{r}
+stepmod=ols_step_both_p(newmodel,pent = 0.1, prem = 0.3, details=TRUE)
+summary(stepmod$model)
+```
+
+After doing stepwise regression, we get our final first order model as:
+Site_Energy = 702.127112 + 6.389525(Emissions_CO2) + 0.614171(Natural_Gas) + 0.153195(Property_GFA) - 1183.156115(NumberofBuildings)
+$$
+\begin{aligned}
+\widehat{Y_{SiteEnergy}}&=\beta_0 +  \beta_1 X_{EmissionsCO2}  +\beta_2 X_{NaturalGas} +\beta_3 X_{PropertyGFA}+\beta_4 X_{NumberofBuildings}  \\
+
+\end{aligned}
+$$
+
+# Interaction Model
+
+For testing an interaction term in regression model, we use the Individual Coefficients Test (t-test) method.
+###Individual Coefficients Test (T-tests) on Interaction Term:
+
+Hypothesis Statement:
+
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0
+\end{aligned}
+$$
+$$
+\begin{aligned} 
+(i=NumberofBuildings*EmissionsCO2,NumberofBuildings*NaturalGas,NumberofBuildings*PropertyGFA,EmissionsCO2*NaturalGas,EmissionsCO2*PropertyGFA,NaturalGas*PropertyGFA ) 
+\end{aligned}
+$$
+We set up the significance level at 0.05($\alpha = 0.05$).
+
+```{r}
+#interactions
+#T-tests:
+#Hypothesis:
+#H0= Bi = 0
+#Ha: Bi != 0 (i = 1,2,3...)
+interacmodel <-lm(Site_Energy~(NumberofBuildings+Emissions_CO2+Natural_Gas+Property_GFA)^2, data=dataset)
+summary(interacmodel)
+```
+From the out put, It shows that the interaction terms $EmissionsCO2*NaturalGas$ has $t_{cal}=7.701$ with the $p-value= 0.000000000000234  < 0.05$, $EmissionsCO2*PropertyGFA$ has $t_{cal}=27.469 $ with the $p-value < 0.0000000000000002  < 0.05$, and $NaturalGas*PropertyGFA$ has $t_{cal}=-14.642$ with the $p-value < 0.0000000000000002  < 0.05$ 
+indicating that we should clearly reject the null hypothesis which means that we should add the above interaction terms to the model at $α=0.05$.
+
+However, the interaction terms $NumberofBuildings*EmissionsCO2$ has $t_{cal}=-0.687$ with the $p-value= 0.492700      > 0.05$, $NumberofBuildings*NaturalGas$ has $t_{cal}=1.233              $ with the $p-value = 0.218692      > 0.05$,
+indicating that we should clearly not reject the null hypothesis which means that we should not add the above interaction terms to the model at $α=0.05$.
+
+The interaction terms $NumberofBuildings*PropertyGFA$ has $t_{cal}=-1.788$ with the $p-value= 0.074809       > 0.05$, is lies in the grey zone.
+
+After including the interaciton terms we can see that not every interaction term contributes to the model. We are removing NumberofBuildings:Emissions_CO2, NumberofBuildings:Natural_Gas but we are going to keep NumberofBuildings:Property_GFA as it lies in the grey zone. Hence we are going to do the T-test again with the predictors that are significant to the model. For the rest of the predictors p-value is less than the alpha value(0.05) hence, we can reject our null hypothesis and accept the alternative.
+
+
+
+###Individual Coefficients Test (T-tests) on Interaction Term:
+
+Hypothesis Statement:
+
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0
+\end{aligned}
+$$
+$$
+\begin{aligned} 
+(i=NumberofBuildings*PropertyGFA,EmissionsCO2*NaturalGas,EmissionsCO2*PropertyGFA,NaturalGas*PropertyGFA ) 
+\end{aligned}
+$$
+We set up the significance level at 0.05($\alpha = 0.05$).
+
+```{r}
+#Hypothesis:
+#H0= Bi = 0
+#Ha: Bi != 0 (i = 1,2,3...)
+interacmodel2 <-lm(Site_Energy~NumberofBuildings+Emissions_CO2+Natural_Gas+Property_GFA+NumberofBuildings*Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+
+summary(interacmodel1)
+```
+From the out put, It shows that the interaction term $NumberofBuildings*PropertyGFA$ has $t_{cal}=-1.450$ with the $p-value= 0.148229          > 0.05$, indicating that we should clearly not reject the null hypothesis which means that we should not add the above interaction terms to the model at $α=0.05$. 
+
+The interaction terms $EmissionsCO2*NaturalGas$ has $t_{cal}=7.610    $ with the $p-value= 0.000000000000413   < 0.05$, $EmissionsCO2*PropertyGFA$ has $t_{cal}=27.672  $ with the $p-value < 0.0000000000000002  < 0.05$, and $NaturalGas*PropertyGFA$ has $t_{cal}=-14.666 $ with the $p-value < 0.0000000000000002  < 0.05$ 
+indicating that we should clearly reject the null hypothesis which means that we should keep the above interaction terms to the model at $α=0.05$.
+
+
+After removing the insignificant terms yet keeping the grey zone predictor, we see that it also becomes insignificant to the model. Hence we can now safely remove the predictor which once was in the grey zone. Therefore, we are left with NumberofBuildings, Emissions_CO2, Natural_Gas+Property_GFA, Emissions_CO2:Natural_Gas, Emissions_CO2:Property_GFA, Natural_Gas:Property_GFA as our final predictors for our model. As for these predictors the p-value is less than the alpha value(0.05) hence, we can reject our null hypothesis and accept the alternative.
+
+
+
+###Individual Coefficients Test (T-tests) on Interaction Term:
+
+Hypothesis Statement:
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0
+\end{aligned}
+$$
+$$
+\begin{aligned} 
+(i=EmissionsCO2*NaturalGas,EmissionsCO2*PropertyGFA,NaturalGas*PropertyGFA ) 
+\end{aligned}
+$$
+
+We set up the significance level at 0.05($\alpha = 0.05$).
+
+```{r}
+#Hypothesis:
+#H0= Bi = 0
+#Ha: Bi != 0 (i = 1,2,3...)
+interacmodel3 <-lm(Site_Energy~NumberofBuildings+Emissions_CO2+Natural_Gas+Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+
+summary(interacmodel2)
+```
+From the out put, It shows that the interaction terms $EmissionsCO2*NaturalGas$ has $t_{cal}=7.759    $ with the $p-value= 0.000000000000156309    < 0.05$, $EmissionsCO2*PropertyGFA$ has $t_{cal}=27.664   $ with the $p-value < 0.0000000000000002  < 0.05$, and $NaturalGas*PropertyGFA$ has $t_{cal}=-14.575  $ with the $p-value < 0.0000000000000002  < 0.05$ 
+indicating that we should clearly reject the null hypothesis which means that we should keep the above interaction terms to the model at $α=0.05$.
+
+All the remaining predictors are significant to the model.
+
+##Interaction Term Partial F-tests:
+
+After fitting a model with all interactions, we dropped non-significant interaction terms. Final estimation model obtained is the  interacmodel3.
+
+$$
+\begin{aligned}
+Y_{SiteEnergy}&=\beta_0 +  \beta_1 X_{EmissionsCO2}  +\beta_2 X_{NaturalGas} +\beta_3 X_{PropertyGFA}+\beta_4 X_{NumberofBuildings} +\beta_5 X_{EmissionsCO2*NaturalGas}\\
+&+\beta_6 X_{EmissionsCO2*PropertyGF}+\beta_7 X_{NaturalGas*PropertyGFA} +\epsilon
+\end{aligned}
+$$
+
+To confirm that we should drop all those interaction terms together, we perform a partial F-test.
+
+###Hypothesis Statement:
+$$
+\begin{aligned}
+H_0&:\beta_{p-q+1}=\beta_{p-q+2}=...=\beta_p=0\\ \mbox{Interaction terms are not significant }
+H_a&:\mbox{at least one }\beta_i \neq0 \mbox{At least one interaction term is significant }
+\end{aligned}
+$$
+
+We set up the significance level at 0.05($\alpha = 0.05$).
+
+```{r}
+anova(interacmodel3,interacmodel1)
+```
+It gives a p-value of $0.1482>0.05$, indicating that we should clearly not to reject the null hypothesis, which confirms that we do not have enough evidence to keep those non-significant interaction terms in the model. Hence, we can conclude that the interaction model below is the best fitted model:
+$$
+\begin{aligned}
+\widehat{Y_{SiteEnergy}}&=\beta_0 +  \beta_1 X_{EmissionsCO2}  +\beta_2 X_{NaturalGas} +\beta_3 X_{PropertyGFA}+\beta_4 X_{NumberofBuildings} +\beta_5 X_{EmissionsCO2*NaturalGas}\\
+&+\beta_6 X_{EmissionsCO2*PropertyGF}+\beta_7 X_{NaturalGas*PropertyGFA}
+\end{aligned}
+$$
+
+
+
+#Higher Order Model
+
+In the previous steps, the stepwise regression procedure declared that the best one-variable predictor of site energy usage is emissions CO2. Hence, we decided to add quadratic term to the model based on it.
+
+For testing an higher order term in regression model, we use the Individual Coefficients Test (t-test) method.
+###Individual Coefficients Test (T-tests) on Interaction Term:
+
+Hypothesis Statement:
+
+
+$$
+\begin{aligned}
+H_0&:\beta_i=0\\
+H_a&:\beta_i\neq0
+\end{aligned}
+$$
+$$
+\begin{aligned} 
+(i=NumberofBuildings*EmissionsCO2,NumberofBuildings*NaturalGas,NumberofBuildings*PropertyGFA,EmissionsCO2*NaturalGas,EmissionsCO2*PropertyGFA,NaturalGas*PropertyGFA ) 
+\end{aligned}
+$$
+We set up the significance level at 0.05($\alpha = 0.05$).
+
+
+
+```{r}
+interacmodel2 <-lm(Site_Energy~NumberofBuildings+Emissions_CO2+I(Emissions_CO2^2)+I(Emissions_CO2^3)+Natural_Gas+Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+
+summary(interacmodel2)
+```
+
+```{r}
+#Linearity Assumption
+
+library(ggplot2)
+ggplot(interacmodel2, aes(x=.fitted, y=.resid)) +
+  geom_point() + geom_smooth()+
+  geom_hline(yintercept = 0)+
+  ggtitle("Residual vs Fitted")
+```
+We can draw the conclusion that, compared to a basic linear regression model, the quadratic model more closely fits the data.
+Model interpretations are meaningless when the independent variable's range is exceeded. Despite the fact that the model seems to back up the data. The value of X must fall inside the range of the independent variable in order to generate a forecast for Y. Otherwise, the prediction won't have any real relevance.
+```{r}
+library(leaps)
+best.subset<-regsubsets(Site_Energy~NumberofBuildings+Emissions_CO2+I(Emissions_CO2^2)+I(Emissions_CO2^3)+Natural_Gas+Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data= dataset, nv=9 ) 
+
+summary(best.subset)
+reg.summary<-summary(best.subset)
+
+# for the output interpretation
+rsquare<-c(reg.summary$rsq)
+cp<-c(reg.summary$cp)
+AdjustedR<-c(reg.summary$adjr2)
+RMSE<-c(reg.summary$rss)
+BIC<-c(reg.summary$bic)
+cbind(rsquare,cp,BIC,RMSE,AdjustedR)
+```
+```{r}
+par(mfrow=c(3,2)) # split the plotting panel into a 3 x 2 grid
+plot(reg.summary$cp,type = "o",pch=10, xlab="Number of Variables",ylab= "Cp")
+plot(reg.summary$bic,type = "o",pch=10, xlab="Number of Variables",ylab= "BIC")
+plot(reg.summary$rsq,type = "o",pch=10, xlab="Number of Variables",ylab= "R^2")
+plot(reg.summary$rss,type = "o",pch=10, xlab="Number of Variables",ylab= "RMSE")
+plot(reg.summary$adjr2,type = "o",pch=10, xlab="Number of Variables",ylab= "Adjusted R^2")
+```
+
+# The Final Model and Interpreting Coefficients
+
+Our final best fitted model including main effects, interaction terms and higher order terms is expressed as:
+
+$$
+\begin{aligned}
+Y_{SiteEnergy}&=\beta_0 +  \beta_1 X_{EmissionsCO2} +  \beta_2 X^2_{EmissionsCO2}+  \beta_3 X^3_{EmissionsCO2} +\beta_4 X_{NaturalGas} +\beta_5 X_{PropertyGFA}\\
+&+\beta_6 X_{NumberofBuildings} +\beta_7 X_{EmissionsCO2*NaturalGas} +\beta_8 X_{EmissionsCO2*PropertyGF}+\beta_9 X_{NaturalGas*PropertyGFA} + \epsilon
+\end{aligned}
+$$
+###Final model expanded with all terms
+
+```{r}
+interacmodel2 <-lm(Site_Energy~NumberofBuildings+Emissions_CO2+I(Emissions_CO2^2)+I(Emissions_CO2^3)+Natural_Gas+Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+
+summary(interacmodel2)
+```
+
+$$
+\begin{aligned}
+\widehat{Y_{SiteEnergy}}&=149.7182 +  5.7774 X_{EmissionsCO2}   -0.0002257 X^2_{EmissionsCO2}+  0.000000007 X^3_{EmissionsCO2} +0.6629 X_{NaturalGas} \\
+&+0.0406 X_{PropertyGFA} -200.0864 X_{NumberofBuildings} +0.0000192 X_{EmissionsCO2*NaturalGas} \\
+&+0.0000385 X_{EmissionsCO2*PropertyGFA}-0.0000031 X_{NaturalGas*PropertyGFA}
+\end{aligned}
+$$
+
+##Adjusted R-square and RMSE of Best Fitted Model
+
+The adjusted R-squared, $R^2_{adj} =0.9995$ implies that 99.95% of the variation in the response variable site energy is explained by this model containing the predictors emissions CO2, natural gas, property GFA, number of buildings, and the interactions trems $EmissionsCO2*NaturalGas$, $EmissionsCO2*PropertyGFA$, $NaturalGas*PropertyGFA$ as well as the second order term and third order term of emissions CO2.
+
+$RMSE = 381.8$, this value indicates that the standard deviation of the unexplained variation in estimation of response variable site energy is 381.8 GJ.
+
+ 
+### Final model with EmissionsCO2 terms collected
+
+$$
+\begin{aligned}
+\widehat{Y_{SiteEnergy}}&=149.7182 +  (5.7774+0.0000192 X_{NaturalGas}+0.0000385 X_{PropertyGFA}) X_{EmissionsCO2}\\
+&-0.0002257 X^2_{EmissionsCO2}+  0.000000007 X^3_{EmissionsCO2} +0.6629 X_{NaturalGas} \\
+&+0.0406 X_{PropertyGFA} -200.0864 X_{NumberofBuildings}  \\
+&-0.0000031 X_{NaturalGas*PropertyGFA}
+\end{aligned}
+$$
+
+### Final model with NaturalGas terms collected
+
+$$
+\begin{aligned}
+\widehat{Y_{SiteEnergy}}&=149.7182 +  5.7774 X_{EmissionsCO2}   -0.0002257 X^2_{EmissionsCO2}+  0.000000007 X^3_{EmissionsCO2}\\
+&+(0.6629 +0.0000192 X_{EmissionsCO2}-0.0000031 X_{PropertyGFA}) X_{NaturalGas} \\
+&+0.0406 X_{PropertyGFA} -200.0864 X_{NumberofBuildings} \\
+&+0.0000385 X_{EmissionsCO2*PropertyGFA}
+\end{aligned}
+$$
+
+### Final model with PropertyGFA terms collected
+$$
+\begin{aligned}
+\widehat{Y_{SiteEnergy}}&=149.7182 +  5.7774 X_{EmissionsCO2}   -0.0002257 X^2_{EmissionsCO2}+  0.000000007 X^3_{EmissionsCO2} +0.6629 X_{NaturalGas} \\
+&+(0.0406+0.0000385 X_{EmissionsCO2}-0.0000031 X_{NaturalGas}) X_{PropertyGFA}\\
+&-200.0864 X_{NumberofBuildings} +0.0000192 X_{EmissionsCO2*NaturalGas} \\
+\end{aligned}
+$$
+
+## Interpretation of Coefficients
+
+There are four $\beta_i (i = EmissionsCO2, PropertyGFA, NaturalGas,NumberofBuildings)$ coefficients in our final model.
+
+Explanations of the relationship between each coefficients and the response variable site energy are given below.
+
+Note that in the following interpretation we ignore the higher order terms, due to their complexity.
+
+$$
+\begin{aligned}
+\widehat{\beta_{EmissionsCO2}}&= 5.7774+0.0000192 X_{NaturalGas}+0.0000385 X_{PropertyGFA}
+\end{aligned}
+$$
+This equation value indicates that the effect of emissions CO2 on site energy
+(in GJ) changes by natural gas and property GFA. While all other main effects are held constant,increasing emissions CO2 by 1 metric tons leads to an increase in site energy by $5.7774+0.0000192 X_{NaturalGas}+0.0000385 X_{PropertyGFA}$ GJ.
+
+$$
+\begin{aligned}
+\widehat{\beta_{NaturalGas}}&= 0.6629 +0.0000192 X_{EmissionsCO2}-0.0000031 X_{PropertyGFA}
+\end{aligned}
+$$
+
+This equation value indicates that the effect of natural gas on site energy
+(in GJ) changes by emissions CO2 and property GFA. While all other main effects are held constant,increasing natural gas by 1 GJ leads to an increase in site energy by $0.6629 +0.0000192 X_{EmissionsCO2}-0.0000031 X_{PropertyGFA}$ GJ.
+
+$$
+\begin{aligned}
+\widehat{\beta_{PropertyGFA}}&= 0.0406+0.0000385 X_{EmissionsCO2}-0.0000031 X_{NaturalGas}
+\end{aligned}
+$$
+
+This equation value indicates that the effect of property GFA on site energy
+(in GJ) changes by emissions CO2 and natural gas. While all other main effects are held constant,increasing the property gross floor area by 1 $m^2$ leads to an increase in site energy by $0.0406+0.0000385 X_{EmissionsCO2}-0.0000031 X_{NaturalGas}$ GJ.
+
+$$
+\begin{aligned}
+\widehat{\beta_{NumberofBuildings}}&=  -200.0864
+\end{aligned}
+$$
+This equation value indicates that while all other main effects are held constant,increasing 1 buildings on the property leads to a decrease in site energy by -200.0864 GJ.
+
+# Predicted Site Energy Use
+
+We use the model to make a prediction of energy usage as an example. In a scenario where the number of buildings is 2, the property gross floor area is 9300 $m^2$, emissions CO2 is 760 Metric Tons, and natural gas usage is 9500 GJ.
+
+
+
+$$
+\begin{aligned}
+\widehat{Y_{SiteEnergy}}&=149.7182 +  5.7774 X_{EmissionsCO2}   -0.0002257 X^2_{EmissionsCO2}+  0.000000007 X^3_{EmissionsCO2} +0.6629 X_{NaturalGas} \\
+&+0.0406 X_{PropertyGFA} -200.0864 X_{NumberofBuildings} +0.0000192 X_{EmissionsCO2*NaturalGas} \\
+&+0.0000385 X_{EmissionsCO2*PropertyGFA}-0.0000031 X_{NaturalGas*PropertyGFA}\\
+
+\widehat{Y_{SiteEnergy}}&=149.7182 +  5.7774 *(760)   -0.0002257 *(760)^2+  0.000000007 (760)^3 +0.6629 *(9500) \\
+&+0.0406 *(9300) -200.0864 *(2) +0.0000192*(760*9500) \\
+&+0.0000385 *(760*9300)-0.0000031*(9500*9300)\\
+&=10825.06491
+
+\end{aligned}
+$$
+In a scenario where the number of buildings is 2, the property gross floor area is 9300 $m^2$, emissions CO2 is 760 Metric Tons, and natural gas usage is 9500 GJ. In this scenario, the predicted site energy usage results are 10825.06491 GJ.
+
+```{r}
+interacmodel3 <-lm(Site_Energy~NumberofBuildings+Emissions_CO2+Natural_Gas+Property_GFA+Emissions_CO2*Natural_Gas+Emissions_CO2*Property_GFA+Natural_Gas*Property_GFA, data=dataset)
+
+
+newdata = data.frame(NumberofBuildings= 2, Emissions_CO2=760, Property_GFA=9300, Natural_Gas = 9500  )
+predict(interacmodel3,newdata,interval="predict")
+
+```
+
+From the R command predict, with 95% confidence interval, the site energy usage is between
+10121.64 GJ to 11711.19 GJ when the number of buildings is 2, the property gross floor area is 9300 $m^2$, emissions CO2 is 760 Metric Tons, and natural gas usage is 9500 GJ. Our result of 10825.06491 GJ which lies in the 95% confidence interval. Thus, it verifies our result.
