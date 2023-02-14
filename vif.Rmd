@@ -1,0 +1,127 @@
+```{r}
+library("car")
+library("ggplot2")
+library("GGally")
+library("dplyr")
+```
+
+```{r}
+mice.df1 <- read.csv("1_25col_2956r_lfst__NoNa_UniformCat_AdSubadYoungonly).csv") %>%
+  mutate(
+    season = as.factor(season),
+    lifestage = as.factor(lifestage),
+    sex = as.factor(sex),
+    ecoregion1 = as.factor(ecoregion1)
+    
+  )
+head(mice.df1)
+```
+
+```{r}
+
+
+model.df1 <- subset(mice.df1, select = -c(long, lat, decade, month, year, X))
+
+#ggpairs(model.df1)
+```
+
+```{r}
+head(model.df1)
+```
+
+
+```{r}
+m <- lm(body_mass ~ ., data = model.df1)
+summary(m)
+```
+
+
+```{r}
+# have to remove HB.Length because it produces NA due to multicollinearity
+vif(lm(body_mass ~ ., data = model.df1))
+```
+
+```{r}
+model.df1 <- subset(model.df1, select = -c(HB.Length))
+vif(lm(body_mass ~ ., data = model.df1))
+
+```
+
+```{r}
+# remove anything that has vif >= 8
+# only looking at GVIF^(1/(2*Df))
+# https://stats.stackexchange.com/questions/70679/which-variance-inflation-factor-should-i-be-using-textgvif-or-textgvif
+
+model.df12 <- subset(model.df1, select = -c( MAT, MWMT, MCMT, TD, DD5))
+
+
+
+vif(lm(body_mass ~ ., data = model.df12))
+```
+
+```{r}
+cor(model.df131 %>% select(-c(ecoregion1, sp, season, lifestage, sex)))
+```
+
+```{r}
+library(dplyr)
+df<-read.csv("mice_filled_all_values.csv")%>%dplyr::select(-c(sex_transformed,ecoregion1_transformed,season_transformed,sex_num,season_num,ecoregion1_num))
+
+df <- df %>%dplyr::select(-c(HB.Length, MAT, MWMT, MCMT, TD, DD5,X.1,X,long,lat,decade,month,year))
+head(df)
+
+df2=df[,c("pop_density_4km2","sp","body_mass","tail_length","total_length", "MAP","MSP","FFP","EMT","EXT")]
+names <-unique(df2$sp)
+names
+library(energy)
+library(dplyr)
+
+```
+
+```{r}
+tmp.df<-df2 %>% filter(sp == "Peromyscus maniculatus luteus") %>% dplyr::select(-sp)
+tmp.df
+mvnorm.etest(tmp.df, R=100)
+```
+```{r}
+tmp.df<-df2 %>% filter(sp == "Peromyscus maniculatus gracilis") %>% dplyr::select(-sp)
+tmp.df
+mvnorm.etest(tmp.df, R=100)
+```
+```{r}
+tmp.df<-df2 %>% filter(sp == "Peromyscus maniculatus blandus") %>% dplyr::select(-sp)
+tmp.df
+mvnorm.etest(tmp.df, R=100)
+```
+```{r}
+tmp.df<-df2 %>% filter(sp == "Peromyscus maniculatus serratus") %>% dplyr::select(-sp)
+tmp.df
+mvnorm.etest(tmp.df, R=100)
+```
+```{r}
+tmp.df<-df2 %>% filter(sp == "Peromyscus maniculatus osgoodi") %>% dplyr::select(-sp)
+tmp.df
+mvnorm.etest(tmp.df, R=100)
+```
+```{r}
+tmp.df<-df2 %>% filter(sp == "Peromyscus maniculatus pallescens") %>% dplyr::select(-sp)
+tmp.df
+mvnorm.etest(tmp.df, R=100)
+```
+```{r}
+tmp.df<-df2 %>% filter(sp == "Peromyscus maniculatus nubiterrae") %>% dplyr::select(-sp)
+tmp.df
+mvnorm.etest(tmp.df, R=100)
+```
+```{r}
+tmp.df<-df2 %>% filter(sp == "Peromyscus maniculatus hollisteri") %>% dplyr::select(-sp)
+tmp.df
+mvnorm.etest(tmp.df, R=100)
+```
+```{r}
+tmp.df<-df2 %>% filter(sp == "Peromyscus maniculatus santacruzae") %>% dplyr::select(-sp)
+tmp.df
+mvnorm.etest(tmp.df, R=100)
+```
+
+

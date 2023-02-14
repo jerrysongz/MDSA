@@ -1,0 +1,240 @@
+---
+title: "R Notebook"
+output: html_notebook
+---
+
+```{r}
+df = read.csv("1_25col_2956r_lfst__NoNa_UniformCat_AdSubadYoungonly).csv")
+head(df)
+```
+```{r}
+set.seed (10)
+idx=sample(1:nrow(df),3/4*nrow(df))
+train=df[idx,]
+test=df[-idx,]
+```
+
+# LDA
+
+##sp
+```{r}
+library(MASS)
+lda.fit<-lda(sp~., data = train)
+lda.fit
+```
+
+```{r}
+#plot(lda.fit)
+```
+
+```{r}
+class.pred<-predict(lda.fit,test)
+table(class.pred$class,test$sp)
+missclassfication <-(sum(class.pred$class !=test$sp))/dim(test)[1]
+missclassfication 
+```
+
+
+
+## sex
+```{r}
+lda.fit<-lda(sex~., data = train)
+lda.fit
+```
+
+```{r}
+plot(lda.fit)
+```
+
+```{r}
+class.pred<-predict(lda.fit,test)
+table(class.pred$class,test$sex)
+missclassfication <-(sum(class.pred$class !=test$sex))/dim(test)[1]
+missclassfication 
+```
+
+```{r}
+library(klaR)
+partimat(sp~.,data=train,method="lda")
+```
+
+# QDA
+
+## sp
+```{r}
+qda.fit<-lda(sp~., data = train)
+qda.fit
+```
+
+```{r}
+#plot(qda.fit)
+```
+
+```{r}
+class.pred<-predict(qda.fit,test)
+table(class.pred$class,test$sp)
+missclassfication <-(sum(class.pred$class !=test$sp))/dim(test)[1]
+missclassfication 
+```
+
+## sex
+```{r}
+qda.fit<-lda(sex~., data = train)
+qda.fit
+```
+
+```{r}
+plot(qda.fit)
+```
+
+```{r}
+class.pred<-predict(qda.fit,test)
+table(class.pred$class,test$sex)
+missclassfication <-(sum(class.pred$class !=test$sex))/dim(test)[1]
+missclassfication 
+```
+
+# multinomial regression
+```{r}
+
+```
+
+# classification tree
+
+## sp
+```{r}
+library(tree)
+
+tree.class<-tree(factor(sp)~., train)
+summary(tree.class)
+```
+
+```{r}
+tree.class
+```
+
+
+```{r}
+plot(tree.class)
+text(tree.class, pretty=0)
+```
+
+```{r}
+tree.pred<-predict(tree.class,test,type = "class")
+table(tree.pred,test$sp)
+missclassfication <-(sum(tree.pred !=test$sp))/dim(test)[1]
+missclassfication 
+```
+
+```{r}
+set.seed(10)
+cv.class<-cv.tree(tree.class, FUN = prune.misclass, K=10) 
+plot(cv.class$size, cv.class$dev,type="b")
+```
+
+
+## sex
+```{r}
+tree.class<-tree(factor(sex)~., train)
+summary(tree.class)
+```
+
+```{r}
+tree.class
+```
+
+
+```{r}
+plot(tree.class)
+text(tree.class, pretty=0)
+```
+
+```{r}
+tree.pred<-predict(tree.class,test,type = "class")
+table(tree.pred,test$sex)
+missclassfication <-(sum(tree.pred !=test$sex))/dim(test)[1]
+missclassfication 
+```
+
+```{r}
+set.seed(10)
+cv.class<-cv.tree(tree.class, FUN = prune.misclass, K=10) 
+plot(cv.class$size, cv.class$dev,type="b")
+```
+
+## sp-male
+```{r}
+male <- subset(df, sex == "male")
+set.seed(10)
+idx=sample(1:nrow(male),3/4*nrow(male))
+train=male[idx,]
+test=male[-idx,]
+```
+
+```{r}
+tree.class<-tree(factor(sp)~., train)
+summary(tree.class)
+```
+
+```{r}
+plot(tree.class)
+text(tree.class, pretty=0)
+```
+
+```{r}
+tree.pred<-predict(tree.class,test,type = "class")
+table(tree.pred,test$sp)
+missclassfication <-(sum(tree.pred !=test$sp))/dim(test)[1]
+missclassfication 
+```
+
+```{r}
+set.seed(10)
+cv.class<-cv.tree(tree.class, FUN = prune.misclass, K=10) 
+plot(cv.class$size, cv.class$dev,type="b")
+```
+
+## sp-female
+```{r}
+male <- subset(df, sex == "female")
+set.seed(10)
+idx=sample(1:nrow(male),3/4*nrow(male))
+train=male[idx,]
+test=male[-idx,]
+```
+
+```{r}
+tree.class<-tree(factor(sp)~., train)
+summary(tree.class)
+```
+
+```{r}
+plot(tree.class)
+text(tree.class, pretty=0)
+```
+
+```{r}
+tree.pred<-predict(tree.class,test,type = "class")
+table(tree.pred,test$sp)
+missclassfication <-(sum(tree.pred !=test$sp))/dim(test)[1]
+missclassfication 
+```
+
+```{r}
+set.seed(10)
+cv.class<-cv.tree(tree.class, FUN = prune.misclass, K=10) 
+plot(cv.class$size, cv.class$dev,type="b")
+```
+
+```{r}
+prune.class=prune.tree(tree.class,best=13)
+plot(prune.class)
+text(prune.class,pretty=0)
+```
+
+```{r}
+prune.pred<-predict(prune.class,test,type = "class")
+table(prune.pred,test$sp)
+missclassfication <-(sum(prune.pred !=test$sp))/dim(test)[1]
+missclassfication 
+```

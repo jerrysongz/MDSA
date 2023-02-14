@@ -1,0 +1,405 @@
+```{r}
+library("car")
+library("ggplot2")
+library("GGally")
+library("dplyr")
+```
+
+
+```{r}
+library(tree)
+df<-read.csv("mice_filled_all_values.csv") %>% dplyr::select(-c(sex_transformed,ecoregion1_transformed,season_transformed,sex_num,season_num,ecoregion1_num))
+names(df)
+
+dim(df)
+```
+
+
+#Regression Tree Model
+
+## Introduction
+
+This part of project aims to model the relationship between various factors and the body mass and body length of a population using regression tree. The target variables of interest are the body mass and body length.
+
+
+
+
+```{r}
+head(df)
+```
+
+
+```{r}
+unique(df$ecoregion1)
+unique(df$sp)
+unique(df$sex)
+unique(df$lifestage)
+unique(df$season)
+```
+The categorical variables such as ecoregion1, sp, sex, lifestage, and season were converted to factors using the as.factor function for avoiding Warning: NAs introduced by coercion.
+```{r}
+# Convert variables to factors
+df$ecoregion1 <- as.factor(df$ecoregion1)
+df$sp <- as.factor(df$sp)
+df$sex <- as.factor(df$sex)
+df$lifestage <- as.factor(df$lifestage)
+df$season <- as.factor(df$season)
+
+# Check levels of the factors
+levels(df$ecoregion1)
+levels(df$sp)
+levels(df$sex)
+levels(df$lifestage)
+levels(df$season)
+
+# Remove redundant or not meaningful levels
+df$ecoregion1 <- droplevels(df$ecoregion1)
+df$sp <- droplevels(df$sp)
+df$sex <- droplevels(df$sex)
+df$lifestage <- droplevels(df$lifestage)
+df$season <- droplevels(df$season)
+
+```
+
+```{r}
+unique(df$ecoregion1)
+unique(df$sp)
+unique(df$sex)
+unique(df$lifestage)
+unique(df$season)
+```
+Two columns, year and month, were removed from the dataset, as year and month variables are simply representation of the year and month in which the data was collected, and has no relationship to the response variable body_mass, then they are useful to include in the analysis and can be dropped.
+ 
+```{r}
+df <- subset(df, select = -c(year))
+df <- subset(df, select = -c(month))
+
+head(df)
+```
+ 
+## Data Split
+The dataset was split into a training set and a test set using a random sample of 75% of the data for training and 25% for testing.
+
+```{r}
+set.seed (10)
+
+
+splitIndex <- sample(1:nrow(df), size = 3/4 * nrow(df))
+train <- df[splitIndex, ]
+test <- df[-splitIndex, ]
+#head(train)
+dim(test)
+dim(train)
+```
+## Regression Tree Model for Body Mass
+
+A regression tree was built using the body mass as the target variable and the remaining variables as predictors. The tree was built using the tree function from the tree library. The model was summarized using the summary function, and a plot of the tree was produced using the plot function.
+
+```{r}
+tree.mass<-tree(body_mass ~. , data=train)
+
+summary(tree.mass)
+tree.mass
+```
+
+
+
+```{r}
+plot(tree.mass)
+text(tree.mass ,pretty =0)
+```
+### Prediction and Evaluation:
+The model was used to make predictions on the test data using the predict function.
+
+```{r}
+mass.pred<-predict(tree.mass,test)
+plot(mass.pred,test$body_mass)
+abline(0,1)
+```
+
+
+```{r}
+sqrt(mean((mass.pred-test$body_mass)^2)) #the mean squared error
+
+```
+```{r}
+SSR <- sum((mass.pred - mean(test$body_mass))^2)
+SST <- sum((test$body_mass - mean(test$body_mass))^2)
+rsq <- 1 - (SST - SSR)/SST
+adjrsq <- 1 - (1-rsq)*(nrow(test) - 1)/(nrow(test) - dim(test)[2] - 1)
+
+cat("R-squared:", rsq, "\n")
+cat("Adjusted R-squared:", adjrsq, "\n")
+
+```
+The performance of the unpruned tree was evaluated by making predictions on the test data and calculating the mean squared error (MSE) between the predictions and the actual body mass values. The MSE for the unpruned tree was 2.951156. The R-squared and adjusted R-squared were also calculated and found to be 0.8787191 and 0.8746425, respectively.
+
+The R-squared value for the unpruned tree was 0.8787191, which indicates that about 51.64% of the variance in the response variable is explained by the predictors. The adjusted R-squared takes into account the number of predictors in the model, and the value for the unpruned tree was 0.8746425.
+
+### Pruning
+
+In order to reduce the complexity of the tree, the tree was pruned using the prune.tree function. The cross-validation error was plotted against the size of the tree to determine the "best" number of terminal nodes. 
+
+```{r}
+cv.mass<-cv.tree(tree.mass)
+plot(cv.mass$size,cv.mass$dev,type="b")
+```
+Based on this plot, the best number of terminal nodes was found to be 6. This means that a tree with 6 terminal nodes had the best balance between overfitting and underfitting.
+
+```{r}
+prune.mass=prune.tree(tree.mass,best=5)
+plot(prune.mass)
+text(prune.mass,pretty=0)
+```
+```{r}
+summary(prune.mass)
+prune.mass
+
+```
+
+
+```{r}
+mass.ppred<-predict(prune.mass,test)
+plot(mass.ppred,test$body_mass)
+abline(0,1)
+```
+```{r}
+sqrt(mean((mass.ppred-test$body_mass)^2)) #the mean squared error
+
+```
+
+```{r}
+SSR <- sum((mass.ppred - mean(test$body_mass))^2)
+SST <- sum((test$body_mass - mean(test$body_mass))^2)
+rsq <- 1 - (SST - SSR)/SST
+adjrsq <- 1 - (1-rsq)*(nrow(test) - 1)/(nrow(test) - dim(test)[2] - 1)
+
+cat("R-squared:", rsq, "\n")
+cat("Adjusted R-squared:", adjrsq, "\n")
+
+
+```
+The pruned tree was then built and its performance was evaluated using the same metrics as the unpruned tree. The MSE for the pruned tree was found to be 3.012308, and the R-squared and adjusted R-squared were 0.4994684 and 0.4826438, respectively.
+
+### Interpreting the Results
+
+The regression tree was pruned using the "prune.mass" function and the summary of the pruned tree is given above. The tree was constructed using four variables: "lifestage", "total_length", "HB.Length", and "decade". The pruned tree has 6 terminal nodes, which indicates that the tree has 6 branches that stop at a final prediction.
+
+The residual mean deviance of the tree is 8.001, which is calculated as the deviance (17690) divided by the number of observations (2211). The deviance is a measure of how well the model fits the data, with a lower deviance indicating a better fit. The residual mean deviance of 8.001 suggests that the pruned regression tree provides a relatively good fit to the data.
+
+The distribution of residuals is also provided in the summary, with the minimum residual being -7.855, the first quartile being -1.972, the median being -0.2294, the mean being 0.0000, the third quartile being 1.697, and the maximum being 13.100. This distribution suggests that the residuals are approximately symmetrical around the mean, which is a good indicator of a well-fitting model.
+
+The tree starts at the root node (node 1), which has 2217 observations and a deviance of 35570. The first split in the tree is based on the "lifestage" variable, with two branches leading to nodes 2 and 3. Node 2 has 657 observations and a deviance of 4424, while node 3 has 1560 observations and a deviance of 20190.
+
+Node 2 splits again based on the "total_length" variable, leading to two final terminal nodes 4 and 5. Node 4 has 468 observations and a deviance of 2385, while node 5 has 189 observations and a deviance of 1348.
+
+Node 3 splits based on the "HB.Length" variable, leading to two branches that end at terminal nodes 6 and 7. Node 6 has 750 observations and a deviance of 7117, while node 7 has 810 observations and a deviance of 9050.
+
+Node 6 splits based on the "decade" variable, leading to two final terminal nodes 12 and 13. Node 12 has 543 observations and a deviance of 4655, while node 13 has 207 observations and a deviance of 1768.
+
+Node 7 splits based on the "total_length" variable, leading to two final terminal nodes 14 and 15. Node 14 has 431 observations and a deviance of 3433, while node 15 has 379 observations and a deviance of 4100.
+
+The mean squared error (MSE) of the pruned regression tree is 3.012308, which is a measure of the average difference between the observed values and the predicted values. The adjusted R-squared is 0.4826438, which is a measure of the proportion of variation in the response variable that can be explained by the predictor variables in the model. Both the MSE and adjusted R-squared provide further evidence that the pruned regression tree provides a good fit to the data.
+
+## Regression Tree Model for Body length
+
+The process for building the regression tree model for body length is similar to the one described above for the body mass model. The performance of this model can be evaluated using the same methods as described for the body mass model.
+
+A regression tree was built using the body length as the target variable and the remaining variables as predictors. The tree was built using the tree function from the tree library. The model was summarized using the summary function, and a plot of the tree was produced using the plot function.
+
+```{r}
+tree.length<-tree(total_length ~. , data=train)
+
+summary(tree.length)
+tree.length
+```
+
+
+
+```{r}
+plot(tree.length)
+text(tree.length ,pretty =0)
+```
+
+
+
+
+### Prediction and Evaluation:
+The model was used to make predictions on the test data using the predict function.
+
+```{r}
+length.pred<-predict(tree.length,test)
+plot(length.pred,test$total_length)
+abline(0,1)
+```
+
+
+```{r}
+sqrt(mean((length.pred-test$total_length)^2)) #the mean squared error
+
+```
+```{r}
+SSR <- sum((length.pred - mean(test$total_length))^2)
+SST <- sum((test$total_length - mean(test$total_length))^2)
+rsq <- 1 - (SST - SSR)/SST
+adjrsq <- 1 - (1-rsq)*(nrow(test) - 1)/(nrow(test) - dim(test)[2] - 1)
+
+cat("R-squared:", rsq, "\n")
+cat("Adjusted R-squared:", adjrsq, "\n")
+
+```
+
+
+
+The performance of the unpruned tree was evaluated by making predictions on the test data and calculating the mean squared error (MSE) between the predictions and the actual body length values. The MSE for the unpruned tree was 2.951156. The R-squared and adjusted R-squared were also calculated and found to be 0.8787191 and 0.8746425, respectively.
+
+The R-squared value for the unpruned tree was 0.8787191, which indicates that about 51.64% of the variance in the response variable is explained by the predictors. The adjusted R-squared takes into account the number of predictors in the model, and the value for the unpruned tree was 0.8746425.
+
+### Pruning
+
+In order to reduce the complexity of the tree, the tree was pruned using the prune.tree function. The cross-validation error was plotted against the size of the tree to determine the "best" number of terminal nodes. 
+
+
+```{r}
+cv.length<-cv.tree(tree.length)
+plot(cv.length$size,cv.length$dev,type="b")
+```
+Based on this plot, the best number of terminal nodes was found to be 8.
+
+```{r}
+prune.length=prune.tree(tree.length,best=7)
+plot(prune.length)
+text(prune.length,pretty=0)
+```
+```{r}
+prune.length
+summary(prune.length)
+```
+
+```{r}
+length.ppred<-predict(prune.length,test)
+plot(length.ppred,test$total_length)
+abline(0,1)
+#MIN(SSR)
+#SSR
+#COMPEER THE PRODTED WITH TEST 
+
+
+```
+```{r}
+sqrt(mean((length.ppred-test$total_length)^2)) #the mean squared error
+
+```
+
+```{r}
+SSR <- sum((length.ppred - mean(test$total_length))^2)
+SST <- sum((test$total_length - mean(test$total_length))^2)
+rsq <- 1 - (SST - SSR)/SST
+adjrsq <- 1 - (1-rsq)*(nrow(test) - 1)/(nrow(test) - dim(test)[2] - 1)
+
+cat("R-squared:", rsq, "\n")
+cat("Adjusted R-squared:", adjrsq, "\n")
+
+#tree have no Adj-r
+```
+
+
+
+The pruned tree was then built and its performance was evaluated using the same metrics as the unpruned tree. The MSE for the pruned tree was found to be 6.807494, and the R-squared and adjusted R-squared were 0.8469578 and 0.8418136, respectively.
+
+### Interpreting the Results:
+
+The results from the regression tree model show that the mean squared error of the model is 6.807494, and the adjusted R-squared value is 0.8418136. MSE of6.807494  means that, on average, the difference between the predicted values and the true values is 6.807494. The adjusted R-squared value measures the goodness of fit of the model, and a value closer to 1 indicates a better fit. In this case, the adjusted R-squared value of 0.8418136 indicates that the model fits the data well.
+
+The tree is split into 7 terminal nodes, represented by the asterisks in the output. The first split is made at the root node, with 2217 observations and a deviance of 623300. The deviance measures the residual sum of squares of the model and a lower deviance indicates a better fit.
+
+The first split is made based on the "tail_length" variable, with observations less than 69.5 going to the left branch and observations greater than 69.5 going to the right branch. The left branch has a deviance of 234500 and the right branch has a deviance of 102700.
+
+The next split in the left branch is based on the "HB.Length" variable, with observations less than 83.25 going to the left branch and observations greater than 83.25 going to the right branch. This split results in two terminal nodes, with deviances of 59060 and 52430, respectively.
+
+The next split in the right branch of the "tail_length" split is based on the "tail_length" variable again, with observations less than 82.5 going to the left branch and observations greater than 82.5 going to the right branch. This split results in two terminal nodes, with deviances of 35170 and 23790, respectively.
+
+In summary, the regression tree model has successfully split the observations into 7 terminal nodes, with a mean squared error of 6.807494 and an adjusted R-squared value of 0.8418136. These results indicate that the model fits the data well and provides a good representation of the underlying relationship between the variables.
+
+```{r}
+vif(lm(total_length ~ tail_length + HB.Length, data = df))
+
+vif(lm(body_mass ~ lifestage + total_length + HB.Length + decade , data = df))
+
+```
+## K-fold 
+for mess tree
+```{r}
+library(caret)
+
+# Specify the number of folds for cross-validation
+k <- 5
+
+# Create a k-fold cross-validation object
+folds <- createFolds(train$body_mass, k = k)
+
+# Initialize a vector to store the performance metrics for each fold
+performance_metrics <- rep(0, k)
+
+# Loop through each fold, training and evaluating the model on each one
+for (i in 1:k) {
+  # Split the training data into training and validation sets for this fold
+  train_indices <- unlist(folds[-i])
+  valid_indices <- folds[[i]]
+  train_data <- train[train_indices, ]
+  valid_data <- train[valid_indices, ]
+  
+  # Train the pruned regressor model on the training data
+  model <- prune.mass
+  
+  # Evaluate the model on the validation data
+  predictions <- predict(model, newdata = valid_data)
+  performance_metric <- sqrt(mean((predictions - valid_data$body_mass)^2))
+  
+  # Store the performance metric for this fold
+  performance_metrics[i] <- performance_metric
+}
+
+# Compute the average performance metric across all folds
+average_performance <- mean(performance_metrics)
+performance_metrics
+average_performance
+```
+
+
+
+for length tree
+```{r}
+k <- 5
+
+# Create a k-fold cross-validation object
+folds <- createFolds(train$body_mass, k = k)
+
+# Initialize a vector to store the performance metrics for each fold
+performance_metrics <- rep(0, k)
+
+# Loop through each fold, training and evaluating the model on each one
+for (i in 1:k) {
+  # Split the training data into training and validation sets for this fold
+  train_indices <- unlist(folds[-i])
+  valid_indices <- folds[[i]]
+  train_data <- train[train_indices, ]
+  valid_data <- train[valid_indices, ]
+  
+  # Train the pruned regressor model on the training data
+  model <- prune.length
+  
+  # Evaluate the model on the validation data
+  predictions <- predict(model, newdata = valid_data)
+  performance_metric <- sqrt(mean((predictions - valid_data$total_length)^2))
+  
+  # Store the performance metric for this fold
+  performance_metrics[i] <- performance_metric
+}
+
+# Compute the average performance metric across all folds
+average_performance <- mean(performance_metrics)
+performance_metrics
+average_performance
+```
+
