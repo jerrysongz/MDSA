@@ -1,0 +1,42 @@
+﻿Machine learning Algorithm​,Data processing​,Number of parameters​,Hyperparameters​,Testing Accuracy​,F1 Score​,Precision​,Recall​
+,,,,,,,
+​,,,,,,,
+,,,,,,,
+Logistic Regression​,Standardizing  features​,784​,C = 0.1​,0.9979​,0.9974​,0.9974​,0.9975​
+,,,,,,,
+,,,multi_class = ovr​,,,,
+,,,,,,,
+,,,penalty =  l2​,,,,
+,,,,,,,
+Support Vector ​,Standardizing  features​,"4,704​",C = 100.0​,0.9977​,0.9962​,0.9950​,0.9973​
+,,,,,,,
+Machine​,,,degree = 6​,,,,
+,,,,,,,
+,,,gamma = 0.0007 ​,,,,
+,,,,,,,
+,,,kernel = rbf​,,,,
+,,,,,,,
+Random ​,Standartizing features​,Non-parametric​,N_estimators=100min_sampleplit=2bootstrap=True​,0.998​,1.00​,1.00​,0.995​
+,,,,,,,
+Forest​,,,,,,,
+,,,,,,,
+K-Neighbors ​,Dimensional ​,Non-parametric​,weights = uniform n_neighbors = 1​,0.9980​,0.9974​,0.9973​,0.9975​
+,,,,,,,
+Classification​,reduction​,,metric: euclidean​,,,,
+,,,,,,,
+Neural ​,Standartizing  features​,"250,459​",4 layers​,0.9990​,0.9987​,0.9979​,0.9985​
+,,,,,,,
+Network​,​,,"(265,128,64,2)​",,,,
+,,,,,,,
+,,,Epochs=7​,,,,
+,,,,,,,
+,,,"Dropout r. =0.3,0.2,0.2​",,,,
+,,,,,,,
+Convolutional​,Standardizing features​,"92,802​","3 x Conv2D  (32, 64, 64)​",0.9991​,0.9985​,0.9983​,0.9987​
+,,,,,,,
+Neural Networks​,,,1 x Dense (64)​,,,,
+,,,,,,,
+,,,CrossEntropy loss​,,,,
+,,,,,,,
+,,,5 epochs​,,,,
+,,,,,,,
